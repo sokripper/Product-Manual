@@ -30,12 +30,18 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 strong{font-weight:680;color:var(--ink)}
 .topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
-.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
-.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar .in{max-width:1080px;margin:0 auto;padding:11px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.up{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:640;color:#fff;background:var(--accent);border-radius:8px;padding:8px 14px;white-space:nowrap;flex:none}
+.up:hover{text-decoration:none;filter:brightness(1.09)}
+.crumb{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);flex-wrap:wrap;min-width:0}
+.crumb a{color:var(--muted)}.crumb a:hover{color:var(--accent)}
+.crumb .sep{color:var(--faint)}
+.crumb .cur{color:var(--ink);font-weight:640}
+.topbar .sp{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.topbar .sp .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+.topbar a.tl{font-family:var(--mono);font-size:11px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
 .topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.topbar a.tl.on{color:#fff;background:var(--accent);border-color:var(--accent)}
 .themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
 .themebtn:hover{border-color:var(--accent);color:var(--accent)}
 .wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
@@ -109,8 +115,9 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 .protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
 .protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
 </style></head><body><div class="topbar"><div class="in">
-<span class="badge">服务商索赔管理</span><span class="nm">设计文档 / 开发计划 Plan.md</span>
-<div class="sp"><a class="tl" href="../../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+<a class="up" href="../index.html">← 返回总览</a>
+<nav class="crumb"><a href="../../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><a href="../index.html">产物站总览</a><span class="sep">›</span><span class="cur">开发计划 Plan.md</span></nav>
+<div class="sp"><span class="lbl">本站</span><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
 </div></div><main class="wrap"><h1>开发计划 Plan.md</h1><div class="p"><h1>开发计划</h1>
 <blockquote><p>设计阶段与开发阶段的衔接文件。所有开发进度以本文件为准。</p>
 <p>项目：服务商索赔管理模块（单模块，V1/MVP）。上游：<code>docs/PRD.md</code>、<code>docs/prototypes/</code>、<code>docs/detail-design/</code>、<code>docs/api-contracts/</code>、<code>docs/conventions.md</code>、<code>docs/db-schema/</code>。</p></blockquote>
@@ -173,4 +180,7 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <li>完整流程走通（新建索赔 → 初审 → 业务审核 →（向欣/判责）→ 结算 → 付款）</li>
 <li>验收（用户门禁）：全流程通过，无阻塞性 Bug</li>
 </ol></div>
-<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script></body></html>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>
+(function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();
+(function(){if('scrollRestoration' in history)history.scrollRestoration='manual';var key='sdd-scroll:'+location.pathname;if(!location.hash){try{var y=sessionStorage.getItem(key);if(y!==null){var r=document.documentElement,p=r.style.scrollBehavior;r.style.scrollBehavior='auto';window.scrollTo(0,parseInt(y,10)||0);r.style.scrollBehavior=p;}}catch(e){}}var t=null;window.addEventListener('scroll',function(){if(t)return;t=setTimeout(function(){t=null;try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}},150);},{passive:true});window.addEventListener('beforeunload',function(){try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}});})();
+</script></body></html>

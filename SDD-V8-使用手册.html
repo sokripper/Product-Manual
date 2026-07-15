@@ -47,7 +47,7 @@ strong{font-weight:680; color:var(--ink)}
 code{font-family:var(--mono); font-size:.85em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
 
 /* ---------- layout ---------- */
-.shell{display:grid; grid-template-columns:250px minmax(0,1fr); gap:0; max-width:1180px; margin:0 auto}
+.shell{display:grid; grid-template-columns:264px minmax(0,1fr); gap:0}
 .sidebar{
   position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
   border-right:1px solid var(--line); padding:26px 20px 60px; font-size:13px;
@@ -62,7 +62,7 @@ code{font-family:var(--mono); font-size:.85em; background:var(--code-bg); color:
 .nav a:hover{color:var(--ink); background:var(--surface-2); text-decoration:none}
 .nav a.on{color:var(--accent); border-left-color:var(--accent); background:var(--accent-soft)}
 .nav .grp{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin:16px 10px 6px}
-.main{min-width:0; padding:0 46px 140px}
+.main{min-width:0; padding:0 56px 140px; max-width:920px; margin:0 auto}
 .themebtn{margin-top:22px; font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:7px; padding:7px 11px; cursor:pointer; width:100%; text-align:left}
 .themebtn:hover{border-color:var(--accent); color:var(--accent)}
 
@@ -703,6 +703,28 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
   }
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
+})();
+// 记住并恢复上次阅读位置（从真实产物页返回时不再回到顶部）
+(function(){
+  if('scrollRestoration' in history) history.scrollRestoration='manual';
+  var key='sdd-scroll:'+location.pathname;
+  if(!location.hash){
+    try{
+      var y=sessionStorage.getItem(key);
+      if(y!==null){
+        var root=document.documentElement, prev=root.style.scrollBehavior;
+        root.style.scrollBehavior='auto';
+        window.scrollTo(0, parseInt(y,10)||0);
+        root.style.scrollBehavior=prev;
+      }
+    }catch(e){}
+  }
+  var t=null;
+  window.addEventListener('scroll', function(){
+    if(t) return;
+    t=setTimeout(function(){ t=null; try{sessionStorage.setItem(key, String(window.scrollY));}catch(e){} }, 150);
+  }, {passive:true});
+  window.addEventListener('beforeunload', function(){ try{sessionStorage.setItem(key, String(window.scrollY));}catch(e){} });
 })();
 </script>
 </body>

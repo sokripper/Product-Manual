@@ -30,12 +30,18 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 strong{font-weight:680;color:var(--ink)}
 .topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
-.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
-.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar .in{max-width:1080px;margin:0 auto;padding:11px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.up{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:640;color:#fff;background:var(--accent);border-radius:8px;padding:8px 14px;white-space:nowrap;flex:none}
+.up:hover{text-decoration:none;filter:brightness(1.09)}
+.crumb{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);flex-wrap:wrap;min-width:0}
+.crumb a{color:var(--muted)}.crumb a:hover{color:var(--accent)}
+.crumb .sep{color:var(--faint)}
+.crumb .cur{color:var(--ink);font-weight:640}
+.topbar .sp{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.topbar .sp .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+.topbar a.tl{font-family:var(--mono);font-size:11px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
 .topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.topbar a.tl.on{color:#fff;background:var(--accent);border-color:var(--accent)}
 .themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
 .themebtn:hover{border-color:var(--accent);color:var(--accent)}
 .wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
@@ -109,8 +115,9 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 .protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
 .protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
 </style></head><body><div class="topbar"><div class="in">
-<span class="badge">服务商索赔管理</span><span class="nm">测试用例</span>
-<div class="sp"><a class="tl" href="../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="index.html">总览</a><a class="tl" href="测试用例.html">测试用例</a><a class="tl" href="代码-前端.html">前端代码</a><a class="tl" href="代码-后端.html">后端代码</a><a class="tl" href="界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+<a class="up" href="index.html">← 返回总览</a>
+<nav class="crumb"><a href="../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><a href="index.html">产物站总览</a><span class="sep">›</span><span class="cur">测试用例</span></nav>
+<div class="sp"><span class="lbl">本站</span><a class="tl" href="index.html">总览</a><a class="tl on" href="测试用例.html">测试用例</a><a class="tl" href="代码-前端.html">前端代码</a><a class="tl" href="代码-后端.html">后端代码</a><a class="tl" href="界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
 </div></div><main class="wrap"><h1>测试用例</h1><div class="note ok"><b>阶段 G 冻结产物 · G-audit 全 PASS。</b>共 188 条用例，覆盖 6 个测试模块（每功能点 ≥1 条 P0 正向，带状态流转/校验/权限的补异常边界）。按 SDD 硬规则「测试数据」列一律留空，执行状态一律「待执行」。</div><div class="tabs"><button class="tab on" data-s="0">服务商索赔单 · 41</button><button class="tab" data-s="1">向欣旺达索赔单 · 38</button><button class="tab" data-s="2">结算 · 63</button><button class="tab" data-s="3">付款申请 · 31</button><button class="tab" data-s="4">结算基础配置 · 8</button><button class="tab" data-s="5">单据编码 · 7</button></div><div class="sheet on" data-s="0"><div class="meta">工作表「服务商索赔单」· 41 条用例 · 14 列（测试数据列按 SDD 规则留空）</div><div class="tablewrap"><table><thead><tr><th>测试用例ID</th><th>测试模块</th><th>模块核心功能</th><th>测试功能点</th><th>测试标题</th><th>角色</th><th>测试前置条件</th><th>测试数据</th><th>测试步骤</th><th>预期结果</th><th>测试类型</th><th>优先级</th><th>执行状态</th><th>备注</th></tr></thead><tbody><tr><td>TC001</td><td>服务商索赔单</td><td>新建索赔单</td><td>F-CLAIM-01</td><td>关联已完工保内工单新建暂存草稿（正向）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
 2. 存在一张状态为【已完工】且为保内、归属本服务商、维修方案已过技术审核的维修工单（工单库 Mock/待挂载）
 3. 该工单业务类型在 claim_type_mapping（enabled=1）中已配置映射
@@ -570,4 +577,7 @@ invoicePermissionFlag/forceSettleFlag/reconConfirmTime/settleTime 按单状态�
 2. 收集各请求最终生成的编号</td><td>1. 同（前缀+日期）序列行被 InnoDB 行锁串行化取号，current_seq 单调递增
 2. 各并发请求获得互不相同的流水，无重号
 3. 业务表唯一索引兜底任何绕过序列表的写入（冲突触发唯一约束异常并回滚）</td><td>并发测试</td><td>P0</td><td>待执行</td><td>conventions §7 并发唯一(D-编码-D1，序列表+同事务行锁) / 详细设计-单据编码.md「流水维度与并发唯一方案」</td></tr></tbody></table></div></div>
-<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script><script>document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){var s=t.dataset.s;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));document.querySelectorAll(".sheet").forEach(x=>x.classList.remove("on"));t.classList.add("on");document.querySelector(".sheet[data-s='"+s+"']").classList.add("on");});});</script></body></html>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>
+(function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();
+(function(){if('scrollRestoration' in history)history.scrollRestoration='manual';var key='sdd-scroll:'+location.pathname;if(!location.hash){try{var y=sessionStorage.getItem(key);if(y!==null){var r=document.documentElement,p=r.style.scrollBehavior;r.style.scrollBehavior='auto';window.scrollTo(0,parseInt(y,10)||0);r.style.scrollBehavior=p;}}catch(e){}}var t=null;window.addEventListener('scroll',function(){if(t)return;t=setTimeout(function(){t=null;try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}},150);},{passive:true});window.addEventListener('beforeunload',function(){try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}});})();
+</script><script>document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){var s=t.dataset.s;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));document.querySelectorAll(".sheet").forEach(x=>x.classList.remove("on"));t.classList.add("on");document.querySelector(".sheet[data-s='"+s+"']").classList.add("on");});});</script></body></html>
