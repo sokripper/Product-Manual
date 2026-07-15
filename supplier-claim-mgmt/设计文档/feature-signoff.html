@@ -1,0 +1,136 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>功能点确认书 · 冻结</title>
+<style>
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--cm:#6b7a90;--kw:#7aa2ff;--str:#e0a458;
+  --th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;
+  --ok:#1f9d55;--ok-soft:#e6f6ec;--warn:#b7791f;--warn-soft:#fdf3e2;--crit:#d64545;--crit-soft:#fbeaea;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}}
+:root[data-theme="dark"]{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}
+:root[data-theme="light"]{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-size:15px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{font-weight:680;color:var(--ink)}
+.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
+.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
+h1{font-size:30px;font-weight:760;margin:30px 0 8px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:21px;font-weight:710;margin:40px 0 12px;padding-top:18px;border-top:1px solid var(--line);letter-spacing:-.005em}
+h3{font-size:16.5px;font-weight:680;margin:26px 0 9px}
+h4{font-size:13.5px;font-weight:680;margin:18px 0 7px;color:var(--muted);font-family:var(--mono)}
+p{margin:11px 0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px}
+code{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);color:var(--accent-ink);padding:1.5px 6px;border-radius:5px}
+blockquote{margin:15px 0;padding:11px 16px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--muted);font-size:14px}
+blockquote p{margin:5px 0}blockquote strong{color:var(--ink)}
+ul,ol{margin:11px 0;padding-left:23px}li{margin:4px 0}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{background:var(--th-bg);color:var(--th-ink);font-weight:600;text-align:left;padding:9px 13px;white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.02em;position:sticky;top:0}
+td{padding:8px 13px;border-top:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+/* code walkthrough */
+.filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
+.filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.filecard .fh .tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px}
+.filecard .fh .tag.be{background:#8957e5}.filecard .fh .tag.fe{background:#1f9d55}.filecard .fh .tag.cfg{background:#b7791f}
+.filecard .fh .pth{font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+.filecard .role{padding:9px 15px;font-size:13px;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line-soft)}
+.filecard .role b{color:var(--accent-ink)}
+.codebox{background:var(--code-bg);overflow-x:auto;max-height:640px;overflow-y:auto}
+pre{margin:0;padding:14px 0}
+pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--code-ink);background:none;padding:0}
+.cl{display:block;counter-increment:l;padding:0 16px 0 0;white-space:pre}
+.cl::before{content:counter(l);display:inline-block;width:38px;padding-right:14px;margin-right:12px;text-align:right;color:#46536b;border-right:1px solid var(--code-line);user-select:none}
+.cl.cm{color:var(--cm)}
+/* tabs (xlsx sheets) */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.tab{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 13px;cursor:pointer}
+.tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sheet{display:none}.sheet.on{display:block}
+.sheet .meta{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:10px 0}
+.toc{display:flex;flex-direction:column;gap:2px;margin:12px 0 20px;font-family:var(--mono);font-size:12.5px}
+.toc a{color:var(--muted);padding:3px 0}.toc a:hover{color:var(--accent)}
+.doc-note{font-family:var(--mono);font-size:11px;color:var(--faint);margin:38px 0 0;padding-top:16px;border-top:1px dashed var(--line)}
+.p>*:first-child{margin-top:0}
+/* dashboard */
+.hero{padding:40px 0 8px}
+.hero .eb{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero p{font-size:16px;color:var(--muted);max-width:60ch;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:26px 0}
+.stat{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:14px 16px}
+.stat .n{font-size:22px;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .n.ok{color:var(--ok)}.stat .n.ac{color:var(--accent)}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px;margin:14px 0}
+.card{display:block;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 17px;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px)}
+.card .ct{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;display:inline-block}
+.card .ct.be{background:#8957e5}.card .ct.fe{background:#1f9d55}.card .ct.ui{background:#0e8a9c}.card .ct.doc{background:#b7791f}
+.card h3{margin:11px 0 5px;font-size:16px;color:var(--ink)}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.grouplabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:30px 0 4px}
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;background:var(--surface)}
+.shot .cap{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.shot .cap .t{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#0e8a9c;border-radius:5px;padding:2px 8px}
+.shot .cap b{font-size:14px}.shot .cap span{font-size:12.5px;color:var(--muted)}
+.shot img{display:block;width:100%;height:auto}
+.protolist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin:12px 0}
+.protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
+.protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+</style></head><body><div class="topbar"><div class="in">
+<span class="badge">服务商索赔管理</span><span class="nm">设计文档 / 功能点确认书 · 冻结</span>
+<div class="sp"><a class="tl" href="../../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+</div></div><main class="wrap"><h1>功能点确认书 · 冻结</h1><div class="p"><h1>功能点确认书（feature-signoff）</h1>
+<blockquote><p>服务商索赔管理模块 · 产品设计冻结合同。开发侧只读消费本合同实现，变更走第四节「变更登记」。</p>
+<p>依据 templates/feature-signoff.md 与 SKILL.md「产品设计冻结与交接」构建。</p></blockquote>
+<h2>一、功能点逐条确认</h2>
+<div class="tablewrap"><table><thead><tr><th>功能编号</th><th>功能名称</th><th>PRD</th><th>原型</th><th>接口契约</th><th>详细设计(LLD)</th><th>测试用例数</th><th>确认状态</th></tr></thead><tbody><tr><td>F-CLAIM-01</td><td>新建索赔</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>6</td><td>已确认</td></tr><tr><td>F-CLAIM-02</td><td>提交索赔</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>5</td><td>已确认</td></tr><tr><td>F-CLAIM-03</td><td>编辑</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>4</td><td>已确认</td></tr><tr><td>F-CLAIM-04</td><td>作废</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>2</td><td>已确认</td></tr><tr><td>F-CLAIM-05</td><td>查看</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>2</td><td>已确认</td></tr><tr><td>F-CLAIM-06</td><td>区域初审</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>6</td><td>已确认</td></tr><tr><td>F-CLAIM-07</td><td>业务审核</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>6</td><td>已确认</td></tr><tr><td>F-CLAIM-08</td><td>责任判定</td><td>PRD.md S4.1</td><td>P02</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>5</td><td>已确认</td></tr><tr><td>F-CLAIM-09</td><td>搜索/导出</td><td>PRD.md S4.1</td><td>P01</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>3</td><td>已确认</td></tr><tr><td>F-CLAIM-10</td><td>批量审核</td><td>PRD.md S4.1</td><td>P01</td><td>api-contracts/接口文档-服务商索赔单.md</td><td>detail-design/详细设计-服务商索赔单.md</td><td>2</td><td>已确认</td></tr><tr><td>F-XW-01</td><td>向欣单生成</td><td>PRD.md S4.2</td><td>P04</td><td>api-contracts/接口文档-向欣旺达索赔单.md</td><td>detail-design/详细设计-向欣旺达索赔单.md</td><td>11</td><td>已确认</td></tr><tr><td>F-XW-02</td><td>提交/审批</td><td>PRD.md S4.2</td><td>P04</td><td>api-contracts/接口文档-向欣旺达索赔单.md</td><td>detail-design/详细设计-向欣旺达索赔单.md</td><td>22</td><td>已确认</td></tr><tr><td>F-XW-03</td><td>查看/导出</td><td>PRD.md S4.2</td><td>P03</td><td>api-contracts/接口文档-向欣旺达索赔单.md</td><td>detail-design/详细设计-向欣旺达索赔单.md</td><td>5</td><td>已确认</td></tr><tr><td>F-SET-01</td><td>自动生成结算单</td><td>PRD.md S4.3</td><td>P05</td><td>api-contracts/接口文档-结算.md</td><td>detail-design/详细设计-结算.md</td><td>9</td><td>已确认</td></tr><tr><td>F-SET-02</td><td>结算确认/对账</td><td>PRD.md S4.3</td><td>P06</td><td>api-contracts/接口文档-结算.md</td><td>detail-design/详细设计-结算.md</td><td>14</td><td>已确认</td></tr><tr><td>F-SET-03</td><td>正数结算-开票</td><td>PRD.md S4.3</td><td>P06</td><td>api-contracts/接口文档-结算.md</td><td>detail-design/详细设计-结算.md</td><td>8</td><td>已确认</td></tr><tr><td>F-SET-04</td><td>发票核验/申请付款</td><td>PRD.md S4.3</td><td>P06</td><td>api-contracts/接口文档-结算.md</td><td>detail-design/详细设计-结算.md</td><td>7</td><td>已确认</td></tr><tr><td>F-SET-05</td><td>负数强制结算</td><td>PRD.md S4.3</td><td>P06</td><td>api-contracts/接口文档-结算.md</td><td>detail-design/详细设计-结算.md</td><td>8</td><td>已确认</td></tr><tr><td>F-SET-06</td><td>闪欣结算</td><td>PRD.md S4.3</td><td>P08</td><td>api-contracts/接口文档-结算.md</td><td>detail-design/详细设计-结算.md</td><td>11</td><td>已确认</td></tr><tr><td>F-SET-07</td><td>查询/导出</td><td>PRD.md S4.3</td><td>P05/P07</td><td>api-contracts/接口文档-结算.md</td><td>detail-design/详细设计-结算.md</td><td>6</td><td>已确认</td></tr><tr><td>F-PAY-01</td><td>付款申请生成</td><td>PRD.md S4.4</td><td>P11</td><td>api-contracts/接口文档-付款申请.md</td><td>detail-design/详细设计-付款申请.md</td><td>8</td><td>已确认</td></tr><tr><td>F-PAY-02</td><td>提交/分级审批</td><td>PRD.md S4.4</td><td>P10</td><td>api-contracts/接口文档-付款申请.md</td><td>detail-design/详细设计-付款申请.md</td><td>8</td><td>已确认</td></tr><tr><td>F-PAY-03</td><td>审批/驳回</td><td>PRD.md S4.4</td><td>P10</td><td>api-contracts/接口文档-付款申请.md</td><td>detail-design/详细设计-付款申请.md</td><td>6</td><td>已确认</td></tr><tr><td>F-PAY-04</td><td>付款/作废</td><td>PRD.md S4.4</td><td>P10</td><td>api-contracts/接口文档-付款申请.md</td><td>detail-design/详细设计-付款申请.md</td><td>5</td><td>已确认</td></tr><tr><td>F-PAY-05</td><td>查询/导出/批量审核</td><td>PRD.md S4.4</td><td>P09</td><td>api-contracts/接口文档-付款申请.md</td><td>detail-design/详细设计-付款申请.md</td><td>4</td><td>已确认</td></tr><tr><td>F-CFG-01</td><td>结算基础配置</td><td>PRD.md S4.5</td><td>P12</td><td>结算配置接口</td><td>—</td><td>8</td><td>已确认</td></tr><tr><td>F-CODE-01</td><td>单据编码（跨单据）</td><td>PRD.md S10</td><td>—</td><td>conventions S7</td><td>detail-design/详细设计-单据编码.md</td><td>7</td><td>已确认</td></tr></tbody></table></div>
+<blockquote><p>合计 27 功能点，测试用例 188 条（覆盖矩阵 <code>.sdd/traceability/测试覆盖矩阵.md</code>，每功能点 ≥1 P0 正向，无孤儿无漏项，G-audit 全 PASS）。</p></blockquote>
+<h2>二、冻结元数据</h2>
+<div class="tablewrap"><table><thead><tr><th>项</th><th>值</th></tr></thead><tbody><tr><td>冻结版本</td><td>v1.0</td></tr><tr><td>冻结时间</td><td>2026-07-14</td></tr><tr><td>确认人</td><td>产品经理 + 研发组长（本会话逐条确认）</td></tr><tr><td>冻结 commit</td><td><code>88ed0f850780e2f012229395c4fa6d109c2d04b7</code></td></tr></tbody></table></div>
+<h2>三、冻结声明</h2>
+<ul>
+<li>本合同一经冻结，开发侧（Planner/Developer/Tester）<strong>只读消费</strong> PRD / 原型 / api-contracts / detail-design / db-schema / test-cases，不回头改需求或重设计。</li>
+<li>决策清零：A0 40 + D/E 33 共 73 项全部处置（60 已确认 / 21 已确认(D/E) 更正见决策表 / 10 待文档 / 2 待契约，无 PENDING）。待文档/待契约项为显式挂起，登记如下。</li>
+</ul>
+<h3>显式挂起项（待文档/待契约，开发按已确认 Mock/待挂载边界执行）</h3>
+<ul>
+<li>待文档(10)：含批量审核语义细化(E-通用-B1)、配置字段级校验(D-配置-B1)、导出通用规格(E-通用-B2)、原型旧态同步(D-付款-B5)等，开发对应功能前回看定稿。</li>
+<li>待契约(2)：回运单实体归属(D-索赔-B3)、内部责任 OA 转嫁(D-索赔-B6)，外部契约到位后补。</li>
+<li>外部系统 QMS/财务共享/OA/工单本期 Mock/内建/待挂载（待料清单 EXT-01~06）。</li>
+</ul>
+<h2>四、变更登记</h2>
+<blockquote><p>冻结后任何设计变更在此登记（变更项 / 影响功能点 / 新版本 / 确认人 / 时间），并重新冻结受影响功能点。</p></blockquote>
+<div class="tablewrap"><table><thead><tr><th>变更项</th><th>影响功能点</th><th>新版本</th><th>确认人</th><th>时间</th></tr></thead><tbody><tr><td>（暂无）</td><td></td><td></td><td></td><td></td></tr></tbody></table></div></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script></body></html>

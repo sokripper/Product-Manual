@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDD V8 使用手册</title>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --surface-2:#fbfcfe; --ink:#12161c; --muted:#5b6673; --faint:#8a95a3;
+  --line:#e3e8ef; --line-soft:#eef1f6; --accent:#2f6bff; --accent-ink:#1d4fd0; --accent-soft:#eaf0ff;
+  --code-bg:#eef2f8; --code-ink:#1f6feb; --quote-bg:#eff4fc; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --ok:#1f9d55; --ok-soft:#e6f6ec; --warn:#b7791f; --warn-soft:#fdf3e2; --crit:#d64545; --crit-soft:#fbeaea;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0a0d12; --surface:#12171f; --surface-2:#0f141b; --ink:#e7edf5; --muted:#94a1b2; --faint:#66707d;
+    --line:#212a37; --line-soft:#1a222d; --accent:#5b8bff; --accent-ink:#8fb0ff; --accent-soft:#152036;
+    --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#111927; --quote-bar:#5b8bff;
+    --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f141b;
+    --ok:#3fb950; --ok-soft:#122019; --warn:#d9a441; --warn-soft:#241d10; --crit:#f07a7a; --crit-soft:#241414;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a0d12; --surface:#12171f; --surface-2:#0f141b; --ink:#e7edf5; --muted:#94a1b2; --faint:#66707d;
+  --line:#212a37; --line-soft:#1a222d; --accent:#5b8bff; --accent-ink:#8fb0ff; --accent-soft:#152036;
+  --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#111927; --quote-bar:#5b8bff;
+  --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f141b;
+  --ok:#3fb950; --ok-soft:#122019; --warn:#d9a441; --warn-soft:#241d10; --crit:#f07a7a; --crit-soft:#241414;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --surface:#ffffff; --surface-2:#fbfcfe; --ink:#12161c; --muted:#5b6673; --faint:#8a95a3;
+  --line:#e3e8ef; --line-soft:#eef1f6; --accent:#2f6bff; --accent-ink:#1d4fd0; --accent-soft:#eaf0ff;
+  --code-bg:#eef2f8; --code-ink:#1f6feb; --quote-bg:#eff4fc; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --ok:#1f9d55; --ok-soft:#e6f6ec; --warn:#b7791f; --warn-soft:#fdf3e2; --crit:#d64545; --crit-soft:#fbeaea;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.72; font-size:15px; letter-spacing:.01em}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline}
+strong{font-weight:680; color:var(--ink)}
+code{font-family:var(--mono); font-size:.85em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
+
+/* ---------- layout ---------- */
+.shell{display:grid; grid-template-columns:250px minmax(0,1fr); gap:0; max-width:1180px; margin:0 auto}
+.sidebar{
+  position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+  border-right:1px solid var(--line); padding:26px 20px 60px; font-size:13px;
+}
+.sidebar .brand{display:flex; align-items:center; gap:9px; margin-bottom:22px}
+.logo{width:26px; height:26px; border-radius:7px; background:var(--accent); position:relative; flex:none}
+.logo::before{content:""; position:absolute; inset:6px; border:2px solid #fff; border-radius:3px; opacity:.9}
+.logo::after{content:""; position:absolute; left:11px; top:6px; bottom:6px; width:2px; background:#fff; opacity:.9}
+.brand b{font-size:14px; letter-spacing:.02em}
+.brand span{font-family:var(--mono); font-size:10px; color:var(--faint); display:block; letter-spacing:.1em}
+.nav a{display:block; color:var(--muted); padding:5px 10px; border-radius:6px; border-left:2px solid transparent; margin:1px 0}
+.nav a:hover{color:var(--ink); background:var(--surface-2); text-decoration:none}
+.nav a.on{color:var(--accent); border-left-color:var(--accent); background:var(--accent-soft)}
+.nav .grp{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin:16px 10px 6px}
+.main{min-width:0; padding:0 46px 140px}
+.themebtn{margin-top:22px; font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:7px; padding:7px 11px; cursor:pointer; width:100%; text-align:left}
+.themebtn:hover{border-color:var(--accent); color:var(--accent)}
+
+/* ---------- hero ---------- */
+.hero{padding:54px 0 30px; border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:14px}
+.hero h1{font-size:38px; line-height:1.15; font-weight:780; margin:0 0 16px; letter-spacing:-.02em; text-wrap:balance}
+.hero .lede{font-size:17px; color:var(--muted); max-width:60ch; margin:0}
+.hero .lede b{color:var(--ink)}
+.pillrow{display:flex; flex-wrap:wrap; gap:8px; margin-top:24px}
+.pill{font-family:var(--mono); font-size:11px; letter-spacing:.03em; color:var(--muted); border:1px solid var(--line); border-radius:20px; padding:5px 12px; background:var(--surface)}
+.pill b{color:var(--accent); font-weight:600}
+
+/* ---------- section ---------- */
+section{padding-top:26px; scroll-margin-top:20px}
+h2{font-size:23px; font-weight:720; margin:40px 0 6px; letter-spacing:-.01em; display:flex; align-items:baseline; gap:12px}
+h2 .idx{font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:500}
+.sub{color:var(--muted); margin:0 0 20px; font-size:14.5px}
+h3{font-size:17px; font-weight:680; margin:28px 0 10px}
+p{margin:12px 0}
+
+/* ---------- pipeline diagram ---------- */
+.pipe{border:1px solid var(--line); border-radius:14px; background:var(--surface); overflow:hidden; margin:22px 0}
+.pipe .lane{display:grid; grid-template-columns:118px 1fr; border-top:1px solid var(--line-soft)}
+.pipe .lane:first-child{border-top:none}
+.pipe .lane .who{padding:16px 14px; font-size:12px; background:var(--surface-2); border-right:1px solid var(--line-soft); display:flex; flex-direction:column; gap:3px; justify-content:center}
+.pipe .lane .who b{font-size:12.5px}
+.pipe .lane .who span{font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; color:var(--faint); text-transform:uppercase}
+.pipe .lane .steps{display:flex; flex-wrap:wrap; gap:8px; padding:14px}
+.node{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:7px 11px; white-space:nowrap}
+.node .k{font-family:var(--mono); font-weight:600; color:var(--accent); font-size:11px}
+.node.audit{border-style:dashed; border-color:var(--ok); background:var(--ok-soft); color:var(--muted)}
+.node.audit .k{color:var(--ok)}
+.node.freeze{border-color:var(--accent); background:var(--accent-soft)}
+.node.freeze .k{color:var(--accent-ink)}
+.arrow{color:var(--faint); align-self:center; font-size:13px}
+.handoff{grid-column:1/-1; text-align:center; font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); padding:8px; background:var(--accent-soft); border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft)}
+
+/* ---------- tables ---------- */
+.tablewrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:11px}
+table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums}
+th{background:var(--th-bg); color:var(--th-ink); font-weight:600; text-align:left; padding:10px 14px; white-space:nowrap; font-family:var(--mono); font-size:11.5px; letter-spacing:.02em}
+td{padding:10px 14px; border-top:1px solid var(--line-soft); vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+td code{white-space:nowrap}
+
+/* ---------- stage card ---------- */
+.stage{border:1px solid var(--line); border-radius:14px; background:var(--surface); margin:16px 0; overflow:hidden}
+.stage > .head{display:flex; align-items:center; gap:14px; padding:16px 20px; border-bottom:1px solid var(--line-soft); background:var(--surface-2)}
+.stage .code{font-family:var(--mono); font-weight:700; font-size:14px; color:#fff; background:var(--accent); border-radius:8px; padding:5px 11px; flex:none; letter-spacing:.02em}
+.stage.opt .code{background:var(--warn)}
+.stage.dev .code{background:var(--ink)}
+.stage .head h4{margin:0; font-size:16px; font-weight:700}
+.stage .head .role{margin-left:auto; font-family:var(--mono); font-size:10.5px; color:var(--muted); text-align:right; letter-spacing:.03em}
+.stage .body{padding:16px 20px}
+.stage .body > p{margin:6px 0 12px}
+.kv{display:flex; gap:10px; margin:7px 0; font-size:13.5px; align-items:baseline}
+.kv .t{font-family:var(--mono); font-size:11px; color:var(--faint); text-transform:uppercase; letter-spacing:.06em; flex:none; width:64px; padding-top:2px}
+.deliv{margin-top:14px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); padding:13px 15px}
+.deliv .lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:9px}
+.deliv .files{display:flex; flex-direction:column; gap:6px}
+.deliv .file{font-family:var(--mono); font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.deliv .file .path{color:var(--ink)}
+.prev{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:11px; color:var(--accent); border:1px solid var(--accent); border-radius:6px; padding:2px 9px; background:transparent}
+.prev:hover{background:var(--accent-soft); text-decoration:none}
+.prev::before{content:"▸"; font-size:9px}
+
+.audit-tag{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:11px; color:var(--ok); background:var(--ok-soft); border:1px solid var(--ok); border-radius:6px; padding:3px 9px; margin-top:12px}
+.audit-tag::before{content:"◈"}
+.realart{display:flex; align-items:center; gap:10px; font-size:13px; color:var(--accent-ink); background:var(--accent-soft); border:1px solid var(--accent); border-radius:9px; padding:9px 13px; margin-top:12px; font-weight:600; flex-wrap:wrap}
+.realart:hover{text-decoration:none; background:var(--accent); color:#fff}
+.realart:hover .lead, .realart:hover .arw{color:#fff}
+.realart .lead{font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); background:var(--surface); border:1px solid var(--accent); border-radius:5px; padding:2px 7px; font-weight:600; flex:none}
+.realart .arw{margin-left:auto; color:var(--accent)}
+.casebar{display:flex; align-items:center; gap:16px; border:1px solid var(--accent); background:var(--accent-soft); border-radius:14px; padding:16px 20px; margin:22px 0 4px; flex-wrap:wrap}
+.casebar .ic{width:38px; height:38px; border-radius:9px; background:var(--accent); flex:none; position:relative}
+.casebar .ic::before{content:"⌘"; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:18px}
+.casebar .tx{flex:1; min-width:220px}
+.casebar .tx b{font-size:15px}
+.casebar .tx p{margin:3px 0 0; font-size:13px; color:var(--muted)}
+.casebar .go{font-family:var(--mono); font-size:12px; color:#fff; background:var(--accent); border-radius:8px; padding:9px 15px; white-space:nowrap}
+.casebar .go:hover{text-decoration:none; filter:brightness(1.08)}
+
+/* ---------- callouts ---------- */
+.note{border-left:3px solid var(--quote-bar); background:var(--quote-bg); border-radius:0 9px 9px 0; padding:12px 16px; margin:16px 0; font-size:14px; color:var(--muted)}
+.note b{color:var(--ink)}
+.note.warn{border-color:var(--warn); background:var(--warn-soft)}
+.note.crit{border-color:var(--crit); background:var(--crit-soft)}
+
+/* ---------- code example ---------- */
+pre{background:var(--code-bg); border:1px solid var(--line); border-radius:11px; padding:15px 17px; overflow-x:auto; margin:14px 0}
+pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.62}
+
+/* ---------- gate list ---------- */
+.gates{counter-reset:g; list-style:none; padding:0; margin:16px 0; display:grid; gap:8px}
+.gates li{counter-increment:g; position:relative; padding:11px 15px 11px 46px; border:1px solid var(--line); border-radius:9px; background:var(--surface); font-size:14px}
+.gates li::before{content:counter(g); position:absolute; left:13px; top:11px; font-family:var(--mono); font-size:11px; font-weight:700; color:#fff; background:var(--accent); width:20px; height:20px; border-radius:5px; display:grid; place-items:center}
+.gates li.hot{border-color:var(--accent)}
+.gates li.hot::before{background:var(--crit)}
+
+.prio{font-family:var(--mono); font-size:13px; background:var(--code-bg); border:1px solid var(--line); border-radius:9px; padding:13px 16px; margin:14px 0; text-align:center; color:var(--muted); letter-spacing:.02em}
+.prio b{color:var(--crit)}
+
+.footer{margin-top:60px; padding-top:22px; border-top:1px solid var(--line); font-size:13px; color:var(--muted)}
+.footer .big{font-size:15px; color:var(--ink); font-weight:600; margin-bottom:6px}
+
+@media (max-width:880px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:0 22px 100px}
+  .hero h1{font-size:30px}
+  .pipe .lane{grid-template-columns:88px 1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="logo"></div>
+    <div><b>SDD V8</b><span>USER MANUAL</span></div>
+  </div>
+  <nav class="nav" id="nav">
+    <a href="supplier-claim-mgmt/index.html" style="color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);font-weight:600">⌘ 真实案例产物站 →</a>
+    <a href="#intro">定位与核心概念</a>
+    <a href="#start">快速上手 · 六大入口</a>
+    <a href="#flow">全流程全景图</a>
+    <a href="#roles">角色区分</a>
+    <div class="grp">产品侧节点</div>
+    <a href="#stage-r">R · 需求澄清</a>
+    <a href="#stage-a">A · PRD + 数据契约</a>
+    <a href="#stage-b">B1 / B2 · 规格 + 原型</a>
+    <a href="#stage-c">C · PRD 定稿</a>
+    <a href="#stage-d">D · 详细设计 LLD ★</a>
+    <a href="#stage-e">E · 接口契约</a>
+    <a href="#stage-f">F · 开发计划</a>
+    <a href="#stage-g">G · 测试用例</a>
+    <a href="#freeze">冻结 · 确认书</a>
+    <div class="grp">研发侧节点</div>
+    <a href="#dev">Planner→Developer→Tester</a>
+    <div class="grp">参考</div>
+    <a href="#manifest">产出物总清单</a>
+    <a href="#gates">门禁与硬规则</a>
+    <a href="#howto">常见操作手册</a>
+    <a href="#exp">三级经验 · 技术栈</a>
+  </nav>
+  <button class="themebtn" id="themebtn" type="button">◐ 切换深浅色</button>
+</aside>
+
+<!-- ===================== MAIN ===================== -->
+<main class="main">
+
+<header class="hero" id="top">
+  <div class="eyebrow">Spec-Driven Development · V8</div>
+  <h1>把需求做实、逐条冻结，<br>再让 AI 只读实现。</h1>
+  <p class="lede">SDD V8 是一套<b>项目管理型、多平台 AI 研发流水线</b>。它把工作切成两侧接力——产品侧负责设计并冻结，研发侧拿冻结合同只读实现，独立审计员全程抓幻觉。<b>人拍板，Agent 执行，门禁把关。</b></p>
+  <div class="pillrow">
+    <span class="pill">三端入口 · <b>Codex / Claude Code / Cursor</b></span>
+    <span class="pill">默认栈 · <b>Spring Boot 3 + React/TS</b></span>
+    <span class="pill">交接合同 · <b>feature-signoff</b></span>
+    <span class="pill">四道独立审计 · <b>A0.5 / D3.5 / E2 / G-audit</b></span>
+  </div>
+</header>
+
+<!-- ===== INTRO ===== -->
+<section id="intro">
+  <h2><span class="idx">01</span>定位与核心概念</h2>
+  <p class="sub">先搞懂这几个词，后面全流程就顺了。</p>
+  <div class="note"><b>V5 是"项目内的开发规范包"，V8 是"管理多个项目的 AI 研发流水线"。</b> 它先管理项目仓库 <code>Projects_Repo/</code>，再按你的意图进入六大分支之一，然后在单个项目里跑完整的产品设计→多 Agent 开发→测试→修复流水线。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>概念</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><b>Harness 根目录</b></td><td>你打开的这个仓库根。只放规则和适配，<b>不放业务代码</b>。</td></tr>
+      <tr><td><code>harness-core/</code></td><td>唯一真相源。所有流程规则、角色定义、开发规范都在这。</td></tr>
+      <tr><td><code>.claude/ .codex/ .cursor/</code></td><td>平台适配层。只做"入口翻译"，不复制流程。</td></tr>
+      <tr><td><code>Projects_Repo/&lt;id&gt;/</code></td><td>所有业务项目都放这里，一个项目一个目录。</td></tr>
+      <tr><td><code>docs/</code></td><td>项目的<b>设计文档</b>（PRD、原型、接口契约、详细设计…）。</td></tr>
+      <tr><td><code>.sdd/</code></td><td>项目的<b>状态大脑</b>（任务、状态机、经验、日志、测试报告、审计报告）。</td></tr>
+      <tr><td><b>两侧接力</b></td><td>产品侧（设计域）与研发侧（执行域）分离，可换人、换会话。</td></tr>
+      <tr><td><b>冻结合同</b></td><td><code>docs/feature-signoff.md</code>，产品侧交给研发侧的唯一凭证。</td></tr>
+      <tr><td><b>门禁 gate</b></td><td>每阶段结束必须用户确认才能进下一步；不满足条件就卡住。</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ===== START ===== -->
+<section id="start">
+  <h2><span class="idx">02</span>快速上手 · 你只需要说人话</h2>
+  <p class="sub">SDD V8 几乎不用手动命令。你用自然语言表达意图，Router 自动分发到六大分支。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>你想做的事</th><th>你可以这么说</th><th>进入的分支</th></tr></thead>
+    <tbody>
+      <tr><td>从零做个新应用</td><td>"新建项目 / 做一个 XX 系统 / 从零开始"</td><td>① 新建项目</td></tr>
+      <tr><td>改已有项目的设计</td><td>"改需求 / 加个功能的设计 / 调整接口契约"</td><td>② 设计修整</td></tr>
+      <tr><td>把老代码纳入管理</td><td>"把这个已有项目接入 SDD / 导入代码库"</td><td>③ 导入项目</td></tr>
+      <tr><td>不要某个项目了</td><td>"删除项目 / 这个项目不要了"</td><td>④ 删除项目</td></tr>
+      <tr><td>开始写代码</td><td>"开始开发 / 继续开发 / 接手这个项目"</td><td>⑤ 开始/继续开发</td></tr>
+      <tr><td>修已交付功能的 Bug</td><td>"修一下这个 bug" 或 <code>/sdd-bugfix</code></td><td>⑥ Bugfix</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">意图不清楚时，Router 只问你一句：<b>"你现在是产品侧的事，还是研发侧的事？"</b></div>
+</section>
+
+<!-- ===== FLOW ===== -->
+<section id="flow">
+  <h2><span class="idx">03</span>全流程全景图</h2>
+  <p class="sub">阶段字母就是真实执行顺序：R→A→B1→B2→C→(D)→E→F→G→冻结→开发。E/F/G 都在产品交接点之后由研发组长生成。</p>
+  <div class="pipe">
+    <div class="lane">
+      <div class="who"><b>产品经理</b><span>Product</span></div>
+      <div class="steps">
+        <span class="node"><span class="k">R</span>需求澄清·竞品调研</span><span class="arrow">→</span>
+        <span class="node"><span class="k">A</span>PRD初稿·数据契约</span>
+        <span class="node audit"><span class="k">A0.5</span>需求盲扫审计</span><span class="arrow">→</span>
+        <span class="node"><span class="k">B1</span>Design Spec</span><span class="arrow">→</span>
+        <span class="node"><span class="k">B2</span>原型·用户验收</span><span class="arrow">→</span>
+        <span class="node"><span class="k">C</span>PRD定稿</span><span class="arrow">→</span>
+        <span class="node"><span class="k">D</span>详细设计 LLD ★条件触发</span>
+        <span class="node audit"><span class="k">D3.5</span>LLD审计</span>
+      </div>
+    </div>
+    <div class="handoff">↓ 产品交接点 · git push → 组长 pull ↓</div>
+    <div class="lane">
+      <div class="who"><b>研发组长</b><span>Dev Lead</span></div>
+      <div class="steps">
+        <span class="node"><span class="k">E</span>接口契约</span>
+        <span class="node audit"><span class="k">E2</span>契约审计</span><span class="arrow">→</span>
+        <span class="node"><span class="k">F</span>Plan.md</span><span class="arrow">→</span>
+        <span class="node"><span class="k">G</span>测试用例·数据留空</span>
+        <span class="node audit"><span class="k">G-audit</span>用例审计</span><span class="arrow">→</span>
+        <span class="node freeze"><span class="k">❄</span>feature-signoff 冻结</span>
+      </div>
+    </div>
+    <div class="handoff">═══ 冻结合同 · 唯一交接凭证 ═══</div>
+    <div class="lane">
+      <div class="who"><b>开发侧</b><span>Engineering</span></div>
+      <div class="steps">
+        <span class="node"><span class="k">P</span>Planner 拆任务</span><span class="arrow">→</span>
+        <span class="node"><span class="k">D</span>Developer 写代码</span><span class="arrow">→</span>
+        <span class="node"><span class="k">T</span>Tester 独立验证</span><span class="arrow">→</span>
+        <span class="node">用户门禁</span><span class="arrow">→</span>
+        <span class="node">E2E 回归·交付</span>
+      </div>
+    </div>
+  </div>
+  <div class="note"><b>独立审计员 design-auditor</b> 贯穿关键节点：有罪推定、只审不改、不看生成过程，专抓四类幻觉（无据 / 强化 / 调和 / 假确认点）与遗漏。虚线节点即四道审计。</div>
+</section>
+
+<!-- ===== ROLES ===== -->
+<section id="roles">
+  <h2><span class="idx">04</span>角色区分 · 人 + Agent</h2>
+  <p class="sub">SDD V8 不是一个角色端到端跑完。它把工作切成"人负责拍板、Agent 负责执行"。</p>
+  <h3>人侧角色</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>角色</th><th>负责什么</th><th>在哪拍板</th></tr></thead>
+    <tbody>
+      <tr><td><b>产品经理</b></td><td>需求与设计的负责人</td><td>R→A→B1→B2→C 全程，D 决策拍板</td></tr>
+      <tr><td><b>研发组长</b></td><td>接口契约 / Plan / 测试用例 / 冻结签署</td><td>E / F / G / 冻结，研发侧最终负责人</td></tr>
+      <tr><td><b>底层研发</b></td><td>研发侧会话操作者（驱动流程、过门禁、处理阻塞）</td><td>开发执行</td></tr>
+      <tr><td><b>业务方 / 用户</b></td><td>需求来源与最终验收人</td><td>每个功能闭环的用户门禁</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn">同一个人可兼多角色，但<b>不能在完成产品工作的同一轮里自动切成研发组长</b>——必须由后续新的用户轮次显式接棒。这是硬门禁。</div>
+  <h3>Agent 角色</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Agent</th><th>身份</th><th>职责</th><th>关键原则</th></tr></thead>
+    <tbody>
+      <tr><td><b>主会话</b><br>Orchestrator</td><td>编排者</td><td>产品侧各阶段执行者；研发侧编排 Planner→Developer→Tester</td><td><b>绝不在主会话直接写功能代码</b>绕过角色边界</td></tr>
+      <tr><td><b>Planner</b></td><td>技术方案设计</td><td>把 PRD/Plan 拆成任务状态机 <code>.sdd/tasks.md</code></td><td>验收标准要让非技术用户从页面看懂</td></tr>
+      <tr><td><b>Developer</b></td><td>代码实现</td><td>按任务写代码，一次只做一个</td><td>只写满足需求的最小代码；严守规范</td></tr>
+      <tr><td><b>Tester</b></td><td>独立验证</td><td>逐条独立验收</td><td>不信任 Developer 声明，只信可复现证据</td></tr>
+      <tr><td><b>design-auditor</b></td><td>独立审计员</td><td>A0.5 / D3.5 / E2 / G-audit 四道审计</td><td>有罪推定，只审不改，不看生成过程</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">关键边界：Agent 是执行工具，<b>不承担最终拍板（Accountable）</b>——每个环节的拍板人必须是人。</div>
+</section>
+
+<!-- ===================== 产品侧节点 ===================== -->
+<section id="nodes">
+  <h2><span class="idx">05</span>节点逐个讲 · 跟着真实项目走</h2>
+  <p class="sub">下面每个阶段都标清：谁做、产出什么文件、文件长什么样。每个节点都挂了一枚 <span style="color:var(--accent-ink);font-weight:600">🔗 真实产物</span> 链接，点开就是真实项目《服务商索赔管理模块》在该节点<b>实际生成的产物</b>——把手册的抽象说明代入具体产物，理解更快。</p>
+
+  <div class="casebar">
+    <div class="ic"></div>
+    <div class="tx"><b>贯穿案例 · 服务商索赔管理模块</b><p>一个走完 A0~G 全流程、设计冻结 v1.0 的真实 V8 项目（27 功能点、188 测试用例）。研发侧已跑通最小场景 F-CLAIM-05（列表+详情）的前后端闭环。下文每个节点的「真实产物」都来自它。</p></div>
+    <a class="go" href="supplier-claim-mgmt/index.html">打开案例产物站 →</a>
+  </div>
+  <p class="sub" style="margin-top:14px">另注：阶段 D 还额外保留了几份跨项目的<b>标杆/压测样例</b>（经销商新能源订单、整车市场活动管理），用于对照"一份合格 LLD 的颗粒度"。</p>
+
+  <!-- R -->
+  <div class="stage" id="stage-r">
+    <div class="head"><span class="code">R</span><h4>需求澄清 + 竞品调研</h4><span class="role">主会话 · 产品经理拍板</span></div>
+    <div class="body">
+      <p>把用户的大段想法整理成清晰的业务目标、范围、场景、验收口径；调研竞品；沉淀视觉证据。</p>
+      <div class="kv"><span class="t">产出</span><span>需求澄清结论（一般合并进 PRD，不单独建文件）；大功能落 <code>docs/澄清文档/&lt;feature&gt;/01-alignment.md</code></span></div>
+      <div class="deliv">
+        <div class="lbl">可预览产物样例</div>
+        <div class="files">
+          <div class="file"><span class="path">整车市场活动管理-产品补充需求清单.md</span><a class="prev" href="samples/整车市场活动管理-产品补充需求清单.html">预览</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A -->
+  <div class="stage" id="stage-a">
+    <div class="head"><span class="code">A</span><h4>PRD 初稿 + 数据契约 + 外部依赖</h4><span class="role">主会话 · 产品经理拍板</span></div>
+    <div class="body">
+      <p>产出 PRD 初稿（A1→A5），核心是<b>数据契约确认清单</b>和<b>接口响应格式契约</b>；A5-3 登记所有外部依赖（LLM/支付/短信/对象存储等供应商、密钥来源、配置字段）。</p>
+      <div class="kv"><span class="t">产出</span><span><code>docs/PRD.md</code>（含完整数据契约章节）</span></div>
+      <div class="audit-tag">A0.5 独立审计 · 用户提供既有 PRD 时触发，BLIND 盲扫抓假确认点与真矛盾</div>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/PRD.html"><span class="lead">真实产物</span>服务商索赔管理 · PRD（含数据契约确认清单 + 外部依赖登记）<span class="arw">→</span></a>
+      <div class="deliv">
+        <div class="lbl">PRD 数据契约片段示例</div>
+<pre><code>## 数据契约确认清单
+| 实体 | 字段 | 类型 | 必填 | 约束 |
+|------|------|------|------|------|
+| 工单 | ticket_id | string | 是 | 雪花ID |
+| 工单 | status | enum | 是 | 待处理/处理中/已关闭 |
+
+## 接口响应格式契约（A5-2 锁定）
+{ "success": true, "code": 0, "message": "", "data": {...}, "traceId": "..." }
+
+## A5-3 外部依赖
+| 服务 | 供应商 | 配置字段 | Key来源 | 降级 |
+| LLM | 阿里百炼 | BAILIAN_API_KEY | 运维提供 | 可Mock |</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="stage" id="stage-b">
+    <div class="head"><span class="code">B1<br>B2</span><h4>Design Spec + 原型</h4><span class="role">主会话 · 产品经理拍板<br>业务方看效果</span></div>
+    <div class="body">
+      <p><b>B1</b> 确立设计上下文与视觉规格（配色、字体、间距、组件规范）。<b>B2</b> 选择原型架构（HTML / Pencil / Stitch），产出高保真原型并让用户验收。</p>
+      <div class="kv"><span class="t">B1 产出</span><span><code>.sdd/tmp/ui-design-spec.md</code>（临时规格，B2 后归档）</span></div>
+      <div class="kv"><span class="t">B2 产出</span><span><code>docs/prototypes/</code>（HTML 原型或 Pencil/Excalidraw 文件）</span></div>
+      <div class="note warn">原型是<b>研发侧写前端的唯一文案/样式依据</b>。Developer 必须逐字对齐原型，Tester 会逐字校验，任何不一致直接 FAIL。</div>
+      <a class="realart" href="supplier-claim-mgmt/界面展示.html"><span class="lead">真实产物</span>服务商索赔管理 · 12 个可交互原型页（+ 真实前端实现截图对照）<span class="arw">→</span></a>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="stage" id="stage-c">
+    <div class="head"><span class="code">C</span><h4>PRD 定稿 · 产品交接点</h4><span class="role">主会话 · 产品经理拍板</span></div>
+    <div class="body">
+      <p>补齐路线图、技术架构蓝图、原型说明、核心流程图，把 PRD 定稿。到达<b>产品交接点</b>。</p>
+      <div class="kv"><span class="t">产出</span><span><code>docs/PRD.md</code>（定稿版）</span></div>
+      <div class="note">交接点动作：写 <code>.sdd/status.json</code> 为 <code>handoff_status="AWAITING_DEV_LEAD"</code>，输出固定交接通知，<b>当前轮强制结束</b>。等研发组长在新轮次显式接手。</div>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/PRD.html"><span class="lead">真实产物</span>服务商索赔管理 · PRD 定稿（路线图 / 架构蓝图 / 核心流程）<span class="arw">→</span></a>
+    </div>
+  </div>
+
+  <!-- D -->
+  <div class="stage opt" id="stage-d">
+    <div class="head"><span class="code">D ★</span><h4>后端详细设计 LLD（条件触发）</h4><span class="role">主会话 · 产品拍板决策<br>组长审定 schema</span></div>
+    <div class="body">
+      <p><b>触发条件</b>（命中任一）：多表事务级联 / 显式状态机 / 资源匹配调度 / 基于既有 DB schema 扩展 / 单据编码规则。绿地简单 CRUD <b>不触发</b>，直接进 E。</p>
+      <p>产出字段级数据来源映射、状态机、操作副作用事务序列、编码规则、并发/回滚设计。</p>
+      <div class="kv"><span class="t">产出</span><span><code>docs/detail-design/详细设计-&lt;功能&gt;.md</code>（LLD）</span></div>
+      <div class="kv"><span class="t"></span><span><code>docs/db-schema/</code>（表结构 + <code>ddl/</code> 建表 SQL，全项目共享一份）</span></div>
+      <div class="kv"><span class="t"></span><span><code>.sdd/traceability/&lt;编码&gt;.md</code>（双向可溯矩阵）</span></div>
+      <div class="kv"><span class="t"></span><span><code>docs/decisions/待确认决策表-&lt;模块&gt;.xlsx</code>（待产品逐条拍板）</span></div>
+      <div class="audit-tag">D3.5 独立审计 · 喂 PRD+LLD+schema+矩阵，逐条抓幻觉与遗漏，PASS 才往下</div>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/详细设计-服务商索赔单.html"><span class="lead">真实产物</span>服务商索赔管理 · 详细设计-服务商索赔单（字段级映射 / 状态机 / 费用计算）<span class="arw">→</span></a>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/表结构文档.html"><span class="lead">真实产物</span>服务商索赔管理 · 表结构文档（既有库纳管登记）<span class="arw">→</span></a>
+      <div class="deliv">
+        <div class="lbl">跨项目标杆/压测样例（对照 LLD 颗粒度）</div>
+        <div class="files">
+          <div class="file"><span class="path">detail-design-示例-经销商新能源订单管理.md</span><span style="color:var(--faint)">标杆·三分支五表事务·双状态机</span><a class="prev" href="samples/detail-design-示例-经销商新能源订单管理.html">预览</a></div>
+          <div class="file"><span class="path">detail-design-整车市场活动管理-压测.md</span><span style="color:var(--faint)">从薄 PRD 真跑的压测产物</span><a class="prev" href="samples/detail-design-整车市场活动管理-压测.html">预览</a></div>
+          <div class="file"><span class="path">detail-design-代提报-schema落地版.md</span><span style="color:var(--faint)">schema 落地版</span><a class="prev" href="samples/detail-design-代提报-schema落地版.html">预览</a></div>
+          <div class="file"><span class="path">db-schema-经销商新能源订单.md</span><span style="color:var(--faint)">既有库 schema 纳管登记</span><a class="prev" href="samples/db-schema-经销商新能源订单.html">预览</a></div>
+          <div class="file"><span class="path">阶段D-清单法演示-薄PRD到详细设计.md</span><span style="color:var(--faint)">清单法方法演示</span><a class="prev" href="samples/阶段D-清单法演示-薄PRD到详细设计.html">预览</a></div>
+        </div>
+      </div>
+      <div class="deliv" style="margin-top:10px">
+        <div class="lbl">决策表示例 · 8 可见列（由 generate.py 派生，禁止手搓）</div>
+        <div class="tablewrap" style="margin:0"><table>
+          <thead><tr><th>编号</th><th>类别</th><th>涉及节点</th><th>描述（冲突/未定义）</th><th>处理建议</th><th>状态</th></tr></thead>
+          <tbody><tr><td>D-工单-B2</td><td>调和</td><td>工单状态</td><td>PRD 表15 有"待市场审核"，按钮逻辑没有</td><td>恢复该状态，"谁审"待拍板</td><td>待确认</td></tr></tbody>
+        </table></div>
+        <p style="font-size:12px; color:var(--muted); margin:8px 0 0">编号格按风险配色（HIGH 红 / MEDIUM 黄 / LOW 绿）。HIGH 必须逐条确认，不能"都按推荐"批量覆盖。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- E -->
+  <div class="stage" id="stage-e">
+    <div class="head"><span class="code">E</span><h4>接口契约</h4><span class="role">主会话 · 研发组长拍板</span></div>
+    <div class="body">
+      <p>前提：研发组长已在新轮次显式接手（跨过角色交接门禁）。E1 基于已确认的 LLD + schema 派生接口契约，<b>不凭空生成</b>。</p>
+      <div class="kv"><span class="t">产出</span><span><code>docs/api-contracts.md</code></span></div>
+      <div class="audit-tag">E2 独立审计 · 喂 LLD+契约+schema，逐接口查"是否胡编 / 是否满足设计"，PASS 才往下</div>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/接口文档-服务商索赔单.html"><span class="lead">真实产物</span>服务商索赔管理 · 接口文档-服务商索赔单（分页 S2.9 / 详情 S2.8）<span class="arw">→</span></a>
+      <div class="deliv">
+        <div class="lbl">接口契约片段示例</div>
+<pre><code>### POST /api/tickets/{id}/accept  坐席接单
+请求：Header Authorization: Bearer &lt;token&gt;
+响应 Result&lt;TicketDTO&gt;：
+{ "success": true, "data": { "ticketId":"...", "status":"处理中", "agentId":"..." } }
+业务处理逻辑（对齐 LLD 副作用）：
+ 1. 校验坐席在线且未满负荷（否则 409）
+ 2. t_ticket.status→处理中，agent_id 带入，version +1
+ 3. t_agent_load.current_count +1
+ 4. t_ticket_log 插入"接单"记录
+错误码：409 坐席已满 / 404 工单不存在 / 401 未登录</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- F -->
+  <div class="stage" id="stage-f">
+    <div class="head"><span class="code">F</span><h4>Plan.md 开发计划</h4><span class="role">主会话 · 研发组长拍板</span></div>
+    <div class="body">
+      <p>产出开发计划，列全功能清单、依赖关系、优先级、<b>外部服务与测试权限清单</b>。</p>
+      <div class="kv"><span class="t">产出</span><span><code>docs/Plan.md</code></span></div>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/Plan.html"><span class="lead">真实产物</span>服务商索赔管理 · Plan.md（功能清单 / 依赖 / 外部服务 EXT-01~06）<span class="arw">→</span></a>
+    </div>
+  </div>
+
+  <!-- G -->
+  <div class="stage" id="stage-g">
+    <div class="head"><span class="code">G</span><h4>测试用例</h4><span class="role">主会话 · 研发组长拍板</span></div>
+    <div class="body">
+      <p>基于已确认功能点<b>拆解</b>测试用例（不是需求再创作）。</p>
+      <div class="kv"><span class="t">产出</span><span><code>docs/test-cases/测试用例[-&lt;模块&gt;].xlsx</code>，统一 14 列</span></div>
+      <div class="note warn" style="margin:10px 0">两条硬规则：① 每条用例必须映射到功能编号，无孤儿用例（防幻觉）；② <b>「测试数据」列一律留空</b>（设计阶段不预置具体数据值）。</div>
+      <div class="audit-tag">G-audit 独立审计 · 查可溯功能点、无编造字段/文案、测试数据列为空、无漏测</div>
+      <a class="realart" href="supplier-claim-mgmt/测试用例.html"><span class="lead">真实产物</span>服务商索赔管理 · 188 条测试用例（6 模块分栏，测试数据列留空）<span class="arw">→</span></a>
+      <div class="deliv">
+        <div class="lbl">测试用例示例 · 14 列节选</div>
+        <div class="tablewrap" style="margin:0"><table>
+          <thead><tr><th>用例ID</th><th>功能点</th><th>标题</th><th>角色</th><th>测试数据</th><th>预期结果</th><th>优先级</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>TC001</td><td>F-03-02</td><td>坐席接单（正向）</td><td>坐席</td><td><i style="color:var(--faint)">留空</i></td><td>工单入处理中列表</td><td>P0</td><td>待执行</td></tr>
+            <tr><td>TC002</td><td>F-03-02</td><td>坐席接单（异常-已满）</td><td>坐席</td><td><i style="color:var(--faint)">留空</i></td><td>提示"已满"，工单不变</td><td>P1</td><td>待执行</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FREEZE -->
+  <div class="stage" id="freeze">
+    <div class="head"><span class="code">❄</span><h4>feature-signoff 功能点确认书 · 冻结</h4><span class="role">组长组织 · 产品/用户逐条确认</span></div>
+    <div class="body">
+      <p>逐条把功能点连同 PRD章节/原型/接口/LLD/测试用例链接列全，<b>请用户逐条确认冻结</b>。每个功能点必须已登记 ≥1 条测试用例覆盖。</p>
+      <div class="kv"><span class="t">产出</span><span><code>docs/feature-signoff.md</code>（唯一交接合同）</span></div>
+      <div class="deliv">
+        <div class="lbl">功能点确认清单示例</div>
+        <div class="tablewrap" style="margin:0"><table>
+          <thead><tr><th>功能编码</th><th>功能点</th><th>页面</th><th>PRD章节</th><th>原型</th><th>api接口</th><th>详细设计</th><th>产品确认</th></tr></thead>
+          <tbody><tr><td>F-03-02</td><td>坐席接单</td><td>P05</td><td>§3.2</td><td>prototypes/agent.html</td><td>POST /accept</td><td>详细设计-工单.md</td><td>✅</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="note crit">⚠️ 第四节「变更登记」表初始<b>只有表头、无数据行</b>——预填空行会被研发侧误判为"合同变更中"而阻塞开发。</div>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/feature-signoff.html"><span class="lead">真实产物</span>服务商索赔管理 · 功能点确认书（27 功能点冻结 v1.0，commit 88ed0f8）<span class="arw">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DEV ===== -->
+<section id="dev">
+  <h2><span class="idx">06</span>研发侧 · Planner → Developer → Tester</h2>
+  <p class="sub">冻结完成后，换人/换会话说"开始开发"进入研发侧。主会话作为 Orchestrator 编排三个子 Agent。</p>
+
+  <div class="stage dev">
+    <div class="head"><span class="code">P</span><h4>Planner · 拆任务</h4><span class="role">子 Agent</span></div>
+    <div class="body">
+      <div class="kv"><span class="t">产出</span><span><code>.sdd/tasks.md</code>（任务状态机，唯一进度文件）</span></div>
+      <p>拆分逻辑：前端 Mock 先行 → 后端基础设施（自动） → 逐功能闭环（逐个门禁） → E2E 回归。核心规则：验收标准分两层——<code>acceptanceCriteria</code>（用户可见，从前端页面视角写）和 <code>technicalChecks</code>（Agent 自动跑 typecheck/lint/<code>mvn verify</code>）。</p>
+      <div class="deliv">
+        <div class="lbl">tasks.md 任务分节示例</div>
+<pre><code>## T-003 · 坐席接单功能
+- 类型：integration ｜ 优先级：3 ｜ 用户门禁：是
+- 功能编码：F-03-02 ｜ 依赖：T-002
+- 状态：pending ｜ retry_count：0
+- 描述：后端真实接单API + 前端坐席端Mock切真实 + 状态同步
+- 验收标准（用户可感知）：
+  1) 坐席在待处理池点接单，工单进入"处理中"列表
+  2) 员工端实时收到"坐席接入"通知
+- 技术检查：$MVN -q verify 通过；前端 VITE_USE_MOCK=false 走真实API
+- 规则文件：dev-standards/backend-java.md, dev-standards/frontend.md</code></pre>
+      </div>
+      <a class="realart" href="supplier-claim-mgmt/设计文档/tasks.html"><span class="lead">真实产物</span>服务商索赔管理 · tasks.md（本轮 T-001~T-009 + 26 功能点 pass 登记）<span class="arw">→</span></a>
+    </div>
+  </div>
+
+  <div class="stage dev">
+    <div class="head"><span class="code">D</span><h4>Developer · 写代码</h4><span class="role">子 Agent</span></div>
+    <div class="body">
+      <div class="kv"><span class="t">产出</span><span>代码文件（backend / frontend）+ <code>.sdd/experience.md</code> 经验追加</span></div>
+      <p>四原则：先想清楚再写、从最简单方案开始、手术刀式精确修改、目标驱动。输出只返回修改/新增的文件路径列表，不返回代码内容；<b>一次只做一个任务</b>。</p>
+      <a class="realart" href="supplier-claim-mgmt/代码-前端.html"><span class="lead">真实产物</span>服务商索赔管理 · 前端代码逻辑（路由 → service → 列表/详情页）<span class="arw">→</span></a>
+      <a class="realart" href="supplier-claim-mgmt/代码-后端.html"><span class="lead">真实产物</span>服务商索赔管理 · 后端代码逻辑（Controller → Service → Mapper → Assembler）<span class="arw">→</span></a>
+    </div>
+  </div>
+
+  <div class="stage dev">
+    <div class="head"><span class="code">T</span><h4>Tester · 独立验证</h4><span class="role">子 Agent</span></div>
+    <div class="body">
+      <div class="kv"><span class="t">产出</span><span><code>.sdd/test-reports/test-&lt;id&gt;.md</code>（覆写）+ <code>.sdd/bug-logs/&lt;id&gt;.md</code>（只追加）</span></div>
+      <p>核心原则：不信任 Developer 任何声明，逐条独立验收，只信可复现证据。三种判定：<b style="color:var(--ok)">PASS</b>（通过）/ <b style="color:var(--crit)">FAIL</b>（代码缺陷，进返修）/ <b style="color:var(--warn)">BLOCKED</b>（环境阻塞，非代码问题）。</p>
+      <div class="deliv">
+        <div class="lbl">测试报告示例</div>
+<pre><code># 测试报告：T-003 坐席接单功能
+## 结果：FAIL
+| # | 标准 | 结果 | 说明 |
+| 1 | 点接单工单进处理中列表 | PASS | 联调命中真实 /api/accept |
+| 2 | 员工端实时收到通知 | FAIL | WebSocket 未推送 |
+## 问题 1
+- 位置：TicketService.java:88（漏调 pushService）
+- 建议修复方向：接单成功后调用 push</code></pre>
+      </div>
+      <a class="realart" href="supplier-claim-mgmt/界面展示.html"><span class="lead">真实产物</span>服务商索赔管理 · Tester 验收对象＝真实前端页面（列表+详情实截图）<span class="arw">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MANIFEST ===== -->
+<section id="manifest">
+  <h2><span class="idx">07</span>产出物总清单 · 谁产、谁审、存哪</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>阶段</th><th>产出物</th><th>路径</th><th>谁产</th><th>谁审</th></tr></thead>
+    <tbody>
+      <tr><td>A</td><td>PRD</td><td><code>docs/PRD.md</code></td><td>产品/主会话</td><td>A0.5</td></tr>
+      <tr><td>B2</td><td>原型</td><td><code>docs/prototypes/</code></td><td>主会话</td><td>用户验收</td></tr>
+      <tr><td>D</td><td>详细设计 LLD</td><td><code>docs/detail-design/</code></td><td>主会话</td><td><b>D3.5</b></td></tr>
+      <tr><td>D</td><td>表结构+建表SQL</td><td><code>docs/db-schema/</code></td><td>组长审定</td><td>D3.5</td></tr>
+      <tr><td>D</td><td>双向可溯矩阵</td><td><code>.sdd/traceability/</code></td><td>主会话</td><td>交叉核对</td></tr>
+      <tr><td>D</td><td>待确认决策表</td><td><code>docs/decisions/</code></td><td>generate.py</td><td>产品逐条拍板</td></tr>
+      <tr><td>E</td><td>接口契约</td><td><code>docs/api-contracts.md</code></td><td>组长/主会话</td><td><b>E2</b></td></tr>
+      <tr><td>F</td><td>开发计划</td><td><code>docs/Plan.md</code></td><td>组长/主会话</td><td>—</td></tr>
+      <tr><td>G</td><td>测试用例</td><td><code>docs/test-cases/</code></td><td>组长/主会话</td><td><b>G-audit</b></td></tr>
+      <tr><td>冻结</td><td>功能点确认书</td><td><code>docs/feature-signoff.md</code></td><td>组长组织</td><td>用户逐条确认</td></tr>
+      <tr><td>开发</td><td>任务状态机</td><td><code>.sdd/tasks.md</code></td><td>Planner</td><td>用户确认清单</td></tr>
+      <tr><td>开发</td><td>代码</td><td><code>backend/ frontend/</code></td><td>Developer</td><td>Tester</td></tr>
+      <tr><td>开发</td><td>测试报告 / BUG日志</td><td><code>.sdd/test-reports/ · bug-logs/</code></td><td>Tester</td><td>Developer 修复前必读</td></tr>
+      <tr><td>审计</td><td>设计审计报告</td><td><code>.sdd/design-audit/</code></td><td>design-auditor</td><td>—</td></tr>
+      <tr><td>全程</td><td>项目 / 系统经验</td><td><code>.sdd/experience.md</code> · <code>memory/harness-experience.md</code></td><td>各子 Agent · Orchestrator 回传</td><td>组长确认升级</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>多模块大项目：</b>产品文档按模块分文件，命名一律"类型-模块"前缀式，如 <code>docs/PRD/PRD-&lt;模块&gt;.md</code>、<code>docs/api-contracts/接口文档-&lt;模块&gt;.md</code>；<code>docs/db-schema/</code> 全项目共享一份。</div>
+</section>
+
+<!-- ===== GATES ===== -->
+<section id="gates">
+  <h2><span class="idx">08</span>门禁与硬规则 · 不满足就走不下去</h2>
+  <h3>开发门禁（进入多智能体开发前，11 条全满足）</h3>
+  <ol class="gates">
+    <li><code>docs/PRD.md</code> 存在</li>
+    <li><code>docs/api-contracts.md</code> 存在</li>
+    <li><code>docs/prototypes/</code> 存在（或用户明确放弃原型）</li>
+    <li><code>docs/Plan.md</code> 存在</li>
+    <li><code>.sdd/tasks.md</code> 存在（首次由 Planner 生成）</li>
+    <li>已对齐运行时（JDK 17+ / Maven 3.9+ / Node 18+ / MySQL 或 PostgreSQL）</li>
+    <li>外部依赖与配置草稿已确认（或明确选 Mock/降级）</li>
+    <li>命中阶段 D 的项目：LLD 完成 + D3.5 与 E2 双双 PASS + 用户确认 + db-schema 就位</li>
+    <li>测试用例已产出（G-audit PASS，测试数据列为空）</li>
+    <li class="hot"><b>产品设计已冻结</b>（<code>feature-signoff.md</code> 逐条确认）</li>
+    <li>用户明确表示开始/继续开发</li>
+  </ol>
+  <h3>角色交接硬门禁（优先级最高）</h3>
+  <div class="prio">角色边界门禁 <b>&gt;</b> 阶段切换协议 <b>&gt;</b> "继续 / 可以 / 确认 / 按方案执行"</div>
+  <p>产品交接点后，<b>不能在同一轮自动切成研发组长</b>。必须由后续新的用户轮次显式说"研发组长接手 / 以研发组长身份继续 / 继续 &lt;项目名&gt; 的设计"才算接棒。产品决策回复、"可以"、"确认"一律不算。</p>
+  <h3>冻结保护约束（研发侧铁律）</h3>
+  <div class="note crit">研发侧<b>只读消费</b>设计文档，禁止修改 PRD / 原型 / api-contracts / detail-design / db-schema / test-cases / feature-signoff。发现设计缺陷 → 停下，回产品侧走「变更登记」重新冻结，绝不私自改。研发侧唯一可写的 docs 文件是 <code>docs/startup.md</code> 和 <code>docs/Plan.md</code> 的任务状态列。</div>
+</section>
+
+<!-- ===== HOWTO ===== -->
+<section id="howto">
+  <h2><span class="idx">09</span>常见操作手册</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>场景</th><th>怎么做</th></tr></thead>
+    <tbody>
+      <tr><td><b>我要新建一个项目</b></td><td>说"新建项目 / 做一个 XX 系统"。进入 <code>sdd-product-design</code>，确认 project_id/name，建目录骨架和 Git，从阶段 R 一路走到冻结。</td></tr>
+      <tr><td><b>设计做到一半换人接</b></td><td>新会话说"继续 &lt;项目名&gt; 的设计"。走接续入口，跳过空项目检查，由 <code>status.json</code> 自动落到当前阶段。</td></tr>
+      <tr><td><b>设计已冻结要写代码</b></td><td>说"开始开发"。进入 <code>sdd-dev-execution</code>，校验冻结合同和开发门禁，通过后 Planner 拆任务→你确认→Developer/Tester 循环。</td></tr>
+      <tr><td><b>接手开发到一半的项目</b></td><td>新会话说"继续开发 / 接手"。读 <code>.sdd/tasks.md</code> + 测试报告 + 项目经验恢复上下文，从第一个未完成任务继续，不重跑设计。</td></tr>
+      <tr><td><b>改已冻结项目的需求</b></td><td>说"改需求 / 加个功能"。走 <code>sdd-project-maintenance</code>，必须走 feature-signoff「变更登记」，重新冻结受影响功能点。研发侧不能借道设计修整改冻结文档。</td></tr>
+      <tr><td><b>修已交付功能的 Bug</b></td><td>用 <code>/sdd-bugfix</code>。可改代码，不改设计文档。设计缺陷不算 Bug，走变更登记。</td></tr>
+      <tr><td><b>导入老代码库</b></td><td>先把代码放到 <code>Projects_Repo/&lt;id&gt;/</code>，再说"导入项目"。只补缺失的 <code>.sdd/</code> 脚手架，反向梳理 PRD/契约/Plan，不覆盖业务文件。</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ===== EXP ===== -->
+<section id="exp">
+  <h2><span class="idx">10</span>三级经验系统 · 技术栈边界</h2>
+  <h3>三级经验：任务经验 → 项目经验 → 系统经验</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>级别</th><th>存哪</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td>任务经验</td><td>对话内</td><td>具体任务/bug 的局部经验</td></tr>
+      <tr><td>项目经验</td><td><code>.sdd/experience.md</code></td><td>当前项目长期有效的经验</td></tr>
+      <tr><td>系统经验</td><td><code>memory/harness-experience.md</code></td><td>跨项目可复用的 Harness 规则</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>闭环：</b>进入开发时 Orchestrator 先读系统经验，挑出相关教训随任务传给 Planner（回读环）；Tester FAIL 时若发现跨项目通用问题，回传系统经验（写回环）。经验可上升，但必须带证据 + 人确认。</div>
+  <h3>技术栈支持边界</h3>
+  <div class="note warn"><b>研发侧自动开发循环只支持默认栈：</b>后端 JDK 17 / Spring Boot 3 / MyBatis-Plus / Maven（MySQL 8 或 PostgreSQL）；前端 React + TypeScript + Vite（桌面 Ant Design，H5/PWA Ant Design Mobile）。其他栈（Python/Go/Vue/原生移动端/纯 CLI）可<b>导入纳管</b>但<b>不进自动开发循环</b>。原生 App / React Native / Flutter / uni-app / 小程序不在默认支持范围。</div>
+</section>
+
+<footer class="footer">
+  <div class="big">一句话总结</div>
+  <p>产品侧把设计做实、逐条冻结；研发侧拿冻结合同只读实现；独立审计员全程抓幻觉；三级经验持续进化。<b>人拍板，Agent 执行，门禁把关。</b></p>
+  <p style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:14px">SDD V8 使用手册 · 唯一真相源 harness-core/ · 本页产出物示例链接指向 docs/samples/ 内真实生成产物</p>
+</footer>
+
+</main>
+</div>
+
+<script>
+// 主题切换
+(function(){
+  var btn=document.getElementById('themebtn');
+  var root=document.documentElement;
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    root.setAttribute('data-theme', cur==='dark'?'light':'dark');
+  });
+})();
+// 滚动高亮当前节
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#nav a'));
+  var map={};
+  links.forEach(function(a){var id=a.getAttribute('href').slice(1); var el=document.getElementById(id); if(el) map[id]=a;});
+  var ids=Object.keys(map);
+  function onScroll(){
+    var y=window.scrollY+120, cur=null;
+    ids.forEach(function(id){var el=document.getElementById(id); if(el && el.offsetTop<=y) cur=id;});
+    links.forEach(function(a){a.classList.remove('on');});
+    if(cur && map[cur]) map[cur].classList.add('on');
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>

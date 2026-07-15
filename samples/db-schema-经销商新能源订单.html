@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>既有库 Schema 契约：经销商新能源订单管理</title>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+    --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+    --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+    --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+  --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+  --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+  --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.7; font-size:15px;
+  letter-spacing:.01em;
+}
+.wrap{max-width:900px; margin:0 auto; padding:0 24px 120px}
+.topbar{
+  position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line); margin-bottom:40px;
+}
+.topbar .inner{max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:14px}
+.badge{
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:5px;
+  padding:3px 9px; white-space:nowrap;
+}
+.topbar .name{font-size:13px; color:var(--muted); font-family:var(--mono)}
+.back{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent); text-decoration:none}
+.back:hover{text-decoration:underline}
+h1{font-size:29px; line-height:1.25; font-weight:750; margin:28px 0 8px; text-wrap:balance; letter-spacing:-.01em}
+h2{font-size:21px; font-weight:700; margin:44px 0 12px; padding-top:16px; border-top:1px solid var(--line); letter-spacing:-.005em}
+h3{font-size:17px; font-weight:680; margin:30px 0 10px; color:var(--ink)}
+h4{font-size:14.5px; font-weight:680; margin:22px 0 8px; color:var(--muted); font-family:var(--mono)}
+p{margin:12px 0}
+a{color:var(--accent)}
+strong{font-weight:680; color:var(--ink)}
+code{font-family:var(--mono); font-size:.86em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
+pre{background:var(--code-bg); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:16px 0}
+pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.6}
+blockquote{
+  margin:16px 0; padding:12px 18px; background:var(--quote-bg);
+  border-left:3px solid var(--quote-bar); border-radius:0 8px 8px 0; color:var(--muted); font-size:14px;
+}
+blockquote p{margin:6px 0}
+blockquote strong{color:var(--ink)}
+ul,ol{margin:12px 0; padding-left:24px}
+li{margin:5px 0}
+ul ul,ol ol,ul ol,ol ul{margin:4px 0}
+hr{border:none; border-top:1px solid var(--line); margin:36px 0}
+.tablewrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums}
+th{background:var(--th-bg); color:var(--th-ink); font-weight:640; text-align:left; padding:9px 13px; white-space:nowrap; font-family:var(--mono); font-size:12px; letter-spacing:.02em}
+td{padding:9px 13px; border-top:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.doc-note{
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  margin:34px 0 0; padding-top:16px; border-top:1px dashed var(--line);
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+  <span class="badge">SDD V8 · 生成产物</span>
+  <span class="name">db-schema-经销商新能源订单.md</span>
+  <a class="back" href="../SDD-V8-使用手册.html">← 返回使用手册</a>
+</div></div>
+<main class="wrap">
+<h1>既有库 Schema 契约：经销商新能源订单管理</h1>
+<blockquote><p>由 D0 Schema 纳管产出（来源：10 个 ORM 实体类）。详细设计与开发<strong>只能引用本文件已登记的表/列</strong>。</p>
+<p>标准审计列（所有表通用，不逐表重列）：<code>CREATION_BY</code>、<code>CREATION_DATE</code>、<code>LAST_UPDATED_BY</code>、<code>LAST_UPDATED_DATE</code>、<code>ENABLED</code>、<code>VERSION</code>(乐观锁)、<code>I_FALG</code>。</p></blockquote>
+<h2>登记总表</h2>
+<div class="tablewrap"><table><thead><tr><th>表名</th><th>中文名</th><th>本模块访问</th><th>主键(序列)</th><th>乐观锁</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER</td><td>经销商采购订单(头)</td><td>可写</td><td>DLR_ORDER_ID (SQ_T_V_Z_BU_DLR_ORDER)</td><td>有</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_NUM_D</td><td>采购订单明细(按AIC)</td><td>可写</td><td>DLR_ORDER_NUM_D_ID</td><td>有</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>采购订单单车明细(按VIN)</td><td>可写</td><td>DLR_ORDER_D_ID</td><td>有</td></tr><tr><td>T_M_Z_BD_CAR</td><td>车辆主数据</td><td>可写(限定列)</td><td>CAR_ID (AUTO)</td><td>有</td></tr><tr><td>T_M_Z_BD_CAR_CHANGE_HIS</td><td>车辆异动历史</td><td>只写(INSERT)</td><td>CAR_CHANGE_HIS_ID (SQ_…)</td><td>有</td></tr><tr><td>T_V_Z_BU_PRODUCT_PLAN</td><td>生产计划实绩</td><td>可写(限定列)</td><td>PRODUCT_PLAN_ID (AUTO)</td><td>有</td></tr><tr><td>T_V_Z_BU_CAR_APPROVE</td><td>车辆审批单</td><td>只写(INSERT)</td><td>APPROVE_ID (SQ_…)</td><td>有</td></tr><tr><td>T_V_Z_BU_CAR_APPROVE_HIS</td><td>审批单审核历史</td><td>只写(INSERT)</td><td>APPROVE_HIS_ID (SQ_…)</td><td>有</td></tr><tr><td>VLS_T_IF_D2L_CARSPLIT_RESULT</td><td>分车结果信息表</td><td>只写(INSERT)</td><td>CARSPLIT_RESULT_ID (AUTO)</td><td>有</td></tr><tr><td>T_M_Z_BD_REGION</td><td>区域</td><td>只读</td><td>REGION_ID (SQ_…)</td><td>—</td></tr></tbody></table></div>
+<hr>
+<h2>表：T_V_Z_BU_DLR_ORDER（经销商采购订单头）</h2>
+<ul>
+<li>本模块可写列：STATE, SUMMIT_TIME⚠️, CAR_SUM_NUM, CAR_SUM_PRICE, ACCOUNT_SUM_USE_PRICE, MADE_TYPE, DLR_CODE, S_DLR_CODE, ORDER_TYPE, ORDER_YEAR/MONTH/WEEKLY, FUND_TYPE_CODE, REMARK</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>列名</th><th>类型</th><th>可空</th><th>含义</th><th>枚举</th><th>关联</th></tr></thead><tbody><tr><td>DLR_ORDER_CODE</td><td>varchar40</td><td>N</td><td>采购单号(唯一)</td><td>编码见下</td><td></td></tr><tr><td>ORDER_TYPE</td><td>varchar40</td><td>N</td><td>订单类型</td><td>→ORDER_TYPE字典⚠️</td><td></td></tr><tr><td>STATE</td><td>varchar40</td><td>N</td><td>订单状态</td><td>→ORDER_STATE字典</td><td></td></tr><tr><td>SUMMIT_TIME</td><td>timestamp</td><td>Y</td><td>提交时间</td><td>⚠️列名拼写为 SUMMIT 非 SUBMIT</td><td></td></tr><tr><td>MADE_TYPE</td><td>varchar20</td><td>N</td><td>制作方式</td><td>经销商/总部(Z)</td><td></td></tr><tr><td>DLR_CODE</td><td>varchar</td><td>N</td><td>经销商代码</td><td></td><td>→T_M_Z_BD_DLR.DLR_CODE</td></tr><tr><td>S_DLR_CODE</td><td>varchar40</td><td>N</td><td>收货经销商代码</td><td></td><td></td></tr><tr><td>CAR_SUM_NUM / CAR_SUM_PRICE</td><td>number</td><td>N</td><td>车辆总数/总价</td><td></td><td></td></tr><tr><td>ACCOUNT_SUM_USE_PRICE</td><td>number</td><td>N</td><td>账户使用金额</td><td>增补默认0</td><td></td></tr><tr><td>ORDER_YEAR/MONTH/WEEKLY</td><td>varchar40</td><td>N</td><td>计划年/月/周</td><td></td><td></td></tr></tbody></table></div>
+<hr>
+<h2>表：T_V_Z_BU_DLR_ORDER_D（单车明细，核心可写表）</h2>
+<ul>
+<li>本模块可写列：DLR_ORDER_D_STATUS, IS_ALLOT_CAR, ACTUAL_ASSIGN_TIME, VIN, APPROVE_VIN, APPROVE_SON, APPROVE_CODE(FK), APPROVE_S_CODE, APPROVE_S_STATUS, APP_CREATION_BY/DATE, APP_LAST_UPDATED_BY/DATE, ONECAR_FLAG, CUS_ORDER, IS_URGENT, URGENT_REASON, OTHER_REASON, EXPECT_ARRIVE_DATE, IS_DELIVER_CONDITION</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>列名</th><th>类型</th><th>含义</th><th>枚举</th><th>关联</th></tr></thead><tbody><tr><td>DLR_ORDER_D_STATUS</td><td>varchar40</td><td>订单行状态</td><td>→ORDER_STATE字典</td><td></td></tr><tr><td>IS_ALLOT_CAR</td><td>varchar20</td><td>是否已分车</td><td>Yes/No</td><td></td></tr><tr><td>ACTUAL_ASSIGN_TIME</td><td>timestamp</td><td>实际分配(分车)时间</td><td></td><td></td></tr><tr><td>VIN / APPROVE_VIN</td><td>varchar</td><td>实际VIN / 审批VIN</td><td></td><td>→T_M_Z_BD_CAR.VIN</td></tr><tr><td>APPROVE_SON</td><td>varchar30</td><td>审批SON</td><td></td><td>→T_V_Z_BU_PRODUCT_PLAN.SON</td></tr><tr><td>APPROVE_CODE</td><td>varchar</td><td>审批单号(FK)</td><td></td><td>→T_V_Z_BU_CAR_APPROVE.APPROVE_CODE</td></tr><tr><td>APPROVE_S_CODE</td><td>varchar40</td><td>审批子单号</td><td></td><td></td></tr><tr><td>APPROVE_S_STATUS</td><td>varchar40</td><td>审批单行状态</td><td>4新建/5有效/6出厂/7接车</td><td></td></tr><tr><td>ONECAR_FLAG</td><td>varchar</td><td>一车一单标记</td><td>Yes/No</td><td></td></tr><tr><td>CUS_ORDER</td><td>varchar40</td><td>留存订单标识</td><td>Yes/No</td><td></td></tr><tr><td>DLR_ORDER_CODE</td><td>varchar</td><td>采购单号(FK)</td><td></td><td>→T_V_Z_BU_DLR_ORDER</td></tr><tr><td>IS_URGENT / URGENT_REASON / OTHER_REASON / EXPECT_ARRIVE_DATE / IS_DELIVER_CONDITION</td><td></td><td>紧急相关</td><td></td><td></td></tr></tbody></table></div>
+<hr>
+<h2>表：T_M_Z_BD_CAR（车辆主数据）</h2>
+<ul>
+<li>本模块可写列：CAR_STATE, DLR_CODE, SPLIT_DATE, STOCK_LOCK_STATE, LOCK_BILL_NO, LOCK_BILL_ID</li>
+<li>匹配用只读列：WAREHOUSE_CODE, EXPECT_SUB_WAREHOUSE, LOGISTICS_CAR_FLAG, IS_SALE_CLOSED, OFFLINE_DATE, ONECAR_FLAG, IS_FROZEN, Z_REC_FLAG, Z_REC_DLR_CODE, AIC, SON</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>列名</th><th>类型</th><th>含义</th><th>枚举</th></tr></thead><tbody><tr><td>CAR_STATE</td><td>varchar</td><td>车辆流转状态</td><td>→CAR_STATE字典</td></tr><tr><td>STOCK_LOCK_STATE</td><td>varchar</td><td>库存锁定状态</td><td>Yes/No</td></tr><tr><td>LOCK_BILL_NO / LOCK_BILL_ID</td><td>varchar/number</td><td>锁定单据号/ID</td><td></td></tr><tr><td>SPLIT_DATE</td><td>timestamp</td><td>分车时间</td><td></td></tr><tr><td>WAREHOUSE_CODE</td><td>varchar</td><td>仓库编码</td><td>匹配条件='A'</td></tr><tr><td>LOGISTICS_CAR_FLAG / IS_SALE_CLOSED</td><td>varchar</td><td>物流车辆状态/销售限制</td><td>Yes/No</td></tr></tbody></table></div>
+<hr>
+<h2>表：T_V_Z_BU_PRODUCT_PLAN（生产计划实绩）</h2>
+<ul>
+<li>本模块可写列：ASSIGN_FLAG, ASSIGN_TYPE, DLR_CODE, ONECAR_FLAG, CUS_ORDER, IS_FROZEN, BILL_NO, BILL_ID</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>列名</th><th>含义</th><th>枚举</th></tr></thead><tbody><tr><td>ASSIGN_FLAG</td><td>分配标识</td><td>Yes/No</td></tr><tr><td>ASSIGN_TYPE</td><td>分配类型</td><td>→ASSIGN_TYPE字典⚠️(无12)</td></tr><tr><td>BILL_NO / BILL_ID</td><td>业务单据号/ID</td><td></td></tr><tr><td>SON</td><td>SON(关联键)</td><td></td></tr><tr><td>IS_FROZEN</td><td>是否冻结资源</td><td>Yes/No</td></tr></tbody></table></div>
+<hr>
+<h2>表：T_M_Z_BD_CAR_CHANGE_HIS（车辆异动历史，只 INSERT）</h2>
+<p>CAR_CHANGE_TYPE, OLD_CAR_STATE, NEW_CAR_STATE, BILL_CODE, REMARK, CAR_CHANGE_TIME, VIN, SON, DLR_CODE。</p>
+<blockquote><p>逆向取值辅助：静态方法按 VIN 取 <code>CAR_CHANGE_TIME</code> 最新一条 → 其 OLD_CAR_STATE 即"回滚目标状态"。</p></blockquote>
+<h2>表：T_V_Z_BU_CAR_APPROVE / _HIS（审批单/历史，只 INSERT）</h2>
+<ul>
+<li>APPROVE：APPROVE_CODE, APPROVE_TYPE, APPROVE_STATUS(4新建/5有效/6出库/7接车/95/96/97), APPROVE_CAR_NUM, APPROVE_CAR_PRICES, DLR_CODE</li>
+<li>APPROVE_HIS：APPROVE_CODE, APPROVE_S_CODE, APPROVE_TYPE, APPROVE_HIS_TYPE(1审批通过/2审批撤销), VIN, AIC, APPROVE_BY, APPROVE_TIME</li>
+</ul>
+<h2>表：VLS_T_IF_D2L_CARSPLIT_RESULT（分车结果，只 INSERT）</h2>
+<p>VIN, AIC, BUY_DEALER_CODE, GET_DEALER_CODE, EXAMINE_NO_M(审批单号), EXAMINE_NO_D(审批子单号), ALLOCATION_DATE(分车时间), IS_URGENT, AREA_CODE, ENABLE。</p>
+<h2>表：T_M_Z_BD_REGION（区域，只读）</h2>
+<p>REGION_CODE, REGION_NAME。</p>
+<hr>
+<h2>枚举字典</h2>
+<div class="tablewrap"><table><thead><tr><th>枚举</th><th>取值 → 含义</th></tr></thead><tbody><tr><td>CAR_STATE</td><td>1生产下线/2生产入库/3整车销售分配/4整车销售出库/5经销商采购入库/6经销商销售分配/7经销商销售出库/8客户销售退回入库/9经销商调拨出库/10经销商调拨入库</td></tr><tr><td>ORDER_STATE(订单头STATE / 行DLR_ORDER_D_STATUS)</td><td>1新建/2提交/3拒绝/4待审批/5完成/93部分拒绝/94部分待审批/95部分完成</td></tr><tr><td>ORDER_TYPE</td><td>1周度提车/2特殊/3周度提车A/4共享/5直销车/6试驾车/7售后服务车；<strong>8增补(SUBJOIN)</strong> ⚠️代码用但 Javadoc 列举未含</td></tr><tr><td>ASSIGN_TYPE</td><td>1月度/2周度提车/3特殊/4周度提车A/5共享/6直销车/7试驾车/8售后服务车；<strong>12增补</strong> ⚠️不在实体枚举内，需确认新增</td></tr><tr><td>APPROVE_STATUS</td><td>4新建/5有效/6出库/7接车/95部分有效/96部分出库/97部分接车</td></tr><tr><td>APPROVE_HIS_TYPE</td><td>1审批通过/2审批撤销</td></tr></tbody></table></div>
+<h2>编码规则（从实体挖出）</h2>
+<div class="tablewrap"><table><thead><tr><th>单据</th><th>规则</th><th>来源</th></tr></thead><tbody><tr><td>采购订单号 DLR_ORDER_CODE</td><td>经销商代码 + OR + YYYYMMDD + 4位流水</td><td>VehicleDlrOrder Javadoc + save()</td></tr><tr><td>审批单号 APPROVE_CODE</td><td>经销商代码 + <strong>OP</strong> + YYYYMMDD + 4位流水</td><td>审批实体 Javadoc ⚠️ PRD写EO，冲突待定</td></tr><tr><td>审批子单号 APPROVE_S_CODE</td><td>审批单号 + 3位流水</td><td>需求</td></tr></tbody></table></div>
+<h2>纳管自检</h2>
+<ul>
+<li>[x] 详细设计要引用的 10 张表全部登记</li>
+<li>[x] 可写列范围已标（防越权写只读列）</li>
+<li>[x] 状态码集中进枚举字典</li>
+<li>[x] 主键序列/自增、乐观锁列已登记</li>
+<li>[x] 来源=ORM 实体类，可回溯</li>
+<li>[x] ⚠️ 3 处 PRD/代码冲突（ORDER_TYPE=8、ASSIGN_TYPE=12、APPROVE_CODE OP/EO、SUMMIT_TIME拼写）已显性标出，交产品/开发确认</li>
+</ul>
+<p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/db-schema-经销商新能源订单.md · 内容为真实生成产物样例</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>详细设计（LLD）落地版：代提报（基于真实 10 张表实体）</title>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+    --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+    --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+    --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+  --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+  --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+  --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.7; font-size:15px;
+  letter-spacing:.01em;
+}
+.wrap{max-width:900px; margin:0 auto; padding:0 24px 120px}
+.topbar{
+  position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line); margin-bottom:40px;
+}
+.topbar .inner{max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:14px}
+.badge{
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:5px;
+  padding:3px 9px; white-space:nowrap;
+}
+.topbar .name{font-size:13px; color:var(--muted); font-family:var(--mono)}
+.back{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent); text-decoration:none}
+.back:hover{text-decoration:underline}
+h1{font-size:29px; line-height:1.25; font-weight:750; margin:28px 0 8px; text-wrap:balance; letter-spacing:-.01em}
+h2{font-size:21px; font-weight:700; margin:44px 0 12px; padding-top:16px; border-top:1px solid var(--line); letter-spacing:-.005em}
+h3{font-size:17px; font-weight:680; margin:30px 0 10px; color:var(--ink)}
+h4{font-size:14.5px; font-weight:680; margin:22px 0 8px; color:var(--muted); font-family:var(--mono)}
+p{margin:12px 0}
+a{color:var(--accent)}
+strong{font-weight:680; color:var(--ink)}
+code{font-family:var(--mono); font-size:.86em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
+pre{background:var(--code-bg); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:16px 0}
+pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.6}
+blockquote{
+  margin:16px 0; padding:12px 18px; background:var(--quote-bg);
+  border-left:3px solid var(--quote-bar); border-radius:0 8px 8px 0; color:var(--muted); font-size:14px;
+}
+blockquote p{margin:6px 0}
+blockquote strong{color:var(--ink)}
+ul,ol{margin:12px 0; padding-left:24px}
+li{margin:5px 0}
+ul ul,ol ol,ul ol,ol ul{margin:4px 0}
+hr{border:none; border-top:1px solid var(--line); margin:36px 0}
+.tablewrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums}
+th{background:var(--th-bg); color:var(--th-ink); font-weight:640; text-align:left; padding:9px 13px; white-space:nowrap; font-family:var(--mono); font-size:12px; letter-spacing:.02em}
+td{padding:9px 13px; border-top:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.doc-note{
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  margin:34px 0 0; padding-top:16px; border-top:1px dashed var(--line);
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+  <span class="badge">SDD V8 · 生成产物</span>
+  <span class="name">detail-design-代提报-schema落地版.md</span>
+  <a class="back" href="../SDD-V8-使用手册.html">← 返回使用手册</a>
+</div></div>
+<main class="wrap">
+<h1>详细设计（LLD）落地版：代提报（基于真实 10 张表实体）</h1>
+<blockquote><p>输入 = 薄 PRD + <strong>真实 schema（10 个 JPA 实体）</strong> + 实体内嵌逻辑。</p>
+<p>目的：证明拿到 schema 后，详细设计能落到<strong>真实列名</strong>、不再占位；并展示 schema/代码顺手解决的考古项 + 暴露的 PRD 矛盾。</p>
+<p>记号：✅ 真实列已确认；🔎 从代码考古得到；⚠️ PRD 与代码不一致（需产品/开发确认）。</p></blockquote>
+<h2>涉及真实表 × 关键列（从实体确认）</h2>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>关键列（真实列名）</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER</td><td>STATE, SUMMIT_TIME⚠️(拼写), DLR_CODE, S_DLR_CODE, MADE_TYPE, ACCOUNT_SUM_USE_PRICE, ORDER_TYPE, CAR_SUM_NUM/PRICE, LAST_UPDATED_BY/DATE</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>DLR_ORDER_D_STATUS, IS_ALLOT_CAR✅(=是否分车), ACTUAL_ASSIGN_TIME✅(=分车时间), VIN, APPROVE_VIN, APPROVE_SON, ONECAR_FLAG, CUS_ORDER, APPROVE_S_CODE, APPROVE_S_STATUS</td></tr><tr><td>T_M_Z_BD_CAR</td><td>CAR_STATE, DLR_CODE, SPLIT_DATE, STOCK_LOCK_STATE, LOCK_BILL_NO, LOCK_BILL_ID</td></tr><tr><td>T_M_Z_BD_CAR_CHANGE_HIS</td><td>CAR_CHANGE_TYPE, OLD_CAR_STATE, NEW_CAR_STATE, BILL_CODE, REMARK, CAR_CHANGE_TIME, VIN, SON</td></tr><tr><td>T_V_Z_BU_PRODUCT_PLAN</td><td>ASSIGN_FLAG, ASSIGN_TYPE⚠️, DLR_CODE, ONECAR_FLAG, CUS_ORDER, IS_FROZEN, BILL_NO, BILL_ID, SON</td></tr><tr><td>T_V_Z_BU_CAR_APPROVE / _HIS</td><td>APPROVE_CODE, APPROVE_S_CODE, APPROVE_TYPE, APPROVE_STATUS, APPROVE_HIS_TYPE, VIN</td></tr><tr><td>VLS_T_IF_D2L_CARSPLIT_RESULT</td><td>VIN, AIC, BUY_DEALER_CODE, GET_DEALER_CODE, EXAMINE_NO_M(审批单号), EXAMINE_NO_D(子单号), ALLOCATION_DATE</td></tr><tr><td>T_M_Z_BD_REGION</td><td>REGION_CODE, REGION_NAME</td></tr></tbody></table></div>
+<h2>🔎 代码考古：解决了之前标"❌待补"的项</h2>
+<div class="tablewrap"><table><thead><tr><th>之前的卡点</th><th>代码给出的答案（来源）</th></tr></thead><tbody><tr><td>采购订单号编码规则（原标"外置待补"）</td><td><strong>经销商代码 + OR + YYYYMMDD + 4位流水</strong>。来源：<code>VehicleDlrOrder</code> Javadoc + <code>save()</code> 里 <code>ProcUtil.CreateBillNo(dlrCode + BlockBussType.DLR_ORDER.getValue(), 4)</code></td></tr><tr><td>订单状态到底几个码</td><td>STATE：<strong>1新建 / 2提交 / 3拒绝 / 4待审批 / 5完成 / 93部分拒绝 / 94部分待审批 / 95部分完成</strong>。来源：<code>VehicleDlrOrder.state</code> Javadoc</td></tr><tr><td>增补订单保存默认值</td><td>ORDER_TYPE=增补(SUBJOIN)、FUND_TYPE_CODE=-1(NO_FUND_TYPE_CODE)、ACCOUNT_SUM_USE_PRICE=0、MADE_TYPE=总部(Z)、STATE=1。来源：<code>save()</code> 的 SUBJOIN 分支</td></tr><tr><td>"是否分车/分车时间"落到哪列</td><td>IS_ALLOT_CAR / ACTUAL_ASSIGN_TIME。来源：<code>VehicleDlrOrderD</code></td></tr><tr><td>拒绝时"原车辆状态"取哪</td><td><code>VehicleCarChangeHis.getNewVehicleCarChangeHis(vin)</code> 取该 VIN <strong>最新一条异动历史的 OLD_CAR_STATE</strong>。来源：实体静态方法</td></tr></tbody></table></div>
+<h2>⚠️ schema/代码暴露的 PRD 矛盾（新发现，需确认）</h2>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>矛盾</th><th>证据</th></tr></thead><tbody><tr><td>M1</td><td><strong>审批单号前缀 OP vs EO</strong>：完整版 PRD 写"交付中心编码+<strong>EO</strong>+YYYYMMDD+四位流水"，但 <code>VehicleCarApprove</code>/<code>VehicleCarApproveHis</code> 的 Javadoc 都写"经销商代码+<strong>OP</strong>+YYYYMMDD+4位流水"。到底 OP 还是 EO？</td><td>两个审批实体 Javadoc</td></tr><tr><td>M2</td><td><strong>ASSIGN_TYPE=12 不在枚举内</strong>：完整版写 PRODUCT_PLAN.ASSIGN_TYPE=12(增补)，但 <code>ProductPlanEntity.assignType</code> 枚举只列到 1~8，无 12。需确认 12 是否为新增码。</td><td><code>ProductPlanEntity</code> Javadoc</td></tr><tr><td>M3</td><td><strong>列名拼写 SUMMIT_TIME</strong>：提交时间真实列是 <code>SUMMIT_TIME</code>（拼写疑似应为 SUBMIT），开发须按真实列名写，别写成 SUBMIT_TIME。</td><td><code>VehicleDlrOrder</code></td></tr></tbody></table></div>
+<h2>代提报 · 副作用（字段级落地版）</h2>
+<h3>分支 A：全部匹配成功 → 订单 STATE='4'(待审批)</h3>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>操作</th><th>列</th><th>写入值</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER</td><td>UPDATE</td><td>STATE / SUMMIT_TIME / LAST_UPDATED_DATE / LAST_UPDATED_BY</td><td>'4' / now / now / user</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>UPDATE(全部行)</td><td>DLR_ORDER_D_STATUS / IS_ALLOT_CAR / ACTUAL_ASSIGN_TIME / VIN / APPROVE_VIN / APPROVE_SON</td><td>'4' / 'Yes' / now / 匹配VIN / 匹配VIN / (匹配VIN→PRODUCT_PLAN.SON)</td></tr><tr><td>T_M_Z_BD_CAR_CHANGE_HIS</td><td>INSERT(每匹配VIN)</td><td>CAR_CHANGE_TYPE / OLD_CAR_STATE / NEW_CAR_STATE / BILL_CODE / REMARK / CAR_CHANGE_TIME / VIN / SON</td><td>增补订单分配 / 车辆原CAR_STATE / '4' / DLR_ORDER_CODE / 增补订单分配 / now / vin / son</td></tr><tr><td>T_M_Z_BD_CAR</td><td>UPDATE(每匹配VIN)</td><td>SPLIT_DATE / CAR_STATE / DLR_CODE / STOCK_LOCK_STATE / LOCK_BILL_NO / LOCK_BILL_ID / LAST_UPDATED_*</td><td>now / '4'(整车销售出库) / 订单DLR_CODE / 'Yes' / DLR_ORDER_CODE / 匹配明细ID / now,user</td></tr><tr><td>T_V_Z_BU_PRODUCT_PLAN</td><td>UPDATE(每匹配VIN)</td><td>ASSIGN_FLAG / ASSIGN_TYPE / DLR_CODE / ONECAR_FLAG / CUS_ORDER / IS_FROZEN / BILL_NO / BILL_ID / LAST_UPDATED_*</td><td>'Yes' / '12'⚠️ / 订单DLR_CODE / 明细ONECAR_FLAG / 明细CUS_ORDER / 'No' / DLR_ORDER_CODE / 明细ID / now,user</td></tr></tbody></table></div>
+<h3>分支 B：部分匹配 → 订单 STATE='94'(部分待审批)</h3>
+<p>已匹配行同分支 A 五表；未匹配行：<code>T_V_Z_BU_DLR_ORDER_D</code> UPDATE DLR_ORDER_D_STATUS='3'(拒绝)。</p>
+<h3>分支 C：无匹配</h3>
+<p>不更新，提示「系统可用资源不足！」（对齐 <code>save()</code> 里 <code>createDailyOrderHis()</code> + 抛错的既有模式）。</p>
+<h2>拒绝 · 逆向回滚（字段级落地版）</h2>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>操作</th><th>列</th><th>写入值</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>UPDATE(被拒且曾匹配)</td><td>DLR_ORDER_D_STATUS / IS_ALLOT_CAR / ACTUAL_ASSIGN_TIME / VIN / APPROVE_VIN / APPROVE_SON</td><td>'3' / 'No' / NULL / NULL / NULL / NULL</td></tr><tr><td>T_M_Z_BD_CAR</td><td>UPDATE(被拒VIN)</td><td>SPLIT_DATE / CAR_STATE / DLR_CODE / STOCK_LOCK_STATE / LOCK_BILL_NO / LOCK_BILL_ID</td><td>NULL / 最新异动历史OLD_CAR_STATE🔎 / NULL / 'No' / NULL / NULL</td></tr><tr><td>T_V_Z_BU_PRODUCT_PLAN</td><td>UPDATE(被拒VIN)</td><td>ASSIGN_FLAG / ASSIGN_TYPE / BILL_NO / BILL_ID / DLR_CODE / ONECAR_FLAG / CUS_ORDER</td><td>'No' / NULL / NULL / NULL / NULL / 'No' / 'No'</td></tr><tr><td>T_M_Z_BD_CAR_CHANGE_HIS</td><td>INSERT(被拒VIN)</td><td>CAR_CHANGE_TYPE / OLD_CAR_STATE / NEW_CAR_STATE / BILL_CODE / REMARK / CAR_CHANGE_TIME</td><td>增补订单分配拒绝 / '4' / 最新异动历史OLD_CAR_STATE🔎 / DLR_ORDER_CODE / 增补订单分配拒绝 / now</td></tr></tbody></table></div>
+<h2>并发（用真实字段）</h2>
+<ul>
+<li>所有实体带 <code>VERSION</code> 列（<code>@Version</code>）→ <strong>乐观锁天然可用</strong>，代提报/审批抢占同一 VIN 时靠版本号 + <code>T_M_Z_BD_CAR.STOCK_LOCK_STATE</code> 双保险。之前这条只能建议，现在是 schema 确认。</li>
+</ul>
+<h2>结论（回答"能否到达这个精细度"）</h2>
+<p><strong>能。</strong> 拿到 schema 的这一刻，代提报从"占位表名"变成了<strong>每格指向真实列</strong>的落地设计：五表字段级、逆向回滚、并发锁，全部锚定 <code>T_M_Z_BD_CAR.STOCK_LOCK_STATE</code>、<code>T_V_Z_BU_DLR_ORDER_D.IS_ALLOT_CAR</code> 这种真实列名。</p>
+<p>更关键的两点，说明这不是"抄"，是"清单法 + 事实源"的价值：</p>
+<ol>
+<li><strong>考古项被代码解决</strong>：采购订单号规则、状态码、增补默认值，都从实体/内嵌逻辑里挖出来了，不用再问产品。</li>
+<li><strong>反向发现 PRD 的错</strong>：OP vs EO（M1）、ASSIGN_TYPE=12 不在枚举（M2）、SUMMIT_TIME 拼写（M3）——这些是<strong>光看 PRD 永远发现不了、只有对上真实 schema 才暴露</strong>的坑。这正是详细设计阶段该拦下的。</li>
+</ol>
+<p><strong>唯一还需要的</strong>：代提报那套"资源匹配 + 五表级联"的服务层原始代码（不在这 10 个实体里，在 service 类），拿到后连"匹配顺序、边界条件"也能 100% 复刻；没有它，我现在已能把字段级写到位，匹配算法引用既有逻辑并标注。</p>
+<p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/detail-design-代提报-schema落地版.md · 内容为真实生成产物样例</p>
+</main>
+</body>
+</html>

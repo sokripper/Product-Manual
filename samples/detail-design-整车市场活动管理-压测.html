@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>详细设计（LLD）压测：整车市场活动管理（从 PRD 真跑阶段 D）</title>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+    --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+    --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+    --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+  --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+  --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+  --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.7; font-size:15px;
+  letter-spacing:.01em;
+}
+.wrap{max-width:900px; margin:0 auto; padding:0 24px 120px}
+.topbar{
+  position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line); margin-bottom:40px;
+}
+.topbar .inner{max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:14px}
+.badge{
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:5px;
+  padding:3px 9px; white-space:nowrap;
+}
+.topbar .name{font-size:13px; color:var(--muted); font-family:var(--mono)}
+.back{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent); text-decoration:none}
+.back:hover{text-decoration:underline}
+h1{font-size:29px; line-height:1.25; font-weight:750; margin:28px 0 8px; text-wrap:balance; letter-spacing:-.01em}
+h2{font-size:21px; font-weight:700; margin:44px 0 12px; padding-top:16px; border-top:1px solid var(--line); letter-spacing:-.005em}
+h3{font-size:17px; font-weight:680; margin:30px 0 10px; color:var(--ink)}
+h4{font-size:14.5px; font-weight:680; margin:22px 0 8px; color:var(--muted); font-family:var(--mono)}
+p{margin:12px 0}
+a{color:var(--accent)}
+strong{font-weight:680; color:var(--ink)}
+code{font-family:var(--mono); font-size:.86em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
+pre{background:var(--code-bg); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:16px 0}
+pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.6}
+blockquote{
+  margin:16px 0; padding:12px 18px; background:var(--quote-bg);
+  border-left:3px solid var(--quote-bar); border-radius:0 8px 8px 0; color:var(--muted); font-size:14px;
+}
+blockquote p{margin:6px 0}
+blockquote strong{color:var(--ink)}
+ul,ol{margin:12px 0; padding-left:24px}
+li{margin:5px 0}
+ul ul,ol ol,ul ol,ol ul{margin:4px 0}
+hr{border:none; border-top:1px solid var(--line); margin:36px 0}
+.tablewrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums}
+th{background:var(--th-bg); color:var(--th-ink); font-weight:640; text-align:left; padding:9px 13px; white-space:nowrap; font-family:var(--mono); font-size:12px; letter-spacing:.02em}
+td{padding:9px 13px; border-top:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.doc-note{
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  margin:34px 0 0; padding-top:16px; border-top:1px dashed var(--line);
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+  <span class="badge">SDD V8 · 生成产物</span>
+  <span class="name">detail-design-整车市场活动管理-压测.md</span>
+  <a class="back" href="../SDD-V8-使用手册.html">← 返回使用手册</a>
+</div></div>
+<main class="wrap">
+<h1>详细设计（LLD）压测：整车市场活动管理（从 PRD 真跑阶段 D）</h1>
+<blockquote><p><strong>这才是正确的压测</strong>：输入 = <code>PRD-Sales-75-整车市场活动管理</code>（PRD 层、有缺口），产出 = 尝试用 <code>templates/detail-design.md</code> 生成详细设计。</p>
+<p>目的：验证阶段 D 能否把 PRD 的缺口逼成"写不下去的具体阻塞点"。</p>
+<p>记号：✅ PRD 已给足；⚠️ PRD 有但矛盾/歧义；❌ PRD 缺，<strong>必须产品补充</strong>才能写下去。</p></blockquote>
+<h2>0. 元信息</h2>
+<ul>
+<li>功能编码：F-Sales-75（活动日历维护 / 市场活动维护 / 市场活动审核）</li>
+<li>节点目录：活动中心 - 整车市场活动管理</li>
+<li>开发类型：新增节点</li>
+<li>Schema 模式：本模块表为新建（活动日历主表/清单表、市场活动主表、审核记录表）；<strong>结算接口</strong>对接既有 GMP/SAP（用户已选 Mock）</li>
+<li>涉及表：</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>表名</th><th>用途</th><th>状态</th></tr></thead><tbody><tr><td>活动日历主表</td><td>年/月汇总预算与数量</td><td>✅ PRD 给了字段</td></tr><tr><td>活动日历清单表</td><td>按活动类型明细</td><td>⚠️ 字段规则对调（见 2.3）</td></tr><tr><td>市场活动主表</td><td>活动基础/审批/执行/预算</td><td>✅（但"是否大客户专场"是孤儿字段）</td></tr><tr><td>市场活动审核记录表</td><td>审核流水</td><td>✅</td></tr><tr><td>南非市场活动结算接口</td><td>总经理通过后结算</td><td>❌ 无接口契约（Mock，见 4.x）</td></tr></tbody></table></div>
+<hr>
+<h2>阻塞点汇总（先看这个——这就是阶段 D 的产出价值）</h2>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>卡点</th><th>卡在模板哪一节</th><th>为什么写不下去</th></tr></thead><tbody><tr><td>B1</td><td><strong>审批链不一致</strong></td><td>3.1 状态机</td><td>状态枚举/角色表有"待市场部审核"，但审核流(3.2 审核界面)写的是 采购部长→销售部长→财务部长→总经理，"待市场部审核"没有归属节点。状态机的迁移边画不出来。</td></tr><tr><td>B2</td><td><strong>验收与结算先后矛盾</strong></td><td>3.1 迁移 + 4.x 副作用</td><td>流程图：总经理通过→立即调结算(SAP)→之后才验收；但状态里又有"验收完成"。结算到底在验收前还是后？副作用顺序无法确定。</td></tr><tr><td>B3</td><td><strong>日历粒度 年/季/月 混用</strong></td><td>2.1 表单字段</td><td>主界面按 年/季度、新增按 年/月份、主表/清单表按月份。表单"月份"字段到底存不存在、卡片按季还是按月，写不了。</td></tr><tr><td>B4</td><td><strong>清单表字段规则对调</strong></td><td>2.3 明细网格</td><td>清单表(表27)：预算金额规则写成"整数≥0 对应数量"，数量写成"保留2位小数 币种ZAR"——两行互换。字段类型无法确定。</td></tr><tr><td>B5</td><td><strong>活动编码规则外置</strong></td><td>5 编码规则</td><td>"活动编码自动生成"，但规则在钉钉《业务单据编码规则》，PRD 未附。生成算法写不了。</td></tr><tr><td>B6</td><td><strong>附件规则矛盾</strong></td><td>4.x 附件操作</td><td>2.3 正文：PNG/JPG/JPEG/MP3 单个 20M；原型图：jpg/png/pdf 单个 10M。校验规则二选一未定。</td></tr><tr><td>B7</td><td><strong>组织机构过滤模型未定义</strong></td><td>1.3 数据范围</td><td>"只能看到本组织机构下的活动"——组织机构树/归属字段未定义，数据权限过滤条件写不了。</td></tr><tr><td>B8</td><td><strong>详情页按钮错误</strong></td><td>4.x</td><td>详情页(2.4)操作区写"保存/提交/状态=录入"，是从新增页复制错误，详情页不应有。需产品确认删除。</td></tr><tr><td>B9</td><td><strong>"是否大客户专场"孤儿字段</strong></td><td>2.1</td><td>市场活动主表字段 14，无必填/规则/界面出现。留还是删、规则是什么，未定。</td></tr></tbody></table></div>
+<blockquote><p>结论预告：<strong>9 个卡点里，B1/B2/B3/B5 是硬阻塞</strong>——审批链、结算顺序、日历粒度、编码规则不定，详细设计的核心（状态机 + 副作用 + 编码）就写不完整。这正是"给到开发前必须产品补齐"的清单。</p></blockquote>
+<hr>
+<h2>1. 查询规格（市场活动维护主界面）</h2>
+<h3>1.1 查询条件 ✅</h3>
+<p>活动编码(模糊) / 活动名称(模糊) / 活动类型(全部·品牌曝光度·促进销售) / 活动状态(默认除作废外全部) / 有效期范围(默认当月) / 计划起止日期(默认当月)。来源均为市场活动主表。</p>
+<h3>1.2 查询结果 ✅</h3>
+<p>活动编码(超链接→详情) / 名称 / 类型 / 状态 / 有效起止 / 计划起止 / 实际起止 / 创建人 / 最后修改时间。</p>
+<h3>1.3 数据范围过滤 ❌ B7</h3>
+<ul>
+<li>硬过滤：活动状态默认排除"作废"。✅</li>
+<li>数据权限：「操作人按组织机构，只能看本组织机构下的活动」——❌ <strong>组织机构模型未定义</strong>，过滤条件写不了。需产品给出：组织机构树结构 + 活动归属字段（按创建人所属公司？按经销商？）。</li>
+</ul>
+<h2>2. 表单与明细字段规格</h2>
+<h3>2.1 市场活动 新增/编辑表单 ✅（除 B9）</h3>
+<p>活动编码(只读自动生成) / 名称(必填≤100) / 描述(≤500) / 类型(必填单选) / 状态(只读系统控) / 计划起止(必填) / 实际起止(选填) / 举办地址(≤200) / 预算金额(必填 ZAR 2位) / 执行人 / 有效起止(必填) / 备注(≤500)。</p>
+<ul>
+<li>⚠️ B9「是否大客户专场」：无必填/规则/界面位置，<strong>产品需定</strong>是否保留及规则。</li>
+</ul>
+<h3>2.2 活动日历 新增/编辑表单 ❌ B3</h3>
+<ul>
+<li>年份(必填) + <strong>月份 or 季度？</strong>——❌ 主界面按季度、新增按月份，<strong>粒度冲突</strong>，表单画不出来。</li>
+<li>每活动类型的 活动数量(≥0整数) / 活动预算(ZAR 2位)。</li>
+</ul>
+<h3>2.3 活动日历清单表（明细网格）⚠️ B4</h3>
+<div class="tablewrap"><table><thead><tr><th>字段</th><th>规则</th><th>问题</th></tr></thead><tbody><tr><td>活动类型</td><td>单选:品牌曝光度/促进销售</td><td>✅</td></tr><tr><td>活动预算金额</td><td>PRD 写"整数≥0，对应数量"</td><td>⚠️ <strong>规则写反</strong>，应为"数值 2 位小数 ZAR"</td></tr><tr><td>活动数量</td><td>PRD 写"2位小数 ZAR，对应预算"</td><td>⚠️ <strong>规则写反</strong>，应为"整数≥0"</td></tr></tbody></table></div>
+<p>需产品确认纠正后才能定字段类型与主/清单一致性校验。</p>
+<h2>3. 状态机（核心，最硬的卡点）</h2>
+<h3>3.1 活动状态 ❌ B1 / B2</h3>
+<ul>
+<li>状态全集（PRD 枚举）：录入 / 待市场部审核 / 待采购部部长审核 / 待销售部长审核 / 待财务部长审核 / 待总经理审核 / 待验收 / 验收完成 / 驳回 / 作废。</li>
+<li>迁移表（<strong>画到一半卡住</strong>）：</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>当前态</th><th>事件</th><th>目标态</th><th>副作用</th><th>状态</th></tr></thead><tbody><tr><td>—</td><td>保存</td><td>录入</td><td>写主表+清单表</td><td>✅</td></tr><tr><td>录入/驳回</td><td>提交</td><td>待市场部审核</td><td>写审核记录</td><td>✅</td></tr><tr><td>待市场部审核</td><td>？谁审</td><td>？</td><td></td><td>❌ B1 角色表无"市场部审核"节点的审批人，<code>审核界面</code>审批流也不含此节点</td></tr><tr><td>待采购部部长审核</td><td>通过</td><td>待销售部长审核</td><td></td><td>✅</td></tr><tr><td>待销售部长审核</td><td>通过</td><td>待财务部长审核</td><td></td><td>✅</td></tr><tr><td>待财务部长审核</td><td>通过</td><td>待总经理审核</td><td></td><td>✅</td></tr><tr><td>待总经理审核</td><td>通过</td><td>待验收?</td><td><strong>调结算接口</strong></td><td>❌ B2 结算与验收先后不明</td></tr><tr><td>待验收</td><td>验收</td><td>待验收审核→验收完成</td><td>写验收附件+意见</td><td>⚠️ 两段验收(财务验收/销售部长验收审批)先后需确认</td></tr><tr><td>任一待审</td><td>驳回</td><td>驳回</td><td>写审核记录</td><td>✅</td></tr><tr><td>录入/驳回</td><td>作废</td><td>作废</td><td>二次确认</td><td>✅</td></tr></tbody></table></div>
+<ul>
+<li>非法迁移拦截：编辑/提交/作废仅 录入/驳回 可用 ✅。</li>
+</ul>
+<h3>3.2 审核记录联动 ✅</h3>
+<p>每次审核写一条 审核记录表(审核人/时间/结果/意见/当前节点)。</p>
+<h2>4. 操作清单（节选卡点）</h2>
+<h3>4.x 操作：审核-通过（总经理节点）❌ B2 + 结算接口 Mock</h3>
+<ul>
+<li>副作用：更新活动状态 → 下一级；<strong>总经理通过后调「南非市场活动结算接口」</strong>。</li>
+<ul>
+<li>❌ 结算接口无契约（入参/出参/失败处理）→ 用户已选 Mock：定义 <code>SettlementAdapter.settle(活动编码)</code> 桩，返回成功/失败；真实契约待 GMP 提供。</li>
+<li>❌ B2：结算成功后置为"待验收"还是"验收完成"？验收环节与结算的先后未定，事务顺序写不了。</li>
+</ul>
+</ul>
+<h3>4.x 操作：附件上传 ❌ B6</h3>
+<ul>
+<li>格式/大小校验二选一未定（20M+MP3 vs 10M+PDF）。</li>
+</ul>
+<h3>4.x 操作：详情页保存/提交 ❌ B8</h3>
+<ul>
+<li>PRD 详情页(2.4)含"保存/提交"，疑似复制错误，需产品确认删除。</li>
+</ul>
+<h2>5. 编码生成规则 ❌ B5</h2>
+<div class="tablewrap"><table><thead><tr><th>单据</th><th>规则</th><th>状态</th></tr></thead><tbody><tr><td>活动编码</td><td>"自动生成"，规则在钉钉《业务单据编码规则》</td><td>❌ 规则未附，生成算法写不了</td></tr></tbody></table></div>
+<h2>6. 并发 / 幂等 / 回滚 ⚠️</h2>
+<ul>
+<li>并发校验：PRD 多处写"并发校验"✅（保存/提交/审核/验收）——需乐观锁字段，PRD 未指定，建议用最后修改时间/版本号。</li>
+<li>逆向：驳回→回到"驳回"态可再编辑提交 ✅；无资源占用类操作，回滚简单（区别于新能源）。</li>
+</ul>
+<h2>7. 依赖既有逻辑（考古项）</h2>
+<ul>
+<li>南非市场活动结算接口：❌ 外部 GMP/SAP，无契约 → Mock。</li>
+<li>业务单据编码规则：❌ 钉钉附件，未提供。</li>
+<li>组织机构/角色/审批人绑定：❌ 依赖平台底座，未定义。</li>
+</ul>
+<h2>8. 压测结论</h2>
+<p><strong>模板本身没问题</strong>——能填的部分（查询、表单、审核记录、简单状态迁移）都干净装下。但这份 PRD <strong>产不出一份完整详细设计</strong>，因为：</p>
+<ul>
+<li><strong>4 个硬阻塞</strong>（B1 审批链 / B2 结算与验收先后 / B3 日历粒度 / B5 编码规则）直接让状态机、核心副作用、编码这三块写不完整；</li>
+<li>另有 5 个需产品澄清（B4/B6/B7/B8/B9）。</li>
+</ul>
+<p><strong>这恰恰证明了阶段 D 的价值</strong>：它把我第一轮 gap 分析里那些"文档层面的矛盾"，变成了"详细设计里画不下去的具体格子"——也就变成了<strong>给开发前，产品必须逐条补齐的清单</strong>。这份清单（阻塞点汇总表）就是产品要回去补的 TODO，补完才能冻结 feature-signoff 进开发。</p>
+<p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/detail-design-整车市场活动管理-压测.md · 内容为真实生成产物样例</p>
+</main>
+</body>
+</html>

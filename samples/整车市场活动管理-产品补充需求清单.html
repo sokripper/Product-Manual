@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>整车市场活动管理 — 产品补充需求清单</title>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+    --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+    --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+    --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+  --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+  --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+  --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.7; font-size:15px;
+  letter-spacing:.01em;
+}
+.wrap{max-width:900px; margin:0 auto; padding:0 24px 120px}
+.topbar{
+  position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line); margin-bottom:40px;
+}
+.topbar .inner{max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:14px}
+.badge{
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:5px;
+  padding:3px 9px; white-space:nowrap;
+}
+.topbar .name{font-size:13px; color:var(--muted); font-family:var(--mono)}
+.back{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent); text-decoration:none}
+.back:hover{text-decoration:underline}
+h1{font-size:29px; line-height:1.25; font-weight:750; margin:28px 0 8px; text-wrap:balance; letter-spacing:-.01em}
+h2{font-size:21px; font-weight:700; margin:44px 0 12px; padding-top:16px; border-top:1px solid var(--line); letter-spacing:-.005em}
+h3{font-size:17px; font-weight:680; margin:30px 0 10px; color:var(--ink)}
+h4{font-size:14.5px; font-weight:680; margin:22px 0 8px; color:var(--muted); font-family:var(--mono)}
+p{margin:12px 0}
+a{color:var(--accent)}
+strong{font-weight:680; color:var(--ink)}
+code{font-family:var(--mono); font-size:.86em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
+pre{background:var(--code-bg); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:16px 0}
+pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.6}
+blockquote{
+  margin:16px 0; padding:12px 18px; background:var(--quote-bg);
+  border-left:3px solid var(--quote-bar); border-radius:0 8px 8px 0; color:var(--muted); font-size:14px;
+}
+blockquote p{margin:6px 0}
+blockquote strong{color:var(--ink)}
+ul,ol{margin:12px 0; padding-left:24px}
+li{margin:5px 0}
+ul ul,ol ol,ul ol,ol ul{margin:4px 0}
+hr{border:none; border-top:1px solid var(--line); margin:36px 0}
+.tablewrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums}
+th{background:var(--th-bg); color:var(--th-ink); font-weight:640; text-align:left; padding:9px 13px; white-space:nowrap; font-family:var(--mono); font-size:12px; letter-spacing:.02em}
+td{padding:9px 13px; border-top:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.doc-note{
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  margin:34px 0 0; padding-top:16px; border-top:1px dashed var(--line);
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+  <span class="badge">SDD V8 · 生成产物</span>
+  <span class="name">整车市场活动管理-产品补充需求清单.md</span>
+  <a class="back" href="../SDD-V8-使用手册.html">← 返回使用手册</a>
+</div></div>
+<main class="wrap">
+<h1>整车市场活动管理 — 产品补充需求清单</h1>
+<blockquote><p>来源：用 PRD-Sales-75 真跑阶段 D（后端详细设计）时逼出的 9 个卡点（见 <code>detail-design-整车市场活动管理-压测.md</code>「阻塞点汇总」）。</p>
+<p>用法：产品逐条在「产品答复」栏作答（可直接确认"我的建议默认"或改）。<strong>硬阻塞不补齐，详细设计写不完整，不能冻结 feature-signoff、不能进开发。</strong></p>
+<p>分级：🔴 硬阻塞（挡住状态机/副作用/编码核心）；🟡 待澄清（影响局部字段/校验）。</p></blockquote>
+<hr>
+<h2>🔴 硬阻塞（4 条，必须先补）</h2>
+<h3>B1　审批链不一致 —— "待市场部审核"没有审批人</h3>
+<ul>
+<li><strong>位置</strong>：状态枚举（表11）、角色权限（表25）、审核界面审批流（3.2）</li>
+<li><strong>矛盾</strong>：状态枚举里有「待市场部审核」，但审核界面写的审批流是 采购部部长→销售部长→财务部长→总经理，<strong>不含市场部审核节点</strong>；角色表里市场部经理是申请人，却又挂了一串"待XX审核"。到底完整审批链是几级、每级谁审，对不上。</li>
+<li><strong>需产品给出</strong>：完整审批链的<strong>有序节点 + 每个节点的审批角色</strong>。</li>
+<li><strong>我的建议默认（供确认）</strong>：</li>
+</ul>
+<p><code>录入 →(市场部经理提交)→ 待采购部部长审核 → 待销售部长审核 → 待财务部长审核 → 待总经理审核 →(总经理通过调结算)→ 待验收 → 待验收审核 → 验收完成</code></p>
+<p>即<strong>删除"待市场部审核"节点</strong>（市场部只提交不自审）。</p>
+<ul>
+<li><strong>卡住</strong>：状态机迁移边、审核界面按钮可用条件。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<h3>B2　结算与验收的先后矛盾</h3>
+<ul>
+<li><strong>位置</strong>：流程图（image1）、审核界面（3.2）、状态枚举</li>
+<li><strong>矛盾</strong>：流程图是「总经理通过 → 立即调结算(SAP) → 之后才验收」；但状态里又有「验收完成」在最后。结算发生在验收<strong>之前</strong>还是<strong>之后</strong>？</li>
+<li><strong>需产品给出</strong>：结算接口的调用时点，且明确结算后活动进入哪个状态。</li>
+<li><strong>我的建议默认（供确认）</strong>：按流程图——总经理审核通过即调结算接口，成功后置「待验收」；验收/验收审批通过后置「验收完成」。（结算在前，验收在后）</li>
+<li><strong>卡住</strong>：审核-通过操作的副作用顺序、事务边界。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<h3>B3　活动日历粒度 年/季/月 混用</h3>
+<ul>
+<li><strong>位置</strong>：日历主界面（1.1 按年/季度）、新增界面（1.2 按年/月份）、日历主表/清单表（按月份）</li>
+<li><strong>矛盾</strong>：查询和卡片按<strong>季度</strong>展示，录入和存储按<strong>月份</strong>。到底以哪个为准。</li>
+<li><strong>需产品给出</strong>：日历的统一粒度（年+季度 / 年+月份 / 年+月且卡片按季汇总）。</li>
+<li><strong>我的建议默认（供确认）</strong>：<strong>存储与录入按"年+月份"</strong>；主界面卡片<strong>按季度汇总展示</strong>（一个季度卡片聚合该季 3 个月）。这样两处都能自洽。</li>
+<li><strong>卡住</strong>：日历表单字段（月份控件是否存在）、卡片列表聚合逻辑。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<h3>B5　活动编码生成规则外置未提供</h3>
+<ul>
+<li><strong>位置</strong>：市场活动主表「活动编码 = 系统自动生成」；规则在钉钉《业务单据编码规则》</li>
+<li><strong>缺失</strong>：PRD 未附编码规则；原型里是 <code>HD22024000002</code>，规则不明。</li>
+<li><strong>需产品给出</strong>：活动编码的生成规则（前缀 / 日期段 / 流水位数 / 重置周期）。</li>
+<li><strong>我的建议默认（供确认）</strong>：参照原型反推 <code>HD2 + YYYY + 6位流水</code>（如 HD22024000002）；请产品确认或给出钉钉文档里的真实规则。</li>
+<li><strong>卡住</strong>：编码生成算法（详细设计第 5 节）。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<hr>
+<h2>🟡 待澄清（5 条，影响局部）</h2>
+<h3>B4　活动日历清单表字段规则对调</h3>
+<ul>
+<li><strong>位置</strong>：活动日历清单表（表27）字段 4、5</li>
+<li><strong>矛盾</strong>：预算金额写成"整数≥0，对应数量"；数量写成"2位小数 ZAR，对应预算"——<strong>两行规则互换了</strong>。</li>
+<li><strong>需产品确认</strong>：是否即为笔误，纠正为「预算金额=数值2位小数 ZAR；数量=整数≥0」。</li>
+<li><strong>我的建议默认</strong>：确认为笔误，按上述纠正。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<h3>B6　附件格式/大小规则矛盾</h3>
+<ul>
+<li><strong>位置</strong>：验收界面（2.3 正文：PNG/JPG/JPEG/MP3，单个 20M）vs 原型图（jpg/png/pdf，单个 10M）</li>
+<li><strong>需产品确认</strong>：以哪套为准（含是否允许 MP3、单文件上限）。</li>
+<li><strong>我的建议默认</strong>：取并集偏保守——<code>jpg/png/jpeg/pdf</code>，单个 ≤ 10M（如需 MP3 请明确说明用途）。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<h3>B7　组织机构数据权限模型未定义</h3>
+<ul>
+<li><strong>位置</strong>：查询「只能看到本组织机构下的活动」</li>
+<li><strong>缺失</strong>：组织机构树结构、活动的归属字段（按创建人所属公司？按经销商？）未定义。</li>
+<li><strong>需产品给出</strong>：组织机构模型 + 活动归属判定字段（本期若只有"南非公司"一个主体，可简化）。</li>
+<li><strong>我的建议默认</strong>：本期单主体（南非公司），数据权限先按「创建人所属公司 = 当前用户所属公司」过滤；多主体扩展留 V2。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<h3>B8　详情页多余的"保存/提交"按钮</h3>
+<ul>
+<li><strong>位置</strong>：详情界面（2.4 操作区写了"保存/提交/状态=录入"）</li>
+<li><strong>判断</strong>：疑似从新增页复制错误，详情页应只读。</li>
+<li><strong>需产品确认</strong>：删除详情页的保存/提交按钮。</li>
+<li><strong>我的建议默认</strong>：删除，详情页纯查看。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<h3>B9　"是否大客户专场"孤儿字段</h3>
+<ul>
+<li><strong>位置</strong>：市场活动主表字段 14</li>
+<li><strong>缺失</strong>：无必填/规则/界面出现，全表仅此一处提及。</li>
+<li><strong>需产品给出</strong>：保留还是删除；保留则给出取值、必填、界面位置、业务含义。</li>
+<li><strong>我的建议默认</strong>：本期<strong>删除</strong>（无配套逻辑）；如属未来大客户专场功能，标 V2。</li>
+<li><strong>产品答复</strong>：____</li>
+</ul>
+<hr>
+<h2>补齐后的动作</h2>
+<ol>
+<li>产品逐条作答上面 9 项 →</li>
+<li>我据此改写 PRD 相应章节 + 补完详细设计（状态机/副作用/编码可写完整）→</li>
+<li>生成并逐条确认 <code>feature-signoff.md</code> 冻结 →</li>
+<li>进开发门禁。</li>
+</ol>
+<blockquote><p>结算接口按用户既定选择走 <strong>Mock</strong>（<code>SettlementAdapter</code> 桩），真实契约由 GMP 后续提供；此项不阻塞开发，但需在 feature-signoff 标注为降级验收。</p></blockquote>
+<p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/整车市场活动管理-产品补充需求清单.md · 内容为真实生成产物样例</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>服务商结算单列表</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body data-active="settle" data-crumb="结算管理 / 服务商结算单列表">
+<div class="app"><aside class="sidebar" id="sidebar"></aside>
+<div class="main"><header class="topbar" id="topbar"></header>
+<div class="content wrap-page">
+
+  <div class="card"><div class="card-bd">
+    <div class="filter">
+      <div class="field"><label>结算单号</label><div class="ctrl">输入单号</div></div>
+      <div class="field"><label>结算周期</label><div class="ctrl">开始 ~ 结束 📅</div></div>
+      <div class="field"><label>结算单状态</label><div class="ctrl">全部状态 ▾</div></div>
+      <div class="field"><label>服务商名称</label><div class="ctrl">全部服务商 ▾</div></div>
+      <div class="field"><label>所属区域</label><div class="ctrl">全部区域 ▾</div></div>
+      <div class="acts"><button class="btn btn--primary">查询</button><button class="btn">重置</button><button class="btn">⬇ 导出</button></div>
+    </div>
+  </div></div>
+
+  <div class="card">
+    <div class="card-hd"><h3>结算单列表</h3><button class="btn">＋ 手动合并结算单</button></div>
+    <div class="card-bd">
+      <div class="tabs" style="margin-bottom:12px"><a class="on">全部 (312)</a><a>待确认 (24)</a><a>待对账 (18)</a><a>待开票 (9)</a><a>待强制结算 (3)</a><a>已结算 (258)</a></div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>结算单号</th><th>服务商名称</th><th>所属区域</th><th>结算周期</th><th class="num">应付总金额</th><th class="num">责任抵扣</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td class="mono"><a href="06-服务商结算单详情.html">SPJS-20260701-0012</a></td><td>苏州星辉服务中心</td><td>华东区/江苏</td><td>2026-06-01 ~ 06-30</td><td class="num money">¥12,480.00</td><td class="num money neg">-¥2,140.00</td><td><span class="tag tag--proc">待对账</span></td><td><span class="link">查看</span><span class="link">确认结算</span></td></tr>
+          <tr><td class="mono"><a href="06-服务商结算单详情.html">SPJS-20260701-0013</a></td><td>杭州锐动服务点</td><td>华东区/浙江</td><td>2026-06-01 ~ 06-30</td><td class="num money">¥6,900.00</td><td class="num money">¥0.00</td><td><span class="tag tag--gray">待确认</span></td><td><span class="link">查看</span><span class="link">确认结算</span><span class="link danger">作废</span></td></tr>
+          <tr><td class="mono"><a href="06-服务商结算单详情.html">SPJS-20260701-0014</a></td><td>无锡华翔售后</td><td>华东区/江苏</td><td>2026-06-01 ~ 06-30</td><td class="num money neg">-¥3,200.00</td><td class="num money neg">-¥5,500.00</td><td><span class="tag tag--warn">待强制结算</span></td><td><span class="link">查看</span><span class="link">强制结算</span></td></tr>
+          <tr><td class="mono"><a href="06-服务商结算单详情.html">SPJS-20260701-0015</a></td><td>南京恒卓维保</td><td>华东区/江苏</td><td>2026-06-01 ~ 06-30</td><td class="num money">¥9,860.00</td><td class="num money neg">-¥820.00</td><td><span class="tag tag--cyan">已核验</span></td><td><span class="link">查看</span><span class="link">申请付款</span></td></tr>
+          <tr><td class="mono"><a href="06-服务商结算单详情.html">SPJS-20260601-0008</a></td><td>苏州星辉服务中心</td><td>华东区/江苏</td><td>2026-05-01 ~ 05-31</td><td class="num money">¥15,200.00</td><td class="num money">¥0.00</td><td><span class="tag tag--succ">已结算</span></td><td><span class="link">查看</span></td></tr>
+          <tr class="total"><td colspan="4">本页合计</td><td class="num money">¥41,240.00</td><td class="num money neg">-¥11,660.00</td><td colspan="2"></td></tr>
+        </tbody>
+      </table></div>
+      <div class="pager"><span>显示第 1–5 条，共 312 条</span><span class="pg">‹</span><span class="pg on">1</span><span class="pg">2</span><span class="pg">…</span><span class="pg">63</span><span class="pg">›</span><span>20 条/页</span></div>
+    </div>
+  </div>
+
+</div></div></div>
+<script src="../assets/app.js"></script></body></html>

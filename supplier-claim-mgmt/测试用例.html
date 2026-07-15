@@ -1,0 +1,573 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>测试用例</title>
+<style>
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--cm:#6b7a90;--kw:#7aa2ff;--str:#e0a458;
+  --th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;
+  --ok:#1f9d55;--ok-soft:#e6f6ec;--warn:#b7791f;--warn-soft:#fdf3e2;--crit:#d64545;--crit-soft:#fbeaea;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}}
+:root[data-theme="dark"]{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}
+:root[data-theme="light"]{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-size:15px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{font-weight:680;color:var(--ink)}
+.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
+.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
+h1{font-size:30px;font-weight:760;margin:30px 0 8px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:21px;font-weight:710;margin:40px 0 12px;padding-top:18px;border-top:1px solid var(--line);letter-spacing:-.005em}
+h3{font-size:16.5px;font-weight:680;margin:26px 0 9px}
+h4{font-size:13.5px;font-weight:680;margin:18px 0 7px;color:var(--muted);font-family:var(--mono)}
+p{margin:11px 0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px}
+code{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);color:var(--accent-ink);padding:1.5px 6px;border-radius:5px}
+blockquote{margin:15px 0;padding:11px 16px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--muted);font-size:14px}
+blockquote p{margin:5px 0}blockquote strong{color:var(--ink)}
+ul,ol{margin:11px 0;padding-left:23px}li{margin:4px 0}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{background:var(--th-bg);color:var(--th-ink);font-weight:600;text-align:left;padding:9px 13px;white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.02em;position:sticky;top:0}
+td{padding:8px 13px;border-top:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+/* code walkthrough */
+.filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
+.filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.filecard .fh .tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px}
+.filecard .fh .tag.be{background:#8957e5}.filecard .fh .tag.fe{background:#1f9d55}.filecard .fh .tag.cfg{background:#b7791f}
+.filecard .fh .pth{font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+.filecard .role{padding:9px 15px;font-size:13px;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line-soft)}
+.filecard .role b{color:var(--accent-ink)}
+.codebox{background:var(--code-bg);overflow-x:auto;max-height:640px;overflow-y:auto}
+pre{margin:0;padding:14px 0}
+pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--code-ink);background:none;padding:0}
+.cl{display:block;counter-increment:l;padding:0 16px 0 0;white-space:pre}
+.cl::before{content:counter(l);display:inline-block;width:38px;padding-right:14px;margin-right:12px;text-align:right;color:#46536b;border-right:1px solid var(--code-line);user-select:none}
+.cl.cm{color:var(--cm)}
+/* tabs (xlsx sheets) */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.tab{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 13px;cursor:pointer}
+.tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sheet{display:none}.sheet.on{display:block}
+.sheet .meta{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:10px 0}
+.toc{display:flex;flex-direction:column;gap:2px;margin:12px 0 20px;font-family:var(--mono);font-size:12.5px}
+.toc a{color:var(--muted);padding:3px 0}.toc a:hover{color:var(--accent)}
+.doc-note{font-family:var(--mono);font-size:11px;color:var(--faint);margin:38px 0 0;padding-top:16px;border-top:1px dashed var(--line)}
+.p>*:first-child{margin-top:0}
+/* dashboard */
+.hero{padding:40px 0 8px}
+.hero .eb{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero p{font-size:16px;color:var(--muted);max-width:60ch;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:26px 0}
+.stat{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:14px 16px}
+.stat .n{font-size:22px;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .n.ok{color:var(--ok)}.stat .n.ac{color:var(--accent)}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px;margin:14px 0}
+.card{display:block;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 17px;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px)}
+.card .ct{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;display:inline-block}
+.card .ct.be{background:#8957e5}.card .ct.fe{background:#1f9d55}.card .ct.ui{background:#0e8a9c}.card .ct.doc{background:#b7791f}
+.card h3{margin:11px 0 5px;font-size:16px;color:var(--ink)}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.grouplabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:30px 0 4px}
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;background:var(--surface)}
+.shot .cap{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.shot .cap .t{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#0e8a9c;border-radius:5px;padding:2px 8px}
+.shot .cap b{font-size:14px}.shot .cap span{font-size:12.5px;color:var(--muted)}
+.shot img{display:block;width:100%;height:auto}
+.protolist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin:12px 0}
+.protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
+.protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+</style></head><body><div class="topbar"><div class="in">
+<span class="badge">服务商索赔管理</span><span class="nm">测试用例</span>
+<div class="sp"><a class="tl" href="../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="index.html">总览</a><a class="tl" href="测试用例.html">测试用例</a><a class="tl" href="代码-前端.html">前端代码</a><a class="tl" href="代码-后端.html">后端代码</a><a class="tl" href="界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+</div></div><main class="wrap"><h1>测试用例</h1><div class="note ok"><b>阶段 G 冻结产物 · G-audit 全 PASS。</b>共 188 条用例，覆盖 6 个测试模块（每功能点 ≥1 条 P0 正向，带状态流转/校验/权限的补异常边界）。按 SDD 硬规则「测试数据」列一律留空，执行状态一律「待执行」。</div><div class="tabs"><button class="tab on" data-s="0">服务商索赔单 · 41</button><button class="tab" data-s="1">向欣旺达索赔单 · 38</button><button class="tab" data-s="2">结算 · 63</button><button class="tab" data-s="3">付款申请 · 31</button><button class="tab" data-s="4">结算基础配置 · 8</button><button class="tab" data-s="5">单据编码 · 7</button></div><div class="sheet on" data-s="0"><div class="meta">工作表「服务商索赔单」· 41 条用例 · 14 列（测试数据列按 SDD 规则留空）</div><div class="tablewrap"><table><thead><tr><th>测试用例ID</th><th>测试模块</th><th>模块核心功能</th><th>测试功能点</th><th>测试标题</th><th>角色</th><th>测试前置条件</th><th>测试数据</th><th>测试步骤</th><th>预期结果</th><th>测试类型</th><th>优先级</th><th>执行状态</th><th>备注</th></tr></thead><tbody><tr><td>TC001</td><td>服务商索赔单</td><td>新建索赔单</td><td>F-CLAIM-01</td><td>关联已完工保内工单新建暂存草稿（正向）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在一张状态为【已完工】且为保内、归属本服务商、维修方案已过技术审核的维修工单（工单库 Mock/待挂载）
+3. 该工单业务类型在 claim_type_mapping（enabled=1）中已配置映射
+4. 该工单无状态非【已拒绝/已作废】的既有索赔单</td><td></td><td>1. 进入「新建索赔单」入口，选择该已完工保内工单
+2. 系统按工单带出工时费明细、备件明细（备件索赔金额、备件管理费）、其它费用明细、维修类型/SN/条码、主责件、索赔类型
+3. 点击暂存草稿</td><td>1. 进入新建页，工单可选
+2. 索赔类型由工单业务类型只读带出；工时费/备件明细只读带入，备件索赔金额恒为 0，备件管理费=备件销售价×系数快照；索赔对象、项目编码暂空
+3. 保存成功生成草稿单，单据编号为 SPCO-年月日-流水，status=DRAFT，币种 CNY，applyTotalAmount=工时费合计+备件管理费+其它费用合计（自动只读）</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-01; 依据=PRD§4.1 F-CLAIM-01/§9; api:POST /claim/order/create-from-work-order; LLD二节; 原型 P02 基础信息+费用明细</td></tr><tr><td>TC002</td><td>服务商索赔单</td><td>新建索赔单</td><td>F-CLAIM-01</td><td>关联工单不满足索赔准入被拦（异常）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在一张不满足准入的工单：状态非【已完工】，或非保内，或不属于本服务商（工单库 Mock/待挂载）</td><td></td><td>1. 进入「新建索赔单」入口，选择该不满足准入的工单
+2. 提交新建</td><td>1. 进入新建页
+2. 新建被拦截，返回业务码 CLAIM_4001「工单不满足索赔准入」，不生成草稿单</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-01; 依据=PRD§8.1(A-8); api:POST /claim/order/create-from-work-order 错误码 CLAIM_4001; LLD二节校验1</td></tr><tr><td>TC003</td><td>服务商索赔单</td><td>新建索赔单</td><td>F-CLAIM-01</td><td>同一工单已存在有效索赔单被拦（异常）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 目标工单已存在一张状态非【已拒绝(DECLINED)/已作废(VOIDED)】的索赔单（含已驳回 REJECTED 亦占用）</td><td></td><td>1. 进入「新建索赔单」入口，选择该已有有效索赔单的工单
+2. 提交新建</td><td>1. 进入新建页
+2. 新建被拦截，返回业务码 CLAIM_4002「该工单已存在有效索赔单」，不重复建单</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-01; 依据=PRD§8.1(A-15)条件唯一; api 错误码 CLAIM_4002; LLD二节校验2</td></tr><tr><td>TC004</td><td>服务商索赔单</td><td>新建索赔单</td><td>F-CLAIM-01</td><td>工单业务类型未配置索赔类型映射被拦（异常）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 目标已完工保内工单的业务类型在 claim_type_mapping（enabled=1）中查不到映射</td><td></td><td>1. 进入「新建索赔单」入口，选择该工单
+2. 提交新建</td><td>1. 进入新建页
+2. 新建被拦截，返回业务码 CLAIM_4005「工单业务类型未配置映射」，不静默、不生成草稿单</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-01; 依据=PRD§10(A-9); api 错误码 CLAIM_4005; LLD二节校验（映射不可静默）</td></tr><tr><td>TC005</td><td>服务商索赔单</td><td>新建索赔单</td><td>F-CLAIM-01</td><td>工时费合计为 0 被拦（边界）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 目标已完工保内工单带出的工时费明细合计为 0（Σ工时费金额=0，边界值）</td><td></td><td>1. 进入「新建索赔单」入口，选择该工单
+2. 提交新建</td><td>1. 进入新建页
+2. 新建被拦截，返回业务码 CLAIM_4004「工时费合计必须大于 0」</td><td>边界</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-01; 依据=PRD§8.2(A-1)工时费&gt;0必有; api 错误码 CLAIM_4004; LLD二节校验3</td></tr><tr><td>TC006</td><td>服务商索赔单</td><td>新建索赔单</td><td>F-CLAIM-01</td><td>非服务商售后专员新建被拒（权限）</td><td>区域负责人/闪欣动力索赔专员/质量部责任判定专员</td><td>1. 以非服务商售后专员角色登录</td><td></td><td>1. 尝试访问「新建索赔单」入口并提交新建</td><td>1. 接口鉴权拦截，返回 403 无权限，不生成草稿单</td><td>权限</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-01; 依据=PRD§2 RBAC 服务商售后专员发起; api:POST /claim/order/create-from-work-order 前置校验 RBAC 403; LLD一节</td></tr><tr><td>TC007</td><td>服务商索赔单</td><td>提交索赔单</td><td>F-CLAIM-02</td><td>草稿单校验通过提交进区域初审（正向）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 DRAFT 草稿索赔单
+3. 已上传至少一张维修凭证类附件
+4. 需回运的备件均已发起回运（存在回运单附件，临时口径）
+5. 工单仍满足已完工+保内+本服务商、工时费合计&gt;0</td><td></td><td>1. 打开该草稿单
+2. 点击提交</td><td>1. 展示草稿单
+2. 提交成功，status→PENDING_REGION（待区域初审），审核/操作时间线新增一条 SUBMIT 操作事件</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-02; 依据=PRD§4.1 F-CLAIM-02/§6.1; api:POST /claim/order/{id}/submit; LLD三节</td></tr><tr><td>TC008</td><td>服务商索赔单</td><td>提交索赔单</td><td>F-CLAIM-02</td><td>缺维修凭证附件提交被拦（异常）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 DRAFT 草稿单，且无任何维修凭证类附件（旧件资料附件有无不影响）</td><td></td><td>1. 打开该草稿单
+2. 点击提交</td><td>1. 展示草稿单
+2. 提交被拦截，返回业务码 CLAIM_4007「缺少维修凭证附件」，状态仍为 DRAFT</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-02; 依据=原始PRD§4.1.1维修凭证必填硬校验; api 错误码 CLAIM_4007; LLD三节校验3; 原型 P02 维修凭证附件*</td></tr><tr><td>TC009</td><td>服务商索赔单</td><td>提交索赔单</td><td>F-CLAIM-02</td><td>需回运备件未发起回运提交被拦（异常）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 DRAFT 草稿单，含备件属性标识为「需回运」的备件
+3. 该单不存在回运单附件（未发起回运，临时口径）
+4. 维修凭证附件已上传</td><td></td><td>1. 打开该草稿单
+2. 点击提交</td><td>1. 展示草稿单
+2. 提交被拦截，返回业务码 CLAIM_4006「存在需回运备件未发起回运」，状态仍为 DRAFT</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-02; 依据=PRD§8.5(A-11); api 错误码 CLAIM_4006; LLD三节校验2(B-2/B-3临时口径)</td></tr><tr><td>TC010</td><td>服务商索赔单</td><td>提交索赔单</td><td>F-CLAIM-02</td><td>已驳回单编辑后重新提交回区域初审（正向）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 REJECTED 已驳回单，维修凭证附件齐、回运条件满足</td><td></td><td>1. 打开该已驳回单
+2. 点击提交（重新提交）</td><td>1. 展示已驳回单
+2. 提交成功，status→PENDING_REGION（从头再走区域初审），操作时间线新增一条 RESUBMIT 操作事件</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-02; 依据=PRD§6.1(A-13)驳回重提从头; api:POST /claim/order/{id}/submit(RESUBMIT); LLD三节/十节</td></tr><tr><td>TC011</td><td>服务商索赔单</td><td>提交索赔单</td><td>F-CLAIM-02</td><td>前置状态不满足提交被拦（边界/并发）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 目标单当前状态不在 {DRAFT, REJECTED}（如已是 PENDING_REGION，或并发已被他人改动）</td><td></td><td>1. 对该单发起提交</td><td>1. 乐观锁双条件命中 0 行，返回业务码 CLAIM_4008「当前状态不允许该操作，请刷新」，状态不变</td><td>边界</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-02; 依据=api 错误码 CLAIM_4008 乐观锁双条件; LLD十节非法迁移拦截</td></tr><tr><td>TC012</td><td>服务商索赔单</td><td>编辑索赔单</td><td>F-CLAIM-03</td><td>草稿态编辑其它费用并重算金额（正向）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 DRAFT 草稿单，含 editable=1 的其它费用行（如物流费）</td><td></td><td>1. 打开草稿单进入编辑
+2. 修改可编辑其它费用行金额、并新增一条其它费用行、删除一条可编辑行
+3. 保存</td><td>1. 进入编辑态，仅其它费用明细可改，工时费/备件明细/备件管理费只读不可改
+2. 编辑生效
+3. 保存成功，otherFeeTotal 按明细重算，applyTotalAmount=工时费合计+备件管理费+其它费用合计（工时/备件两项不变），status 仍为 DRAFT</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-03; 依据=PRD§4.1 F-CLAIM-03/§8.2(A-7); api:PUT /claim/order/{id}; LLD四节; 原型 P02 其它费用明细(仅物流费等可编辑)</td></tr><tr><td>TC013</td><td>服务商索赔单</td><td>编辑索赔单</td><td>F-CLAIM-03</td><td>已驳回态编辑其它费用状态保持（正向）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 REJECTED 已驳回单，含 editable=1 其它费用行</td><td></td><td>1. 打开已驳回单进入编辑
+2. 修改可编辑其它费用行金额
+3. 保存</td><td>1. 进入编辑态
+2. 编辑生效
+3. 保存成功，金额重算，status 仍为 REJECTED（编辑不改状态，可再走提交）</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-03; 依据=PRD§4.1 F-CLAIM-03 仅草稿/已驳回可编辑; api:PUT /claim/order/{id}; LLD四节/十节</td></tr><tr><td>TC014</td><td>服务商索赔单</td><td>编辑索赔单</td><td>F-CLAIM-03</td><td>改动不可编辑其它费用行被拦（异常）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 DRAFT 草稿单，含 editable=0 的其它费用行</td><td></td><td>1. 打开草稿单进入编辑
+2. 尝试修改或删除 editable=0 的其它费用行
+3. 保存</td><td>1. 进入编辑态
+2. editable=0 行前端不可改删
+3. 若请求体命中 editable=0 行的改/删，后端返回 400 拦截，不落库</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-03; 依据=D-索赔-B8(仅editable=1可增删改); api:PUT /claim/order/{id} 400; LLD四节</td></tr><tr><td>TC015</td><td>服务商索赔单</td><td>编辑索赔单</td><td>F-CLAIM-03</td><td>非草稿/已驳回态编辑被拦（边界）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 目标单当前状态不在 {DRAFT, REJECTED}（如 PENDING_REGION/PENDING_SETTLE）</td><td></td><td>1. 对该单发起编辑其它费用保存</td><td>1. 乐观锁双条件命中 0 行，返回业务码 CLAIM_4008「当前状态不允许该操作，请刷新」，不落库</td><td>边界</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-03; 依据=api 错误码 CLAIM_4008; LLD四节/十节非法迁移</td></tr><tr><td>TC016</td><td>服务商索赔单</td><td>作废索赔单</td><td>F-CLAIM-04</td><td>草稿单作废置终态并保留明细（正向）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在本服务商一张 DRAFT 草稿单</td><td></td><td>1. 打开草稿单
+2. 点击作废，填写作废原因</td><td>1. 展示草稿单
+2. 作废成功，status→VOIDED（终态），三张费用明细与附件保留供全状态查看，操作时间线新增一条 VOID 操作事件；作废后该工单可重新发起新单</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-04; 依据=PRD§4.1 F-CLAIM-04(A-15仅草稿可作废); api:POST /claim/order/{id}/void; LLD五节; 原型 P01 草稿行「作废」</td></tr><tr><td>TC017</td><td>服务商索赔单</td><td>作废索赔单</td><td>F-CLAIM-04</td><td>非草稿态作废被拦（异常）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 目标单当前状态非 DRAFT（如 PENDING_REGION/待结算/已结算）</td><td></td><td>1. 对该单发起作废</td><td>1. 乐观锁双条件（status='DRAFT'）命中 0 行，返回业务码 CLAIM_4008「当前状态不允许该操作，请刷新」，状态不变</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-04; 依据=PRD§7 仅草稿可作废; api 错误码 CLAIM_4008; LLD五节/十节</td></tr><tr><td>TC018</td><td>服务商索赔单</td><td>查看索赔单</td><td>F-CLAIM-05</td><td>任意状态查看索赔单全量详情（正向）</td><td>服务商售后专员/区域负责人/闪欣动力索赔专员/质量部责任判定专员</td><td>1. 以有权角色登录且在数据范围内
+2. 存在一张任意状态的索赔单（含已判责/已生成抵扣单的单据）</td><td></td><td>1. 从列表点击索赔单编号或「查看」进入详情</td><td>1. 展示主档 + 工时费/备件/其它三张费用明细 + 审核记录与操作事件时间线（按时间升序）+ 附件按 biz_type 分组（CLAIM/LIABILITY）+ 责任判定字段 + 抵扣单（如有），无状态变更</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-05; 依据=PRD§4.1 F-CLAIM-05; api:GET /claim/order/{id}; LLD九节; 原型 P02 全区块</td></tr><tr><td>TC019</td><td>服务商索赔单</td><td>查看索赔单</td><td>F-CLAIM-05</td><td>越数据范围查看被过滤（权限）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 存在一张归属其它服务商的索赔单</td><td></td><td>1. 尝试查看该非本服务商索赔单详情</td><td>1. 按角色数据范围（provider_id）过滤，无权限访问/查不到该单（§12 无权限拦截）</td><td>权限</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-05; 依据=PRD§2 数据范围仅本服务商/§12; api:GET /claim/order/{id} 数据范围过滤; LLD一节/九节</td></tr><tr><td>TC020</td><td>服务商索赔单</td><td>区域初审</td><td>F-CLAIM-06</td><td>区域初审通过·欣旺达件录项目编码（正向）</td><td>区域负责人</td><td>1. 以区域负责人登录，目标单在其所辖区域
+2. 存在一张 PENDING_REGION 待区域初审单</td><td></td><td>1. 打开待区域初审单，发起审核
+2. 审核结果选「通过」，主责件归属录入 XW（欣旺达件），填写项目编码，填核查意见
+3. 确认</td><td>1. 展示审核弹窗
+2. 通过时校验主责件归属必填、XW 时项目编码必填
+3. 提交成功，status→PENDING_HQ（待总部审核），claim_target=XW、project_code 落库，审核记录新增一条「区域初审/通过」（SN 预判倾向并入 remark）</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-06; 依据=PRD§4.1 F-CLAIM-06(A-26/A-6); api:POST /claim/order/{id}/region-review; LLD六节; 原型 P02 审核记录/索赔对象</td></tr><tr><td>TC021</td><td>服务商索赔单</td><td>区域初审</td><td>F-CLAIM-06</td><td>区域初审通过·自采件项目编码置空（正向）</td><td>区域负责人</td><td>1. 以区域负责人登录，目标单在其所辖区域
+2. 存在一张 PENDING_REGION 待区域初审单</td><td></td><td>1. 打开待区域初审单，发起审核
+2. 审核结果选「通过」，主责件归属录入 SELF（自采件）
+3. 确认</td><td>1. 展示审核弹窗
+2. SELF 时不要求项目编码
+3. 提交成功，status→PENDING_HQ，claim_target=SELF、project_code 置 NULL，审核记录新增一条「区域初审/通过」</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-06; 依据=api 附录4.6 SELF; api:POST /claim/order/{id}/region-review; LLD六节</td></tr><tr><td>TC022</td><td>服务商索赔单</td><td>区域初审</td><td>F-CLAIM-06</td><td>通过但主责件归属/项目编码缺失被拦（异常）</td><td>区域负责人</td><td>1. 以区域负责人登录，目标单在其所辖区域
+2. 存在一张 PENDING_REGION 待区域初审单</td><td></td><td>1. 发起审核，结果选「通过」但不录主责件归属；或录 XW 但不填项目编码
+2. 确认</td><td>1. 提交被拦截，返回业务码 CLAIM_4009「主责件归属或项目编码缺失」，状态仍为 PENDING_REGION</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-06; 依据=api 错误码 CLAIM_4009; LLD六节校验; api:POST /claim/order/{id}/region-review</td></tr><tr><td>TC023</td><td>服务商索赔单</td><td>区域初审</td><td>F-CLAIM-06</td><td>区域初审驳回退回服务商（分支）</td><td>区域负责人</td><td>1. 以区域负责人登录，目标单在其所辖区域
+2. 存在一张 PENDING_REGION 待区域初审单（如汽车电子自由填报工时不合理）</td><td></td><td>1. 发起审核，结果选「驳回」，填写驳回原因
+2. 确认</td><td>1. 校验驳回原因必填
+2. 提交成功，status→REJECTED（已驳回，可编辑重提），审核记录新增一条「区域初审/驳回」含原因</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-06; 依据=PRD§6.1(A-13)/§4.1 F-CLAIM-06(A-14); api:POST /claim/order/{id}/region-review; LLD六节</td></tr><tr><td>TC024</td><td>服务商索赔单</td><td>区域初审</td><td>F-CLAIM-06</td><td>区域初审拒绝终止（分支）</td><td>区域负责人</td><td>1. 以区域负责人登录，目标单在其所辖区域
+2. 存在一张 PENDING_REGION 待区域初审单</td><td></td><td>1. 发起审核，结果选「拒绝」，填写拒绝原因
+2. 确认</td><td>1. 校验拒绝原因必填
+2. 提交成功，status→DECLINED（已拒绝，终态，不可再流转），审核记录新增一条「区域初审/拒绝」含原因</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-06; 依据=PRD§7(A-15已关闭=已拒绝); api:POST /claim/order/{id}/region-review; LLD六节/十节</td></tr><tr><td>TC025</td><td>服务商索赔单</td><td>区域初审</td><td>F-CLAIM-06</td><td>非本区域/非区域负责人初审被拒（权限）</td><td>区域负责人（他辖区）/服务商售后专员</td><td>1. 以非该区域的区域负责人或非区域负责人角色登录
+2. 存在一张 PENDING_REGION 待区域初审单</td><td></td><td>1. 尝试对该单发起区域初审</td><td>1. 接口鉴权+数据范围拦截，返回 403 无权限，状态不变</td><td>权限</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-06; 依据=PRD§2 区域负责人仅所辖区域; api:POST /claim/order/{id}/region-review 403; LLD一节/六节</td></tr><tr><td>TC026</td><td>服务商索赔单</td><td>业务审核</td><td>F-CLAIM-07</td><td>业务审核通过·欣旺达件逐单生成向欣旺达索赔单（正向）</td><td>闪欣动力索赔专员</td><td>1. 以闪欣动力索赔专员登录（全国数据范围）
+2. 存在一张 PENDING_HQ 待总部审核单，claim_target=XW</td><td></td><td>1. 打开待总部审核单，发起业务审核
+2. 审核结果选「通过」，填审核意见
+3. 确认</td><td>1. 展示审核弹窗
+2. 提交成功，status→PENDING_SETTLE（待结算），审核记录新增一条「业务审核/通过」
+3. 同事务逐单自动生成一张向欣旺达索赔单（SXCO 号，关联 provider_claim_id/provider_claim_no），响应返回 xwClaimNo</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-07; 依据=PRD§4.1 F-CLAIM-07(A-6/A-36); api:POST /claim/order/{id}/business-audit; LLD七节</td></tr><tr><td>TC027</td><td>服务商索赔单</td><td>业务审核</td><td>F-CLAIM-07</td><td>业务审核通过·自采件进待责任判定（正向）</td><td>闪欣动力索赔专员</td><td>1. 以闪欣动力索赔专员登录
+2. 存在一张 PENDING_HQ 待总部审核单，claim_target=SELF</td><td></td><td>1. 打开待总部审核单，发起业务审核
+2. 审核结果选「通过」，填审核意见
+3. 确认</td><td>1. 展示审核弹窗
+2. 提交成功，status→PENDING_LIABILITY（待责任判定），审核记录新增一条「业务审核/通过」
+3. 无向欣旺达单生成，xwClaimNo 为 null</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-07; 依据=PRD§4.1 F-CLAIM-07(A-12); api:POST /claim/order/{id}/business-audit; LLD七节</td></tr><tr><td>TC028</td><td>服务商索赔单</td><td>业务审核</td><td>F-CLAIM-07</td><td>业务审核驳回退回可重提（分支）</td><td>闪欣动力索赔专员</td><td>1. 以闪欣动力索赔专员登录
+2. 存在一张 PENDING_HQ 待总部审核单</td><td></td><td>1. 发起业务审核，结果选「驳回」，填驳回原因
+2. 确认</td><td>1. 校验驳回原因必填
+2. 提交成功，status→REJECTED，审核记录新增一条「业务审核/驳回」含原因；重提回 PENDING_REGION 从头</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-07; 依据=PRD§6.1(A-13); api:POST /claim/order/{id}/business-audit; LLD七节/十节</td></tr><tr><td>TC029</td><td>服务商索赔单</td><td>业务审核</td><td>F-CLAIM-07</td><td>业务审核拒绝终止（分支）</td><td>闪欣动力索赔专员</td><td>1. 以闪欣动力索赔专员登录
+2. 存在一张 PENDING_HQ 待总部审核单</td><td></td><td>1. 发起业务审核，结果选「拒绝」，填拒绝原因
+2. 确认</td><td>1. 校验拒绝原因必填
+2. 提交成功，status→DECLINED（终态），审核记录新增一条「业务审核/拒绝」含原因</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-07; 依据=PRD§7; api:POST /claim/order/{id}/business-audit; LLD七节/十节</td></tr><tr><td>TC030</td><td>服务商索赔单</td><td>业务审核</td><td>F-CLAIM-07</td><td>非闪欣索赔专员业务审核被拒（权限）</td><td>区域负责人/服务商售后专员/质量部责任判定专员</td><td>1. 以非闪欣动力索赔专员角色登录
+2. 存在一张 PENDING_HQ 待总部审核单</td><td></td><td>1. 尝试对该单发起业务审核</td><td>1. 接口鉴权拦截，返回 403 无权限，状态不变</td><td>权限</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-07; 依据=PRD§2 业务审核=闪欣动力索赔专员; api:POST /claim/order/{id}/business-audit 403; LLD一节/七节</td></tr><tr><td>TC031</td><td>服务商索赔单</td><td>业务审核</td><td>F-CLAIM-07</td><td>前置状态不满足业务审核被拦（边界）</td><td>闪欣动力索赔专员</td><td>1. 以闪欣动力索赔专员登录
+2. 目标单当前状态非 PENDING_HQ（或并发已变）</td><td></td><td>1. 对该单发起业务审核</td><td>1. 乐观锁双条件命中 0 行，返回业务码 CLAIM_4008「当前状态不允许该操作，请刷新」</td><td>边界</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-07; 依据=api 错误码 CLAIM_4008; LLD十节非法迁移</td></tr><tr><td>TC032</td><td>服务商索赔单</td><td>责任判定</td><td>F-CLAIM-08</td><td>判定服务商责任自动生成索赔抵扣单（正向）</td><td>质量部责任判定专员</td><td>1. 以质量部责任判定专员登录
+2. 存在一张 PENDING_LIABILITY 待责任判定的自采件单</td><td></td><td>1. 打开待责任判定单，点击「判责结果录入」
+2. 责任判定结果选「服务商责任(PROVIDER)」，填责任说明，填承担比例（0&lt;比例≤100）
+3. 确认</td><td>1. 展示判责录入弹窗
+2. 校验责任说明必填(≤200)、PROVIDER 承担比例必填且 0&lt;比例≤100
+3. 提交成功，status→PENDING_SETTLE，provider_deduct_started=1；同事务生成索赔抵扣单（DKD 号），deductAmount=抵扣基数(整单 applyTotalAmount)×承担比例/100，settle_period_belong=业务审核通过日期，响应返回 deductNo/deductAmount</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-08; 依据=PRD§4.1 F-CLAIM-08(A-27/A-30)/D-索赔-D1抵扣基数=apply_total_amount; api:POST /claim/order/{id}/liability; LLD八节; 原型 P02 判责弹窗</td></tr><tr><td>TC033</td><td>服务商索赔单</td><td>责任判定</td><td>F-CLAIM-08</td><td>判定供应商责任仅置标志不生成单据（正向）</td><td>质量部责任判定专员</td><td>1. 以质量部责任判定专员登录
+2. 存在一张 PENDING_LIABILITY 待责任判定的自采件单</td><td></td><td>1. 点击「判责结果录入」
+2. 责任判定结果选「供应商责任(SUPPLIER)」，填责任说明
+3. 确认</td><td>1. 展示判责录入弹窗
+2. 提交成功，status→PENDING_SETTLE，supplier_claim_started=1（待挂载），本期不生成实际单据或占位单，无抵扣单</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-08; 依据=D-索赔-B5(供应商责任本期仅置标志); api:POST /claim/order/{id}/liability 附录4.4; LLD八节</td></tr><tr><td>TC034</td><td>服务商索赔单</td><td>责任判定</td><td>F-CLAIM-08</td><td>判定内部责任仅记录比例说明（正向）</td><td>质量部责任判定专员</td><td>1. 以质量部责任判定专员登录
+2. 存在一张 PENDING_LIABILITY 待责任判定的自采件单</td><td></td><td>1. 点击「判责结果录入」
+2. 责任判定结果选「内部责任(INTERNAL)」，填责任说明
+3. 确认</td><td>1. 展示判责录入弹窗
+2. 提交成功，status→PENDING_SETTLE，仅记录责任结果/比例/说明；OA 内部转嫁待挂载，不生成转嫁单，无抵扣单</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-08; 依据=D-索赔-B6(内部责任OA待挂载); api:POST /claim/order/{id}/liability 附录4.4; LLD八节</td></tr><tr><td>TC035</td><td>服务商索赔单</td><td>责任判定</td><td>F-CLAIM-08</td><td>承担比例非法或 PROVIDER 未填比例被拦（边界）</td><td>质量部责任判定专员</td><td>1. 以质量部责任判定专员登录
+2. 存在一张 PENDING_LIABILITY 待责任判定的自采件单</td><td></td><td>1. 点击「判责结果录入」
+2. 场景A：承担比例填 0 或 &gt;100（超范围）；场景B：结果选 PROVIDER 但不填承担比例
+3. 确认</td><td>1. 展示判责录入弹窗
+2. 提交被拦截，返回业务码 CLAIM_4010「责任承担比例非法」（不满足 0&lt;比例≤100，或 PROVIDER 未填比例），状态仍为 PENDING_LIABILITY</td><td>边界</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-08; 依据=D-索赔-B7(0&lt;ratio≤100不允许0/PROVIDER必填); api 错误码 CLAIM_4010; LLD八节</td></tr><tr><td>TC036</td><td>服务商索赔单</td><td>责任判定</td><td>F-CLAIM-08</td><td>非质量部/非待责任判定单判责被拒（权限）</td><td>闪欣动力索赔专员/服务商售后专员</td><td>1. 以非质量部责任判定专员角色登录（或目标单非【待责任判定】自采件单）</td><td></td><td>1. 尝试对该单发起判责录入</td><td>1. 接口鉴权拦截，返回 403 无权限（或前置状态非 PENDING_LIABILITY 时 CLAIM_4008），状态不变</td><td>权限</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-08; 依据=PRD§2 质量部仅【待责任判定】外采件; api:POST /claim/order/{id}/liability 403/CLAIM_4008; LLD一节/八节</td></tr><tr><td>TC037</td><td>服务商索赔单</td><td>搜索导出</td><td>F-CLAIM-09</td><td>多维筛选分页查询索赔单（正向）</td><td>服务商售后专员/区域负责人/闪欣动力索赔专员/质量部责任判定专员</td><td>1. 以有权角色登录
+2. 存在多张不同状态/类型/区域/时间的索赔单</td><td></td><td>1. 进入服务商索赔单列表页
+2. 组合筛选条件（如索赔单状态+主责件归属+创建时间区间）
+3. 点击查询</td><td>1. 展示列表与筛选区
+2. 筛选条件生效
+3. 返回 PageResult 命中筛选条件的记录，含总条数/页码/每页条数，并按角色数据范围过滤</td><td>接口</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-09; 依据=PRD§4.1 F-CLAIM-09; api:GET /claim/order/page; 原型 P01 筛选区</td></tr><tr><td>TC038</td><td>服务商索赔单</td><td>搜索导出</td><td>F-CLAIM-09</td><td>按当前筛选条件导出（正向）</td><td>服务商售后专员/闪欣动力索赔专员</td><td>1. 以有权角色登录
+2. 列表已按某组筛选条件查询出结果</td><td></td><td>1. 在列表页保持当前筛选条件
+2. 点击「导出」按钮</td><td>1. 展示列表
+2. 触发按当前筛选条件的导出（导出明细与筛选结果一致，数据范围过滤）</td><td>功能性</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-09; 依据=PRD§4.1 F-CLAIM-09 按筛选导出/原型 P01「导出」按钮; 备注:导出接口契约未在 api-contracts 定义，本用例仅到 UI+PRD 行为级（见返回变更登记项）</td></tr><tr><td>TC039</td><td>服务商索赔单</td><td>搜索导出</td><td>F-CLAIM-09</td><td>服务商专员搜索仅见本服务商数据（权限）</td><td>服务商售后专员</td><td>1. 以服务商售后专员登录
+2. 库中存在多个服务商的索赔单</td><td></td><td>1. 进入列表页，不加服务商条件直接查询</td><td>1. 返回结果仅含本服务商索赔单（数据范围 provider_id 过滤），不展示其它服务商数据</td><td>权限</td><td>P2</td><td>待执行</td><td>feature=F-CLAIM-09; 依据=PRD§2 数据范围仅本服务商; api:GET /claim/order/page 数据范围过滤; LLD一节</td></tr><tr><td>TC040</td><td>服务商索赔单</td><td>批量审核</td><td>F-CLAIM-10</td><td>勾选多条批量审核（正向）</td><td>区域负责人/闪欣动力索赔专员</td><td>1. 以区域负责人或闪欣动力索赔专员登录
+2. 列表中存在多条处于本角色可审核前置态的索赔单</td><td></td><td>1. 在列表页勾选多条待审核索赔单
+2. 点击「批量审核」并提交审核</td><td>1. 勾选生效
+2. 批量审核执行，返回成功/失败明细，命中前置态的单据审核成功并流转</td><td>功能性</td><td>P0</td><td>待执行</td><td>feature=F-CLAIM-10; 依据=PRD§4.1 F-CLAIM-10/§12; 原型 P01「批量审核」按钮+复选框; 备注:批量审核接口契约未在 api-contracts 定义，本用例到 UI+PRD 行为级（见返回变更登记项）</td></tr><tr><td>TC041</td><td>服务商索赔单</td><td>批量审核</td><td>F-CLAIM-10</td><td>批量审核部分成功部分失败返回明细（异常）</td><td>区域负责人/闪欣动力索赔专员</td><td>1. 以区域负责人或闪欣动力索赔专员登录
+2. 勾选集合中同时含前置态满足与不满足（如状态已变/越权/越数据范围）的索赔单</td><td></td><td>1. 勾选混合状态的多条索赔单
+2. 点击「批量审核」并提交</td><td>1. 勾选生效
+2. 部分成功部分失败，返回成功/失败明细（失败项标明原因，如状态不满足），成功项正常流转、失败项不动</td><td>异常</td><td>P1</td><td>待执行</td><td>feature=F-CLAIM-10; 依据=PRD§4.1 F-CLAIM-10 部分成功部分失败/§12 批量返回明细; 备注:批量审核接口契约未定义，行为口径依 PRD</td></tr></tbody></table></div></div><div class="sheet" data-s="1"><div class="meta">工作表「向欣旺达索赔单」· 38 条用例 · 14 列（测试数据列按 SDD 规则留空）</div><div class="tablewrap"><table><thead><tr><th>测试用例ID</th><th>测试模块</th><th>模块核心功能</th><th>测试功能点</th><th>测试标题</th><th>角色</th><th>测试前置条件</th><th>测试数据</th><th>测试步骤</th><th>预期结果</th><th>测试类型</th><th>优先级</th><th>执行状态</th><th>备注</th></tr></thead><tbody><tr><td>TC001</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[正向] 欣旺达件服务商索赔单业务审核通过，系统逐单自动生成向欣旺达索赔单</td><td>系统（随 F-CLAIM-07 业务审核通过同事务触发，操作人=闪欣动力索赔专员）</td><td>1. 存在一张 claim_target=XW（欣旺达件）的服务商索赔单，处于业务审核环节
+2. 该服务商单此前未生成过向欣旺达索赔单（provider_claim_id 未占用 uk_provider_claim）</td><td></td><td>1. 闪欣动力索赔专员在 F-CLAIM-07 业务审核对该欣旺达件点通过
+2. 观察同一数据库事务内向欣旺达索赔单的生成结果与落库字段
+3. 校对头表金额与状态字段</td><td>1. 服务商单状态迁至 PENDING_SETTLE，同事务生成一张 xw_claim_order + 一条 xw_claim_detail（非汇总、一对一）
+2. 新单 status=DRAFT、claim_no 为 SXCO-yyyyMMdd-4位日内流水、approved_amount=NULL、currency=CNY、audit_result=NULL、liability_result/internal_dept/liability_ratio=NULL、fee_transfer_started/provider_deduct_started=0、version=0
+3. apply_total_amount = labor_fee_total + part_mgmt_fee + other_fee_total（含备件管理费、不乘系数，等于服务商单总额）；明细 subtotal = labor_fee_total + other_fee_total</td><td>功能</td><td>P0</td><td>待执行</td><td>LLD §3.1 逐单自动生成 / api-contracts §2.0 / A-36 / D-向欣-B2 / A-37</td></tr><tr><td>TC002</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[边界] 非欣旺达件（claim_target≠XW）业务审核通过不生成向欣旺达索赔单</td><td>系统（随 F-CLAIM-07 业务审核通过）</td><td>1. 存在一张 claim_target≠XW（如外采件）的服务商索赔单，处于业务审核环节</td><td></td><td>1. 闪欣动力索赔专员在 F-CLAIM-07 业务审核对该非欣旺达件点通过
+2. 观察是否生成 xw_claim_order</td><td>1. 不生成任何 xw_claim_order / xw_claim_detail（逐单自动生成仅对 claim_target=XW 欣旺达件触发）</td><td>功能</td><td>P1</td><td>待执行</td><td>LLD §3.1 前置（claim_target='XW'）/ api-contracts §2.0 / A-36</td></tr><tr><td>TC003</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[异常] 同一服务商索赔单重复生成被 uk_provider_claim 挡，跳过生成（幂等）</td><td>系统（随 F-CLAIM-07 业务审核通过）</td><td>1. 某欣旺达件服务商索赔单已生成过一张向欣旺达索赔单（provider_claim_id 已占用 uk_provider_claim）</td><td></td><td>1. 对同一 claim_order.id 再次触发逐单自动生成逻辑</td><td>1. 落 xw_claim_detail.provider_claim_id 命中 UNIQUE uk_provider_claim，已存在则跳过，不生成第二张向欣旺达索赔单（一张服务商单对一张闪欣单）</td><td>幂等</td><td>P1</td><td>待执行</td><td>LLD §3.1 幂等校验 / §5 生成幂等 / api-contracts §2.0.2 / A-36 非汇总</td></tr><tr><td>TC004</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[异常] 生成失败（如撞号重试仍失败）整笔业务审核回滚</td><td>系统（随 F-CLAIM-07 业务审核通过）</td><td>1. 欣旺达件服务商索赔单处于业务审核环节
+2. 构造向欣旺达索赔单生成失败场景（如 SXCO 取号撞 UNIQUE 重试仍失败）</td><td></td><td>1. 闪欣动力索赔专员点业务审核通过，触发同事务生成
+2. 生成环节抛错
+3. 校验服务商单状态与向欣旺达单落库</td><td>1. 同一数据库事务整体回滚：服务商单不置 PENDING_SETTLE、不落 xw_claim_order、不落明细，三者全滚</td><td>事务</td><td>P1</td><td>待执行</td><td>LLD §3.1 同事务/回滚 / §5 / api-contracts §2.0.8</td></tr><tr><td>TC005</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[正向] 闪欣索赔专员在草稿态补附件（只动附件、不动明细金额）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=DRAFT 的向欣旺达索赔单
+2. 准备合法附件（fileName≤255、filePath≤512、fileType∈{IMAGE,PDF} 或空）</td><td></td><td>1. 调用 PUT /xw/claim/{id}，请求体带 attachments 列表
+2. 校验附件落库与头表变更
+3. 校验金额与明细字段</td><td>1. 每个附件写一行 attachment（biz_type='XW'、biz_id=本单 id、upload_by=当前用户、upload_time=NOW）
+2. 头表仅刷 version+1、update_by、updated_at；status 不变（DRAFT→DRAFT）
+3. laborFeeTotal/partMgmtFee/otherFeeTotal/applyTotalAmount 与 xw_claim_detail 一律不变（生成时已定稿、编辑不重算）</td><td>接口</td><td>P0</td><td>待执行</td><td>LLD §3.2 编辑 / api-contracts §2.1</td></tr><tr><td>TC006</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[正向] 已驳回态可编辑补附件后重提（状态不变 REJECTED）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=REJECTED 的向欣旺达索赔单</td><td></td><td>1. 调用 PUT /xw/claim/{id} 补附件
+2. 校验附件落库与状态</td><td>1. 附件写入成功，version+1
+2. status 不变（REJECTED→REJECTED），已驳回可改后重提</td><td>接口</td><td>P1</td><td>待执行</td><td>LLD §3.2 / §6 H3（编辑前置态=DRAFT+REJECTED）/ api-contracts §2.1.1</td></tr><tr><td>TC007</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[异常] 非 DRAFT/REJECTED 态编辑被拒（XW_4001）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=PENDING_AUDIT（或 PENDING_SETTLE/DECLINED/SETTLED/VOIDED）的向欣旺达索赔单</td><td></td><td>1. 调用 PUT /xw/claim/{id} 补附件</td><td>1. 前置校验 status∈{DRAFT,REJECTED} 不满足，乐观锁双条件命中 0 行，返回 code=409 / XW_4001，附件不落库</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.2 前置状态 / api-contracts §2.1.1 / 错误码 XW_4001</td></tr><tr><td>TC008</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[边界] 编辑不允许增删/合并明细、不允许勾选纳入多张服务商单（A-36 非汇总）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=DRAFT 的向欣旺达索赔单，已含其对应服务商单的一条明细快照</td><td></td><td>1. 尝试通过编辑接口增删明细或将其他服务商索赔单勾选纳入本单
+2. 校验明细集合</td><td>1. 编辑接口请求体不含明细字段，xw_claim_detail 保持为该单对应那一张服务商单的一条快照，不可增删合并（原型 04 的勾选纳入多张/新增明细/删除已勾选 UI 以 A-36 废止、不落地）</td><td>边界</td><td>P2</td><td>待执行</td><td>LLD §3.2 / §6 H1（A-36）/ api-contracts §2.1 备注</td></tr><tr><td>TC009</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[异常] 编辑并发乐观锁冲突（命中 0 行返回 409）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=DRAFT 的向欣旺达索赔单
+2. 构造并发：两次编辑基于同一版本先后提交</td><td></td><td>1. 两个会话同时对同一单发起 PUT /xw/claim/{id}
+2. 第二次提交落库时校验版本</td><td>1. 后到的写因 status 双条件 + @Version 事务内自读版本自增命中 0 行，返回 code=409 提示刷新，整体回滚</td><td>并发</td><td>P2</td><td>待执行</td><td>LLD §3.2 同事务/回滚 / api-contracts §2.1.1 乐观锁</td></tr><tr><td>TC010</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[正向] 闪欣索赔专员作废草稿态向欣旺达索赔单</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=DRAFT 的向欣旺达索赔单</td><td></td><td>1. 调用 POST /xw/claim/{id}/void
+2. 校验头表状态、明细与上游服务商单</td><td>1. status=DRAFT→VOIDED（终态），version+1
+2. xw_claim_detail 明细保留、deleted_at 保持 NULL、uk_provider_claim 占用不释放
+3. 上游 claim_order 仍保持 PENDING_SETTLE，继续进服务商结算链，不因追偿单作废取消对服务商应付</td><td>接口</td><td>P0</td><td>待执行</td><td>LLD §3.5 作废 / api-contracts §2.5 / D-向欣-B1 / D-向欣-D1</td></tr><tr><td>TC011</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-01</td><td>[异常] 非草稿态（PENDING_AUDIT 等）作废被拒（XW_4001，不允许撤回作废）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=PENDING_AUDIT（或其它非 DRAFT 态）的向欣旺达索赔单</td><td></td><td>1. 调用 POST /xw/claim/{id}/void</td><td>1. 前置 status=DRAFT 不满足，乐观锁双条件命中 0 行，返回 code=409 / XW_4001；PENDING_AUDIT 不允许撤回作废</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.5 前置 / api-contracts §2.5.1 / D-向欣-B1 已确认</td></tr><tr><td>TC012</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] 闪欣索赔专员提交草稿单，进入待审核并推欣旺达待办（内建角色、无外呼）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=DRAFT 的向欣旺达索赔单，且 xw_claim_detail 明细 ≥ 1 条</td><td></td><td>1. 调用 POST /xw/claim/{id}/submit
+2. 校验状态流转与待办推送方式</td><td>1. status=DRAFT→PENDING_AUDIT，version+1
+2. 单子推给欣旺达索赔专员待办（本系统内建角色，无跨系统调用，不外呼欣旺达售后系统）</td><td>接口</td><td>P0</td><td>待执行</td><td>LLD §3.3 提交 / api-contracts §2.2 / A-22 内建角色</td></tr><tr><td>TC013</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] 已驳回态提交重新进入待审核</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=REJECTED 的向欣旺达索赔单，明细 ≥ 1 条</td><td></td><td>1. 调用 POST /xw/claim/{id}/submit</td><td>1. status=REJECTED→PENDING_AUDIT，version+1</td><td>接口</td><td>P1</td><td>待执行</td><td>LLD §3.3 / 状态机 REJECTED→PENDING_AUDIT / api-contracts §2.2</td></tr><tr><td>TC014</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 提交时明细为空被拒（XW_4002）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=DRAFT 的向欣旺达索赔单，但 xw_claim_detail 明细 &lt; 1 条（构造异常数据）</td><td></td><td>1. 调用 POST /xw/claim/{id}/submit</td><td>1. 明细数校验不通过，返回 XW_4002（明细为空），状态不变</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.3 校验 / api-contracts §2.2.2 / 错误码 XW_4002</td></tr><tr><td>TC015</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 非 DRAFT/REJECTED 态提交被拒（XW_4001）</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=PENDING_AUDIT（或 PENDING_SETTLE 等）的向欣旺达索赔单</td><td></td><td>1. 调用 POST /xw/claim/{id}/submit</td><td>1. 前置 status∈{DRAFT,REJECTED} 不满足，返回 code=409 / XW_4001，状态不变</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.3 前置 / api-contracts §2.2.1 / XW_4001</td></tr><tr><td>TC016</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[边界] A-39 条件必填字段本期 Mock 未带出时提交放行不卡</td><td>闪欣动力索赔专员</td><td>1. 存在一张 status=DRAFT 的向欣旺达索赔单，明细≥1
+2. 该单 battery_sn/serial_no/vin 因工单库本期 Mock 待挂载未带出（为 NULL）</td><td></td><td>1. 调用 POST /xw/claim/{id}/submit
+2. 校验是否因条件必填被卡</td><td>1. 本期 Mock 未带出时 A-39 条件必填放行不卡，提交成功进入 PENDING_AUDIT（真库接上后按 A-39 改硬校验并补错误码）</td><td>边界</td><td>P1</td><td>待执行</td><td>LLD §3.3 条件必填（A-39）/ api-contracts §2.2.3 / D-向欣-B3 已确认（本期 Mock 放行）</td></tr><tr><td>TC017</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] 欣旺达审核=通过（PASS），全额进待结算</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单
+2. 操作人角色=欣旺达索赔专员</td><td></td><td>1. 调用 POST /xw/claim/{id}/audit，auditResult=PASS
+2. 校验状态、审核结果字段与审核记录</td><td>1. status=PENDING_AUDIT→PENDING_SETTLE，audit_result=PASS，approved_amount 保持 NULL（NULL=全额通过，结算按 apply_total_amount）
+2. 写一条 claim_audit_record（biz_type='XW'、audit_stage='欣旺达审核'、audit_result='通过'）
+3. 内部角色操作，无跨系统外呼</td><td>功能</td><td>P0</td><td>待执行</td><td>LLD §3.4 通过分支 / api-contracts §2.3 / A-22</td></tr><tr><td>TC018</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] 欣旺达审核=部分通过（PARTIAL），按核准金额调整并记核减明细</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单
+2. 准备核准金额（在 (0, 申请总额] 区间内的合法值）与核减明细说明文本</td><td></td><td>1. 调用 POST /xw/claim/{id}/audit，auditResult=PARTIAL、approvedAmount=核准金额、remark=核减明细说明
+2. 校验状态、核准金额与审核记录</td><td>1. status→PENDING_SETTLE，audit_result=PARTIAL，approved_amount=录入核准金额（结算口径以此为准、覆盖 apply_total_amount）
+2. 写一条 claim_audit_record（audit_result='部分通过'、approved_amount=核准金额、remark=核减明细说明文本，本期不建专表）</td><td>功能</td><td>P0</td><td>待执行</td><td>LLD §3.4 部分通过 / api-contracts §2.3 / A-40 / D-向欣-B4</td></tr><tr><td>TC019</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] 欣旺达审核=驳回（REJECT），回已驳回可编辑重提</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单
+2. 准备驳回原因 remark</td><td></td><td>1. 调用 POST /xw/claim/{id}/audit，auditResult=REJECT、remark=驳回原因
+2. 校验状态与审核记录</td><td>1. status→REJECTED（可编辑重提），audit_result=REJECT
+2. 写一条 claim_audit_record（audit_result='驳回'、remark=驳回原因）</td><td>功能</td><td>P1</td><td>待执行</td><td>LLD §3.4 驳回分支 / api-contracts §2.3</td></tr><tr><td>TC020</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] 欣旺达审核=拒绝（DECLINE），进终态已拒绝</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单
+2. 准备拒绝原因 remark</td><td></td><td>1. 调用 POST /xw/claim/{id}/audit，auditResult=DECLINE、remark=拒绝原因
+2. 校验状态与审核记录</td><td>1. status→DECLINED（终态），audit_result=DECLINE
+2. 写一条 claim_audit_record（audit_result='拒绝'、remark=拒绝原因）</td><td>功能</td><td>P1</td><td>待执行</td><td>LLD §3.4 拒绝分支 / api-contracts §2.3 / 状态机终态</td></tr><tr><td>TC021</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 部分通过核准金额缺失/≤0/&gt;申请总额被拒（XW_4003）</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单</td><td></td><td>1. 分别以 auditResult=PARTIAL 且 approvedAmount 缺失、为 0/负、大于 apply_total_amount 三种非法值调用审核接口
+2. 校验返回</td><td>1. 三种情形均校验不通过（核准金额须满足 0 &lt; approvedAmount ≤ apply_total_amount），返回 XW_4003，状态不变、审核记录不落</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.4 校验 / api-contracts §2.3.3 / 错误码 XW_4003</td></tr><tr><td>TC022</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[边界] 部分通过核准金额等于申请总额（上界）允许</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单</td><td></td><td>1. 调用审核接口，auditResult=PARTIAL、approvedAmount=apply_total_amount（上界值）</td><td>1. 满足 0 &lt; approvedAmount ≤ apply_total_amount，审核通过，status→PENDING_SETTLE、approved_amount=申请总额</td><td>边界</td><td>P2</td><td>待执行</td><td>LLD §3.4 校验（≤ apply_total_amount）/ api-contracts §2.3.3</td></tr><tr><td>TC023</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 驳回/拒绝未填审批意见 remark 被拒（XW_4004）</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单</td><td></td><td>1. 分别以 auditResult=REJECT、auditResult=DECLINE 且 remark 为空调用审核接口
+2. 校验返回</td><td>1. remark 必填校验不通过，返回 XW_4004，状态不变</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.4 校验 / api-contracts §2.3.3 / 错误码 XW_4004</td></tr><tr><td>TC024</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 重复审核（非 PENDING_AUDIT 态）被拒（XW_4001）</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张已流转到 PENDING_SETTLE/REJECTED/DECLINED 的向欣旺达索赔单</td><td></td><td>1. 再次调用 POST /xw/claim/{id}/audit</td><td>1. 前置 status=PENDING_AUDIT 不满足，乐观锁双条件命中 0 行，返回 code=409 / XW_4001，挡重复审核</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.4 前置/拦截 / api-contracts §2.3.1 / XW_4001</td></tr><tr><td>TC025</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 非欣旺达索赔专员角色审核被拒（403，内建角色鉴权）</td><td>非欣旺达索赔专员（如闪欣动力索赔专员）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单
+2. 操作人角色≠欣旺达索赔专员</td><td></td><td>1. 以非欣旺达索赔专员身份调用 POST /xw/claim/{id}/audit</td><td>1. 权限校验不通过，返回 code=403，审核不执行（欣旺达审核为本系统内建角色专属操作）</td><td>权限</td><td>P1</td><td>待执行</td><td>LLD §3.4 谁能点 / api-contracts §2.3.2 / A-22 内建角色</td></tr><tr><td>TC026</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] auditResult 越枚举被拒（400）</td><td>欣旺达索赔专员（本系统内建角色）</td><td>1. 存在一张 status=PENDING_AUDIT 的向欣旺达索赔单</td><td></td><td>1. 调用审核接口，auditResult 传 {PASS,REJECT,DECLINE,PARTIAL} 之外的非法值</td><td>1. 入参枚举校验不通过，返回 code=400，状态不变</td><td>异常</td><td>P2</td><td>待执行</td><td>LLD §3.4 入参 / api-contracts §2.3.3 / §4.2 枚举</td></tr><tr><td>TC027</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] QMS 判责 Mock 人工回填=内部责任（INTERNAL），标志置位、留痕</td><td>具「QMS Mock 回填」权限的欣旺达索赔专员</td><td>1. 存在一张状态∈{DRAFT,REJECTED,PENDING_AUDIT,PENDING_SETTLE} 且未纳入有效结算的向欣旺达索赔单
+2. 准备判责说明与内部责任部门、合法责任比例</td><td></td><td>1. 调用 POST /xw/claim/{id}/qms-liability，liabilityResult=INTERNAL、internalDept=内部责任部门、liabilityRatio=合法比例、liabilityDesc=判责说明
+2. 校验头表字段、标志位与留痕记录</td><td>1. 头表写 liability_result=INTERNAL、internal_dept=内部责任部门、liability_ratio=录入比例；fee_transfer_started=1、provider_deduct_started=0（仅记录后续转嫁意图，不外呼 QMS、不伪造外部单据）
+2. 写一条 claim_audit_record（audit_stage='QMS_MOCK'、audit_result='INTERNAL'、remark=判责说明）
+3. 单据状态不变</td><td>功能</td><td>P0</td><td>待执行</td><td>LLD §3.4a / api-contracts §2.4 / A-20 Mock 人工回填</td></tr><tr><td>TC028</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[正向] QMS 判责回填=服务商责任（PROVIDER），抵扣标志置位</td><td>具「QMS Mock 回填」权限的欣旺达索赔专员</td><td>1. 存在一张允许回填状态的向欣旺达索赔单
+2. 准备判责说明与合法责任比例</td><td></td><td>1. 调用 qms-liability 接口，liabilityResult=PROVIDER、internalDept 显式 NULL、liabilityRatio=合法比例、liabilityDesc=判责说明
+2. 校验标志位与内部部门字段</td><td>1. 头表写 liability_result=PROVIDER、internal_dept=NULL；provider_deduct_started=1、fee_transfer_started=0
+2. 写一条 QMS_MOCK 留痕（audit_result='PROVIDER'）</td><td>功能</td><td>P1</td><td>待执行</td><td>LLD §3.4a 写入 / api-contracts §2.4.4</td></tr><tr><td>TC029</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 判责结果=INTERNAL 缺内部责任部门被拒（XW_4005）</td><td>具「QMS Mock 回填」权限的欣旺达索赔专员</td><td>1. 存在一张允许回填状态的向欣旺达索赔单</td><td></td><td>1. 调用 qms-liability 接口，liabilityResult=INTERNAL 但 internalDept 缺失</td><td>1. 判责参数校验不通过，返回 XW_4005，头表与留痕均不落</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.4a 入参校验 / api-contracts §2.4.3 / 错误码 XW_4005</td></tr><tr><td>TC030</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[边界] 判责责任比例边界校验：(0,100] 之外被拒、=100 允许</td><td>具「QMS Mock 回填」权限的欣旺达索赔专员</td><td>1. 存在一张允许回填状态的向欣旺达索赔单</td><td></td><td>1. 分别以 liabilityRatio=0、&gt;100 调用回填接口
+2. 以 liabilityRatio=100（上界）调用回填接口</td><td>1. liabilityRatio=0 或 &gt;100 校验不通过，返回 XW_4005
+2. liabilityRatio=100 满足 0 &lt; 比例 ≤ 100，回填成功</td><td>边界</td><td>P2</td><td>待执行</td><td>LLD §3.4a 入参校验 / api-contracts §2.4.3 / XW_4005</td></tr><tr><td>TC031</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 判责回填在已结算/已作废/已纳入结算单时被拒（XW_4006）</td><td>具「QMS Mock 回填」权限的欣旺达索赔专员</td><td>1. 存在一张已结算（SETTLED）或已作废/拒绝、或已纳入有效 claim_settle_detail 的向欣旺达索赔单</td><td></td><td>1. 调用 qms-liability 接口回填判责</td><td>1. 先锁行复核状态/结算占用，命中拦截条件，返回 XW_4006（避免分账依据在结算中途被改写），不落库</td><td>异常</td><td>P1</td><td>待执行</td><td>LLD §3.4a 允许状态 / api-contracts §2.4.1 / 错误码 XW_4006</td></tr><tr><td>TC032</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[异常] 无「QMS Mock 回填」权限回填被拒（403）</td><td>无 QMS Mock 回填权限的用户</td><td>1. 存在一张允许回填状态的向欣旺达索赔单
+2. 操作人不具「QMS Mock 回填」权限</td><td></td><td>1. 调用 POST /xw/claim/{id}/qms-liability</td><td>1. 权限校验不通过，返回 code=403，不落库</td><td>权限</td><td>P2</td><td>待执行</td><td>LLD §3.4a 谁能点 / api-contracts §2.4.2</td></tr><tr><td>TC033</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-02</td><td>[边界] 重复判责回填新增一条历史并覆盖头表当前值</td><td>具「QMS Mock 回填」权限的欣旺达索赔专员</td><td>1. 存在一张已回填过一次判责、仍处允许回填状态的向欣旺达索赔单</td><td></td><td>1. 再次调用 qms-liability 接口以不同判责值回填
+2. 校验头表当前值与 claim_audit_record 历史条数</td><td>1. 头表 liability_result/internal_dept/liability_ratio 被覆盖为最新值
+2. claim_audit_record 新增一条 QMS_MOCK 历史，保留可追溯修改轨迹</td><td>功能</td><td>P2</td><td>待执行</td><td>LLD §3.4a 状态与回滚 / api-contracts §2.4.7</td></tr><tr><td>TC034</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-03</td><td>[正向] 查看向欣旺达索赔单详情（头+明细+审核记录+附件+关联服务商单）</td><td>闪欣动力索赔专员 / 欣旺达索赔专员（全状态可查）</td><td>1. 存在一张向欣旺达索赔单，含明细、审核记录、附件及关联服务商索赔单</td><td></td><td>1. 调用 GET /xw/claim/{id}
+2. 校验返回结构各区块</td><td>1. 返回头表全字段 + details（xw_claim_detail）+ auditRecords（biz_type='XW'，按 audit_time 升序）+ attachments（biz_type='XW'）+ providerClaim（按 provider_claim_id 反查 claim_order 只读）
+2. 闪欣/欣旺达专员全状态可查，数据范围权限过滤生效</td><td>接口</td><td>P0</td><td>待执行</td><td>LLD §3.6 查看 / api-contracts §2.6</td></tr><tr><td>TC035</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-03</td><td>[边界] 详情申请总金额口径核对（含备件管理费、不乘系数）</td><td>闪欣动力索赔专员</td><td>1. 存在一张向欣旺达索赔单，工时费/备件管理费/其它费用均非零</td><td></td><td>1. 调用 GET /xw/claim/{id}
+2. 核对 applyTotalAmount 与各费用项、明细 subtotal</td><td>1. applyTotalAmount = laborFeeTotal + partMgmtFee + otherFeeTotal（含备件管理费、不乘系数、等于服务商单总额）
+2. 明细 subtotal = laborFeeTotal + otherFeeTotal（明细表未登记备件管理费列）</td><td>边界</td><td>P1</td><td>待执行</td><td>LLD §4 金额规则 / api-contracts §2.6 / D-向欣-B2 / A-37</td></tr><tr><td>TC036</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-03</td><td>[正向] 分页列表多维筛选查询（编号/关联服务商单号/状态/创建时间）</td><td>闪欣动力索赔专员 / 欣旺达索赔专员</td><td>1. 存在多张不同状态、不同创建时间的向欣旺达索赔单</td><td></td><td>1. 调用 GET /xw/claim/page，带 claimNo/providerClaimNo/status/createTimeStart/createTimeEnd + pageNo/pageSize
+2. 校验返回 PageResult 与筛选命中</td><td>1. 返回 PageResult&lt;列表行&gt;（total/pageNo/pageSize/list），全部附 WHERE deleted_at IS NULL
+2. 结果符合各筛选条件，数据范围权限过滤生效</td><td>接口</td><td>P0</td><td>待执行</td><td>LLD §3.6 列表页 / api-contracts §2.7</td></tr><tr><td>TC037</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-03</td><td>[边界] 导出按当前筛选条件（沿用列表页通用规格）</td><td>闪欣动力索赔专员</td><td>1. 存在多张向欣旺达索赔单，列表页已设定筛选条件</td><td></td><td>1. 在列表页设定筛选条件后触发导出
+2. 校验导出范围</td><td>1. 导出内容按当前筛选条件（与分页列表同口径、不单列接口），全部 WHERE deleted_at IS NULL</td><td>功能</td><td>P2</td><td>待执行</td><td>LLD §3.6 导出按当前筛选 / api-contracts §2.7 描述 / 原型 03 导出</td></tr><tr><td>TC038</td><td>向欣旺达索赔单</td><td>向欣旺达索赔单</td><td>F-XW-03</td><td>[异常] 查看/列表数据范围权限过滤（越权数据不可见）</td><td>闪欣动力索赔专员 / 欣旺达索赔专员</td><td>1. 存在多张分属不同数据范围的向欣旺达索赔单</td><td></td><td>1. 以受限数据范围账号调用 GET /xw/claim/page 与 GET /xw/claim/{id}
+2. 校验返回范围</td><td>1. 列表与详情均按角色数据范围行级过滤，超出数据范围的单据不返回</td><td>权限</td><td>P2</td><td>待执行</td><td>LLD §3.6 数据范围权限过滤 / api-contracts §2.6/§2.7 / PRD §2 权限三层</td></tr></tbody></table></div></div><div class="sheet" data-s="2"><div class="meta">工作表「结算」· 63 条用例 · 14 列（测试数据列按 SDD 规则留空）</div><div class="tablewrap"><table><thead><tr><th>测试用例ID</th><th>测试模块</th><th>模块核心功能</th><th>测试功能点</th><th>测试标题</th><th>角色</th><th>测试前置条件</th><th>测试数据</th><th>测试步骤</th><th>预期结果</th><th>测试类型</th><th>优先级</th><th>执行状态</th><th>备注</th></tr></thead><tbody><tr><td>TC001</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>定时自动生成服务商结算单（应付&gt;0，正向）</td><td>系统定时任务（无人工）</td><td>settle_period_config 存在 frequency=MONTHLY 有效配置，含 gen_day/period_start_day/period_end_day/belong_basis=APPROVED_TIME/zero_amount_rule=NOT_GENERATE
+某服务商同周期存在 claim_order.status=PENDING_SETTLE 且归属时间落入周期窗口、未纳入任何有效结算明细
+同服务商同周期可存在 claim_deduct_order.status=UNSETTLED 的服务商责任抵扣单
+应付合计（Σ索赔应付 − Σ抵扣）≠ 0</td><td></td><td>定时作业在 gen_day 0 点触发 OP1（settle_type=PROVIDER），任务启动快照当时生效配置
+按半开区间 [settle_period_start, period_end_exclusive) 逐服务商聚合候选索赔单与候选抵扣单
+计算 payable_amount = Σ claim_order.apply_total_amount − Σ claim_deduct_order.deduct_amount
+落库分支 A：写 claim_settle_order 与逐行 claim_settle_detail</td><td>生成一张 claim_settle_order：settle_type=PROVIDER、settle_no 为 SPJS 前缀编码、status=PENDING_CONFIRM、payee_name=服务商名、claim_count=纳入索赔单数、force_settle_flag=0、发票四字段/settle_time=NULL
+每张索赔单/抵扣单各写一行 claim_settle_detail（抵扣行 claim_total 为负、deduct_amount 为正）
+纳入的 claim_deduct_order.status 由 UNSETTLED→SETTLED；claim_order.status 不改（仍 PENDING_SETTLE）靠明细占位排除后续扫描
+断言 payable_amount = Σ claim_settle_detail.claim_total，一致；同服务商同周期同 settle_type 至多 1 张有效单</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP1 分支A / api §2.1 / PRD §4.3 F-SET-01 / A-30</td></tr><tr><td>TC002</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>应付=0 零元核销不建单（A-34，边界）</td><td>系统定时任务（无人工）</td><td>某服务商同周期候选索赔单与候选抵扣单聚合后 payable_amount 恰为 0
+zero_amount_rule=NOT_GENERATE</td><td></td><td>OP1 逐服务商聚合，计算得 payable_amount=0
+进入落库分支 B（0 元核销，同事务）</td><td>不写 claim_settle_order、不写 claim_settle_detail
+参与的每张 claim_order.status 由 PENDING_SETTLE→SETTLED（乐观锁双条件）
+参与的每张 claim_deduct_order.status 由 UNSETTLED→SETTLED
+无发票、无付款、无质保金动作；作业汇总 zeroWriteoffCount 计数+1</td><td>边界测试</td><td>P0</td><td>待执行</td><td>LLD OP1 分支B / api §2.1 步骤7 / PRD §8.7 A-34</td></tr><tr><td>TC003</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>手动提前结算生成结算单（OP2，正向）</td><td>闪欣动力索赔专员</td><td>settle_period_config.manual_advance=1
+指定 settleType=PROVIDER + providerId + 当前进行中周期，且该周期该主体无有效结算单
+目标周期存在待结算索赔单，应付≠0</td><td></td><td>P05 点「+ 手动合并结算单」，提交 settleType/providerId/settlePeriodStart/settlePeriodEnd 调 /settle/order/manual-generate
+校验 manual_advance=1 与幂等键
+按 OP1 分支A 聚合落库，settle_no 的 yyyyMMdd 取操作当天</td><td>返回 settleId/settleNo（SPJS-操作当天）/status=PENDING_CONFIRM/payableAmount、zeroWriteoff=false
+聚合与写库逻辑同 OP1（结算单+明细+抵扣回写同事务），触发者为人工、周期可为进行中周期</td><td>功能测试</td><td>P1</td><td>待执行</td><td>LLD OP2 / api §2.2 / PRD §4.3 F-SET-01（支持手动提前结算）</td></tr><tr><td>TC004</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>手动提前结算幂等键冲突拒绝（异常）</td><td>闪欣动力索赔专员</td><td>同 settle_type+provider_id+period_start+period_end 幂等键已存在一张有效结算单</td><td></td><td>对同键主体同周期再次发起 /settle/order/manual-generate</td><td>返回 SET_4010（该周期该主体已有有效结算单），不新建、不改动既有单</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP2 / api §2.2 步骤2 / 错误码 SET_4010</td></tr><tr><td>TC005</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>未开放手动提前结算被拦截（异常）</td><td>闪欣动力索赔专员</td><td>settle_period_config.manual_advance=0</td><td></td><td>发起 /settle/order/manual-generate</td><td>前置校验失败返回 code=400（未开放手动提前），不生成结算单</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP2 / api §2.2 步骤1</td></tr><tr><td>TC006</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>同键重跑合并本周期新出现未占用明细（幂等，边界）</td><td>系统定时任务（无人工）</td><td>同幂等键已有一张 status=PENDING_CONFIRM 的有效结算单
+本执行周期又新出现同服务商同周期、未被任何有效明细占用的索赔/抵扣</td><td></td><td>OP1 重跑，命中同键 PENDING_CONFIRM 单
+行锁下合并本执行周期新出现的未占用明细并重算金额</td><td>不新建结算单，在原 PENDING_CONFIRM 单上追加明细并重算 payable_amount/claim_count
+若同键单已进入对账及后续状态则不改旧单，迟到项留给再下一次可执行周期</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD OP1 幂等 / api §2.1 步骤4 / §八 生成幂等</td></tr><tr><td>TC007</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>迟到数据滚入下一执行周期（D-结算-B6，边界）</td><td>系统定时任务（无人工）</td><td>存在原归属时间 &lt; 本执行周期起始日、原周期结算单已生成、且该索赔/抵扣仍未被有效明细占用</td><td></td><td>OP1 另行检出迟到未占用项
+将其纳入下一次可执行结算周期生成/合并</td><td>不补开原周期单、不重开或回改已生成结算单
+生成的结算单写下一执行周期 settle_period_start/end；源单归属日期不变（索赔仍按原 claim_audit_record.audit_time、抵扣仍按原 settle_period_belong）
+明细经 claim_no/xw_claim_no 回查源单，列表/导出展示「执行周期 + 原归属日期」</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD OP1 迟到处置 / api §2.1 步骤4 / D-结算-B6</td></tr><tr><td>TC008</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>单服务商维度失败不影响其他维度（异常隔离）</td><td>系统定时任务（无人工）</td><td>同一次 OP1 涉及多个服务商维度，其中某维度写库过程发生异常</td><td></td><td>OP1 各服务商维度独立事务独立提交
+某维度事务内某步失败</td><td>失败维度整体回滚，不产生半完成结算单/明细/抵扣回写
+其他维度不受影响，正常生成并提交</td><td>数据一致性</td><td>P2</td><td>待执行</td><td>LLD OP1 失败回滚 / api §2.1 步骤10</td></tr><tr><td>TC009</td><td>结算</td><td>结算</td><td>F-SET-01</td><td>周期日期按目标月月末钳制（边界）</td><td>系统定时任务（无人工）</td><td>settle_period_config 配置 period_end_day=31，目标月只有 28/29/30 天</td><td></td><td>OP1 以触发时点为锚，取严格早于本次触发的最近 period_end_day 为 settle_period_end
+按 period_start_day 与 period_end_day 大小关系推 settle_period_start（跨月取上一月 start day）</td><td>period_end_day=31 而目标月不足时钳制为该月最后一天；start day 同按月末钳制
+查询使用半开区间 [settle_period_start, settle_period_end+1 日)</td><td>边界测试</td><td>P2</td><td>待执行</td><td>LLD OP1 周期日期生成算法 / api §2.1 步骤2</td></tr><tr><td>TC010</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>确认结算 PENDING_CONFIRM→PENDING_RECON（OP3b，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_CONFIRM
+payable_amount≠0 且至少 1 行未删除索赔明细</td><td></td><td>P06 核对明细后点「确认结算」，调 /settle/order/{id}/confirm
+校验 payable_amount≠0、明细非空
+更新结算单状态</td><td>claim_settle_order.status 由 PENDING_CONFIRM→PENDING_RECON，无其他表写入
+推送对账给收款方（服务商），本期站内消息/列表可见、无外呼
+返回 status=PENDING_RECON</td><td>状态机</td><td>P0</td><td>待执行</td><td>LLD OP3b / api §2.5 / PRD §4.3 F-SET-02</td></tr><tr><td>TC011</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>新增结算明细并重算金额（OP3a 增，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_CONFIRM
+待增 claim_order.status=PENDING_SETTLE 且不在任何 status&lt;&gt;VOIDED 的有效结算明细中</td><td></td><td>P06 增补一张索赔单据，调 POST /settle/order/{id}/detail 传 sourceClaimId
+校验结算单待确认（乐观锁双条件）与来源单可纳入
+INSERT claim_settle_detail 后回写汇总</td><td>新增一行 claim_settle_detail（字段同 OP1 服务商索赔行、claim_total=apply_total_amount、deduct_amount=0.00）
+回写 claim_count=未删除索赔行数、payable_amount=Σclaim_total
+返回 detailId/claimCount/payableAmount，status 仍 PENDING_CONFIRM</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP3a 增 / api §2.3 / PRD §4.3 F-SET-02（可增删）</td></tr><tr><td>TC012</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>删除结算明细源单恢复可扫描（OP3a 删，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_CONFIRM，含多行明细
+目标 detailId 属于本单且未删</td><td></td><td>P06 移除一行索赔明细，调 DELETE /settle/order/{id}/detail/{detailId}
+软删该行后回写汇总</td><td>claim_settle_detail 该行 deleted_at 置值（软删）；对应 claim_order 恢复可被下次扫描（状态不改，仍 PENDING_SETTLE）
+回写 claim_count/payable_amount
+返回重算后 claimCount/payableAmount，status 仍 PENDING_CONFIRM</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP3a 删 / api §2.4</td></tr><tr><td>TC013</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>编辑致应付变号按新符号重分正负线（D-结算-B2，边界）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_CONFIRM，原 payable_amount 为正（或负）
+增删明细后重算 payable_amount 变为相反符号且≠0</td><td></td><td>OP3a 增/删明细提交，重算 payable_amount 符号翻转
+后续走 OP5 对账确认</td><td>结算单保持 PENDING_CONFIRM，仅记录新符号
+对账确认（OP5）时按新符号重新分流：变正走正数线 PENDING_INVOICE、变负走负数线 PENDING_FORCE</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD OP3a 边界 / api §2.3/§2.4 步骤5 / D-结算-B2</td></tr><tr><td>TC014</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>编辑致应付=0 立即 0 元核销（D-结算-B2，边界）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_CONFIRM
+增删明细后重算 payable_amount=0</td><td></td><td>OP3a 增/删明细提交，重算得 payable_amount=0
+同事务立即走 0 元核销</td><td>当前 PENDING_CONFIRM 结算单置 VOIDED、剩余明细软删
+剩余参与索赔单置 SETTLED、相关抵扣单置/保持 SETTLED
+不进入对账/开票/付款/质保金流程；上述写入同一事务，任一步失败整体回滚</td><td>边界测试</td><td>P0</td><td>待执行</td><td>LLD OP3a 边界 / api §2.3/§2.4 步骤5 / D-结算-B2</td></tr><tr><td>TC015</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>确认结算 payable=0 被拦截（异常）</td><td>闪欣动力索赔专员</td><td>结算单 status=PENDING_CONFIRM 且 payable_amount=0（编辑所致，未走核销）</td><td></td><td>点「确认结算」调 /settle/order/{id}/confirm</td><td>返回 SET_4002（应付金额为 0，不可确认），提示需先处理明细/走 0 元核销，不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP3b 校验 / api §2.5 步骤2 / 错误码 SET_4002</td></tr><tr><td>TC016</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>确认结算明细为空被拦截（异常）</td><td>闪欣动力索赔专员</td><td>结算单 status=PENDING_CONFIRM，无未删除索赔明细</td><td></td><td>点「确认结算」调 /settle/order/{id}/confirm</td><td>返回 SET_4003（结算明细为空），不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP3b 校验 / api §2.5 步骤2 / 错误码 SET_4003</td></tr><tr><td>TC017</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>非待确认态增删/确认被拦截（异常）</td><td>闪欣动力索赔专员</td><td>结算单 status 已非 PENDING_CONFIRM（如 PENDING_RECON）</td><td></td><td>对该单发起增删明细或确认结算</td><td>乐观锁双条件 WHERE status='PENDING_CONFIRM' 命中 0 行，返回 code=409/SET_4001（状态不允许该操作），不写库</td><td>状态机</td><td>P1</td><td>待执行</td><td>LLD 非法迁移拦截 / api §2.3~2.5 前置校验 / 错误码 SET_4001</td></tr><tr><td>TC018</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>对账确认正数分流→PENDING_INVOICE（OP5，正向）</td><td>服务商售后专员</td><td>服务商结算单 status=PENDING_RECON 且 payable_amount&gt;0</td><td></td><td>P06 收款方点「对账确认」，调 /settle/order/{id}/recon-confirm
+写 recon_confirm_time，读取生单时 invoice_permission_flag 快照</td><td>recon_confirm_time=NOW()；status 由 PENDING_RECON→PENDING_INVOICE
+使用生单快照 invoice_permission_flag：为 1 可开票、为 0 挂起（挂起标记非独立状态）
+返回 status=PENDING_INVOICE、invoicePermissionFlag、forceSettleFlag=0</td><td>状态机</td><td>P0</td><td>待执行</td><td>LLD OP5 正数线 / api §2.7 / A-32 / PRD §6.3</td></tr><tr><td>TC019</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>对账确认负数分流→PENDING_FORCE（OP5，正向）</td><td>服务商售后专员</td><td>服务商结算单 status=PENDING_RECON 且 payable_amount&lt;0</td><td></td><td>点「对账确认」调 /settle/order/{id}/recon-confirm</td><td>recon_confirm_time=NOW()；invoice_permission_flag=0、force_settle_flag=1
+status 由 PENDING_RECON→PENDING_FORCE（关闭开票权限）
+返回 status=PENDING_FORCE、forceSettleFlag=1</td><td>状态机</td><td>P0</td><td>待执行</td><td>LLD OP5 负数线 / api §2.7 步骤4 / A-33 / PRD §6.4</td></tr><tr><td>TC020</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>对账确认应付=0 被拦截（异常）</td><td>服务商售后专员</td><td>结算单 status=PENDING_RECON 且 payable_amount=0（编辑所致）</td><td></td><td>点「对账确认」调 /settle/order/{id}/recon-confirm</td><td>返回 SET_4002，提示先处理明细，不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP5 拦截 / api §2.7 步骤1 / 错误码 SET_4002</td></tr><tr><td>TC021</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>作废待确认结算单并回滚抵扣（OP4，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_CONFIRM，明细中含 deduct_amount&lt;&gt;0 的抵扣行</td><td></td><td>P05/P06 点「作废」，调 /settle/order/{id}/void
+同事务执行末态+明细软删+抵扣回滚</td><td>claim_settle_order.status 由 PENDING_CONFIRM→VOIDED（终态）
+软删该单全部 claim_settle_detail；deduct_amount&lt;&gt;0 对应 claim_deduct_order.status 由 SETTLED→UNSETTLED
+claim_order.status 不动（仍 PENDING_SETTLE），移出明细后恢复可被扫描；三步同事务</td><td>状态机</td><td>P0</td><td>待执行</td><td>LLD OP4 / api §2.6</td></tr><tr><td>TC022</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>非待确认态作废被拦截（异常）</td><td>闪欣动力索赔专员</td><td>结算单 status 已非 PENDING_CONFIRM（如 PENDING_INVOICE）</td><td></td><td>对该单点「作废」调 /settle/order/{id}/void</td><td>返回 SET_4001/code=409（仅待确认可作废），不写库</td><td>状态机</td><td>P1</td><td>待执行</td><td>LLD OP4 前置 / api §2.6 步骤1 / 错误码 SET_4001</td></tr><tr><td>TC023</td><td>结算</td><td>结算</td><td>F-SET-02</td><td>并发更新乐观锁冲突（并发）</td><td>闪欣动力索赔专员</td><td>两个操作者对同一结算单并发提交状态变更（如同时确认结算）</td><td></td><td>先后两次提交同一 id 同一现态的写操作
+后端以 WHERE id=? AND status=? 双条件 + @Version 事务内自增执行更新</td><td>先到者成功、version+1；后到者乐观锁命中 0 行返回 code=409（数据已变更请刷新）
+接口请求/响应体均不含 version，前端靠 status+冲突码感知并发</td><td>并发测试</td><td>P2</td><td>待执行</td><td>LLD §八 乐观锁 / api 附录 4.1 说明</td></tr><tr><td>TC024</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>有白名单权限对账后开票上传发票（OP7，正向）</td><td>服务商售后专员</td><td>服务商结算单 status=PENDING_INVOICE 且 invoice_permission_flag=1
+发票附件已先落 attachment（biz_type=SETTLE、biz_id=结算单 id）
+invoiceAmount 等于 payable_amount</td><td></td><td>P06 点「开票」，录入发票代码/号码/日期/金额并传附件 id，调 /settle/order/{id}/invoice
+校验权限、附件、金额一致后更新</td><td>写入 invoice_code/invoice_no/invoice_date/invoice_amount/invoice_attachment_id
+status 由 PENDING_INVOICE→PENDING_VERIFY
+返回 status=PENDING_VERIFY</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP7 / api §2.9 / PRD §4.3 F-SET-03 / A-32</td></tr><tr><td>TC025</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>无白名单权限对账后挂起（A-32，边界）</td><td>服务商售后专员</td><td>服务商结算单生单时白名单快照 invoice_permission_flag=0，对账确认进入 PENDING_INVOICE</td><td></td><td>对账确认（OP5）后进入 PENDING_INVOICE 且 flag=0
+尝试开票</td><td>结算单停留 PENDING_INVOICE 并标记挂起（flag=0，挂起非独立状态）
+此时开票被 SET_4006 拦截，需先经 OP6 白名单恢复</td><td>边界测试</td><td>P0</td><td>待执行</td><td>LLD OP5/OP7 / api §2.7/§2.9 / A-32</td></tr><tr><td>TC026</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>白名单恢复挂起单解挂（OP6，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_INVOICE 且 invoice_permission_flag=0（挂起）
+索赔业务管理员已配置该主体白名单：enabled=1、未软删、effective_from&lt;=当前日期</td><td></td><td>点「白名单恢复开票」，调 /settle/order/{id}/invoice-resume
+校验当前白名单已启用且已生效</td><td>invoice_permission_flag 由 0→1，status 不变（仍 PENDING_INVOICE），此后可开票
+此为 A-16「配置不回溯」对已挂起单的 A-32 显式例外
+返回 invoicePermissionFlag=1、status=PENDING_INVOICE</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP6 / api §2.8 / A-32/A-16</td></tr><tr><td>TC027</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>开票金额≠应付被拦截（D-结算-B3，异常）</td><td>服务商售后专员</td><td>服务商结算单 status=PENDING_INVOICE 且 flag=1
+invoiceAmount 与 payable_amount 不相等</td><td></td><td>提交开票，invoiceAmount≠payable_amount</td><td>返回 SET_4005（开票金额与应付不一致），阻断提交、不允许差额，不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP7 校验 / api §2.9 步骤2 / D-结算-B3 / 错误码 SET_4005</td></tr><tr><td>TC028</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>无权限（flag=0）直接开票被拦截（异常）</td><td>服务商售后专员</td><td>服务商结算单 status=PENDING_INVOICE 且 invoice_permission_flag=0（未解挂）</td><td></td><td>提交开票 /settle/order/{id}/invoice</td><td>前置校验 invoice_permission_flag=1 不满足，返回 SET_4006（无开票权限/白名单挂起），不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP7 前置 / api §2.9 步骤1 / 错误码 SET_4006</td></tr><tr><td>TC029</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>开票发票附件缺失被拦截（异常）</td><td>服务商售后专员</td><td>服务商结算单 status=PENDING_INVOICE 且 flag=1，但未提供 biz_type=SETTLE 的发票附件</td><td></td><td>提交开票，缺发票附件/四字段不齐</td><td>返回 SET_4007（发票信息/附件缺失），不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP7 校验 / api §2.9 步骤2 / 错误码 SET_4007</td></tr><tr><td>TC030</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>恢复开票时白名单未生效被拦截（边界）</td><td>闪欣动力索赔专员</td><td>挂起单对应白名单 enabled=1 但 effective_from 尚未到达当前日期</td><td></td><td>点「白名单恢复开票」调 /settle/order/{id}/invoice-resume</td><td>返回 SET_4006（白名单未生效，effective_from 未到不得提前解挂），flag 保持 0</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD OP6 校验 / api §2.8 步骤2 / 错误码 SET_4006</td></tr><tr><td>TC031</td><td>结算</td><td>结算</td><td>F-SET-03</td><td>白名单快照不回溯已生成单（A-16/A-32，边界）</td><td>索赔业务管理员</td><td>结算单生单时已写入 invoice_permission_flag 快照
+生单后白名单被取消/变更</td><td></td><td>在结算单生单后取消该主体白名单
+对该已生成单执行对账确认（OP5）走正数线</td><td>对账使用生单时的 invoice_permission_flag 快照，白名单后续取消不回改已生成单
+新单快照按新配置计算，已生成单不受影响</td><td>边界测试</td><td>P2</td><td>待执行</td><td>LLD OP5 快照规则 / api §2.7 步骤3 / A-16/A-32</td></tr><tr><td>TC032</td><td>结算</td><td>结算</td><td>F-SET-04</td><td>发票确认 PENDING_VERIFY→VERIFIED（OP8，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=PENDING_VERIFY，发票四字段+附件齐全</td><td></td><td>P06 核验方点「发票确认」，调 /settle/order/{id}/invoice-verify
+校验发票四字段+附件齐全后更新</td><td>claim_settle_order.status 由 PENDING_VERIFY→VERIFIED，无其他表写入
+返回 status=VERIFIED</td><td>状态机</td><td>P0</td><td>待执行</td><td>LLD OP8 / api §2.10 / PRD §4.3 F-SET-04</td></tr><tr><td>TC033</td><td>结算</td><td>结算</td><td>F-SET-04</td><td>发票确认信息不齐被拦截（异常）</td><td>闪欣动力索赔专员</td><td>结算单 status=PENDING_VERIFY 但发票四字段或附件不齐全</td><td></td><td>点「发票确认」调 /settle/order/{id}/invoice-verify</td><td>返回 SET_4007（发票信息/附件缺失），不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP8 校验 / api §2.10 步骤2 / 错误码 SET_4007</td></tr><tr><td>TC034</td><td>结算</td><td>结算</td><td>F-SET-04</td><td>申请付款触发付款链（OP9，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 settle_type=PROVIDER 且 status=VERIFIED
+该结算单尚无有效 payment_apply</td><td></td><td>P05/P06 已核验单点「申请付款」，调 /settle/order/{id}/apply-payment
+触发付款链生成 payment_apply 草稿</td><td>结算单状态保持 VERIFIED 不变（本链无写库）
+付款链据本单生成 payment_apply 草稿（带出 settle_id/settle_no/payee_name/fee_owner/apply_amount=payable_amount/发票信息）
+返回 status=VERIFIED</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP9 / api §2.11 / A-28 / PRD §4.3 F-SET-04</td></tr><tr><td>TC035</td><td>结算</td><td>结算</td><td>F-SET-04</td><td>重复申请付款被拦截（异常）</td><td>闪欣动力索赔专员</td><td>服务商结算单 status=VERIFIED 且已存在有效 payment_apply（status&lt;&gt;VOIDED）</td><td></td><td>再次点「申请付款」调 /settle/order/{id}/apply-payment</td><td>返回 code=409（一结算单仅 1 张有效付款申请），返回既有单提示，不重复生成</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP9 校验 / api §2.11 步骤1</td></tr><tr><td>TC036</td><td>结算</td><td>结算</td><td>F-SET-04</td><td>闪欣结算走申请付款接口被拦截（异常）</td><td>闪欣动力索赔专员</td><td>结算单 settle_type=SHANXIN</td><td></td><td>对闪欣结算单调 /settle/order/{id}/apply-payment</td><td>返回 SET_4011（结算类型不匹配该操作，申请付款仅 PROVIDER），不处理</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP9 前置 / api §2.11 步骤1 / 错误码 SET_4011</td></tr><tr><td>TC037</td><td>结算</td><td>结算</td><td>F-SET-04</td><td>付款完成回写 VERIFIED→SETTLED（OP10，数据一致性）</td><td>系统（付款链内部回调）</td><td>服务商结算单 settle_type=PROVIDER 且 status=VERIFIED
+对应 payment_apply 已付款完成（PAID）</td><td></td><td>付款链回调 /settle/order/{id}/payment-callback
+同事务置结算单末态与名下索赔单末态</td><td>claim_settle_order.status 由 VERIFIED→SETTLED、settle_time=NOW()
+该单明细中每张 claim_order.status 由 PENDING_SETTLE→SETTLED（同事务、乐观锁双条件）
+结算单末态+索赔单末态同事务，任一步失败整体回滚（防结算已完但索赔未销）；返回 settledClaimCount</td><td>数据一致性</td><td>P0</td><td>待执行</td><td>LLD OP10 / api §2.12</td></tr><tr><td>TC038</td><td>结算</td><td>结算</td><td>F-SET-04</td><td>付款回写幂等（非 VERIFIED 态，边界）</td><td>系统（付款链内部回调）</td><td>结算单已非 VERIFIED（如已 SETTLED，重复回调）</td><td></td><td>再次调用 /settle/order/{id}/payment-callback</td><td>乐观锁双条件命中 0 行，幂等返回「已处理」(code=409)，不重复置末态、不重复销索赔单</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD OP10 前置 / api §2.12 步骤1</td></tr><tr><td>TC039</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>发起强制结算上传扣减依据（OP11 步骤A，正向）</td><td>闪欣动力索赔专员</td><td>服务商结算单 settle_type=PROVIDER、status=PENDING_FORCE、payable_amount&lt;0、force_settle_flag=1
+已准备扣减依据附件（attachment biz_type=SETTLE、biz_id=结算单 id）</td><td></td><td>P05/P06 点「强制结算」，调 /settle/order/{id}/force-settle/initiate 传 voucherAttachmentId
+绑定扣减依据附件</td><td>绑定扣减依据附件；结算单状态保持 PENDING_FORCE，不扣质保金、不写扣减流水
+等待财务二次确认；返回 status=PENDING_FORCE、voucherAttachmentId</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP11 步骤A / api §2.13 / A-31/A-33 / D-结算-B4</td></tr><tr><td>TC040</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>财务确认执行质保金扣减+结算完结（OP11 步骤B，数据一致性）</td><td>财务人员（闪欣）</td><td>结算单 settle_type=PROVIDER、status=PENDING_FORCE、payable_amount&lt;0、force_settle_flag=1
+扣减依据附件已上传；质保金账户余额充足</td><td></td><td>财务核验扣减依据后点确认，调 /settle/order/{id}/force-settle/execute
+对 warranty_deposit_account 按 account_id 加分布式锁
+计算实扣=MIN(|payable|,balance)、shortfall=扣需−实扣
+同事务写流水+回写账户+置结算单及索赔单末态</td><td>写 warranty_deposit_txn：biz_type=DEDUCT、amount=-实扣、balance_after=balance-实扣、shortfall_carryover=0.00（充足）、绑定凭证附件
+回写 warranty_deposit_account.balance=balance-实扣（乐观锁）；status=NORMAL 不变
+claim_settle_order.status 由 PENDING_FORCE→SETTLED、settle_time=NOW()；名下 claim_order.status 由 PENDING_SETTLE→SETTLED
+账户扣减+流水+结算单末态+索赔单末态同一事务，任一步失败整体回滚</td><td>数据一致性</td><td>P0</td><td>待执行</td><td>LLD OP11 步骤B / api §2.14 / D-结算-B4 / A-31</td></tr><tr><td>TC041</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>质保金余额不足扣全部+差额挂账（A-31，边界）</td><td>财务人员（闪欣）</td><td>结算单负数强制结算前置满足；质保金账户 balance &lt; |payable_amount|</td><td></td><td>财务确认执行扣减 /settle/order/{id}/force-settle/execute
+计算实扣=MIN(扣需,balance)=balance、shortfall=扣需−balance</td><td>amount=-balance（扣全部）、balance_after=0.00、shortfall_carryover=shortfall（差额挂账结转）
+本期不生成二次追扣单（挂账结转，V2 追）
+结算单仍置 SETTLED、索赔单置 SETTLED（同事务）；返回 deductAmount/balanceAfter=0/shortfallCarryover</td><td>边界测试</td><td>P0</td><td>待执行</td><td>LLD OP11 步骤B 边界 / api §2.14 步骤6 / A-31</td></tr><tr><td>TC042</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>发起强制结算扣减依据缺失被拦截（异常）</td><td>闪欣动力索赔专员</td><td>结算单 status=PENDING_FORCE 但未上传扣减依据附件</td><td></td><td>调 /settle/order/{id}/force-settle/initiate 未带有效 voucherAttachmentId</td><td>返回 SET_4008（强制结算前置不满足/扣减依据缺失），状态不变</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP11 步骤A 校验 / api §2.13 步骤2 / 错误码 SET_4008</td></tr><tr><td>TC043</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>财务执行前置不满足被拦截（异常）</td><td>财务人员（闪欣）</td><td>结算单非 PENDING_FORCE，或 payable_amount≥0，或 force_settle_flag≠1</td><td></td><td>调 /settle/order/{id}/force-settle/execute</td><td>返回 SET_4008（强制结算前置不满足），不扣减、不置末态</td><td>状态机</td><td>P1</td><td>待执行</td><td>LLD OP11 步骤B 前置 / api §2.14 步骤1 / 错误码 SET_4008</td></tr><tr><td>TC044</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>质保金账户异常被拦截（异常）</td><td>财务人员（闪欣）</td><td>结算单负数强制结算前置满足，但质保金账户不存在/加锁失败</td><td></td><td>财务确认执行扣减 /settle/order/{id}/force-settle/execute</td><td>返回 SET_4009（质保金账户异常），整体回滚不产生扣减流水与末态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP11 步骤B / api §2.14 步骤2 / 错误码 SET_4009</td></tr><tr><td>TC045</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>索赔专员发起不扣款、财务二次确认才扣（D-结算-B4，权限分工）</td><td>闪欣动力索赔专员 / 财务人员（闪欣）</td><td>负数结算单 status=PENDING_FORCE</td><td></td><td>步骤A：索赔专员发起强制结算并上传依据
+检查此时质保金账户与流水
+步骤B：财务确认执行</td><td>步骤A 后结算单仍 PENDING_FORCE，质保金账户余额未变、无 DEDUCT 流水
+仅步骤B（财务确认执行）才发生扣减与结算完结
+两步分工严格分离，索赔专员无扣款权</td><td>权限测试</td><td>P1</td><td>待执行</td><td>LLD OP11 两步 / api §2.13/§2.14 / D-结算-B4</td></tr><tr><td>TC046</td><td>结算</td><td>结算</td><td>F-SET-05</td><td>同账户并发扣减分布式锁串行化（并发）</td><td>财务人员（闪欣）</td><td>同一质保金账户存在两笔负数结算单并发执行扣减</td><td></td><td>两笔 force-settle/execute 并发对同一 account_id 发起
+后端按 account_id 加分布式锁</td><td>两笔扣减串行执行、余额顺序递减，不出现超扣/丢更新
+账户回写乐观锁保证一致，balance_after 链式正确</td><td>并发测试</td><td>P2</td><td>待执行</td><td>LLD OP11 分布式锁 / api §2.14 步骤2 / §八 分布式锁</td></tr><tr><td>TC047</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣结算统一生成一张不拆分（A-35，正向）</td><td>系统定时任务（无人工）</td><td>存在 xw_claim_order.status=PENDING_SETTLE 且归属时间落入周期、未占用的向欣旺达索赔单
+应付合计（Σ核准金额，含备件管理费）≠0</td><td></td><td>OP1 按 settle_type=SHANXIN 聚合「欣旺达↔闪欣」维度
+核准金额取 COALESCE(approved_amount,apply_total_amount)（含 part_mgmt_fee）
+统一生成一张不拆分结算单+逐行明细</td><td>生成一张 claim_settle_order：settle_type=SHANXIN、settle_no=SXJS 前缀、payee_name=闪欣动力、counterpart_name=欣旺达售后、provider_id/region=NULL、invoice_permission_flag=1、status=PENDING_CONFIRM
+每张明细 xw_claim_no 非空、claim_total=核准金额、part_mgmt_fee=xw_claim_order.part_mgmt_fee（落库计入金额）、fee_owner=NULL 待人工补选
+统一一张不拆分开票；payable_amount 恒≥0</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP1 闪欣聚合 / api §2.1 步骤8 / A-35/A-40 / D-结算-B5</td></tr><tr><td>TC048</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣结算确认要求全明细 fee_owner 非空（OP3b，正向）</td><td>欣旺达索赔专员</td><td>闪欣结算单 status=PENDING_CONFIRM，所有未删除明细已人工选定 fee_owner∈{XW,SHANXIN,INTERNAL_DEPT}</td><td></td><td>P08 点「确认结算」，调 /settle/order/{id}/confirm
+校验所有未删除明细 fee_owner 非空且在字典内</td><td>status 由 PENDING_CONFIRM→PENDING_RECON
+推送对账给闪欣（收款方），无外呼；返回 status=PENDING_RECON</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP3b（SHANXIN）/ api §2.5 步骤2 / A-35</td></tr><tr><td>TC049</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣结算确认 fee_owner 缺失被拦截（异常）</td><td>欣旺达索赔专员</td><td>闪欣结算单 status=PENDING_CONFIRM，存在明细行 fee_owner 为空或不在字典内</td><td></td><td>点「确认结算」调 /settle/order/{id}/confirm</td><td>返回 SET_4004（费用归属缺失或非法），拦截确认、不改状态</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP3b（SHANXIN）/ api §2.5 步骤2 / 错误码 SET_4004</td></tr><tr><td>TC050</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣新增明细选 INTERNAL_DEPT 但 internal_dept 为空被拦截（异常）</td><td>欣旺达索赔专员</td><td>闪欣结算单 status=PENDING_CONFIRM；待增 xw_claim_order.status=PENDING_SETTLE 未占用，其 internal_dept 为空</td><td></td><td>POST /settle/order/{id}/detail 传 sourceClaimId 且 feeOwner=INTERNAL_DEPT</td><td>返回 SET_4004（选 INTERNAL_DEPT 但 internal_dept 为空），不新增明细</td><td>接口测试</td><td>P1</td><td>待执行</td><td>LLD OP3a（SHANXIN）/ api §2.3 步骤2 / 错误码 SET_4004</td></tr><tr><td>TC051</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣对账确认直接进待开票（OP5，正向）</td><td>闪欣动力索赔专员</td><td>闪欣结算单 status=PENDING_RECON、payable_amount&gt;0（恒正）</td><td></td><td>P08 收款方（闪欣）点「对账确认」，调 /settle/order/{id}/recon-confirm</td><td>白名单仅约束服务商、不套闪欣主体：直接 invoice_permission_flag=1
+recon_confirm_time=NOW()；status 由 PENDING_RECON→PENDING_INVOICE，由闪欣开票
+返回 status=PENDING_INVOICE</td><td>状态机</td><td>P0</td><td>待执行</td><td>LLD OP5（SHANXIN）/ api §2.7 步骤3</td></tr><tr><td>TC052</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣结算不进负数/强制结算分支（异常）</td><td>闪欣动力索赔专员</td><td>结算单 settle_type=SHANXIN（恒正数）</td><td></td><td>构造对闪欣结算单走负数分流/强制结算的调用</td><td>命中负数分支或强制结算时返回 SET_4011（结算类型不匹配该操作），闪欣结算无 PENDING_FORCE 分支</td><td>状态机</td><td>P1</td><td>待执行</td><td>LLD 非法迁移拦截 / api §2.7 步骤4 / 错误码 SET_4011</td></tr><tr><td>TC053</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣发起付款财务共享 Mock 展示不外呼（OP12 步骤A，正向）</td><td>欣旺达索赔专员</td><td>闪欣结算单 settle_type=SHANXIN 且 status=VERIFIED</td><td></td><td>P07/P08 点「申请付款」，调 /settle/order/{id}/shanxin-pay/initiate
+系统组装 settle_no/payable_amount/currency 及分账清单展示给财务</td><td>返回分账清单 feeOwnerBreakdown（逐行 xwClaimNo/feeOwner/amount=claim_total）供线下办理
+本期无外部 HTTP 调用、不伪造 success/payment_ref 回执、不改业务状态（仍 VERIFIED）、不生成 payment_apply
+可重复查看/发起</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD OP12 步骤A / api §2.15 / A-18/A-35</td></tr><tr><td>TC054</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣付款成功回填置末态（OP12 步骤B，数据一致性）</td><td>财务人员（闪欣）</td><td>闪欣结算单 settle_type=SHANXIN 且 status=VERIFIED；线下付款已完成</td><td></td><td>财务在内建 Mock 回填页点「付款成功」，调 /settle/order/{id}/shanxin-pay/fill-result（可选传付款凭证附件）
+同事务置结算单与名下 xw 索赔单末态</td><td>claim_settle_order.status 由 VERIFIED→SETTLED、settle_time=NOW()
+该单明细中每张 xw_claim_order.status 由 PENDING_SETTLE→SETTLED（同事务、乐观锁）
+分账记 claim_settle_detail.fee_owner 为本期 Mock 记录、不外呼；返回 settledClaimCount</td><td>数据一致性</td><td>P0</td><td>待执行</td><td>LLD OP12 步骤B / api §2.16 / A-35/A-19</td></tr><tr><td>TC055</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣付款回填重复幂等（边界）</td><td>财务人员（闪欣）</td><td>闪欣结算单已 SETTLED（重复回填）</td><td></td><td>再次调 /settle/order/{id}/shanxin-pay/fill-result</td><td>前置状态不符（非 VERIFIED），幂等返回「已处理」(code=409)，不重复置末态</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD OP12 步骤B / api §2.16 步骤1</td></tr><tr><td>TC056</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣结算 payable=0 直接核销不建单（边界）</td><td>系统定时任务（无人工）</td><td>闪欣结算聚合后 payable_amount=0</td><td></td><td>OP1（SHANXIN）聚合得 payable_amount=0</td><td>不建单；参与的 xw_claim_order.status 由 PENDING_SETTLE→SETTLED（同分支B）
+无发票/付款动作</td><td>边界测试</td><td>P2</td><td>待执行</td><td>LLD OP1 闪欣聚合步骤5 / api §2.1 步骤8</td></tr><tr><td>TC057</td><td>结算</td><td>结算</td><td>F-SET-06</td><td>闪欣明细备件管理费落库展示并计入金额（D-结算-B5，边界）</td><td>欣旺达索赔专员</td><td>闪欣结算单明细来自含 part_mgmt_fee 的向欣旺达索赔单</td><td></td><td>查看 P08 结算单详情明细
+核对 part_mgmt_fee 列与结算金额构成</td><td>明细 part_mgmt_fee=xw_claim_order.part_mgmt_fee，落库、展示并计入 claim_total（不恒置 0）
+与 D-向欣-B2 同口径（原型 08 旧表头需补列，属已确认口径）</td><td>边界测试</td><td>P2</td><td>待执行</td><td>LLD §2 数据来源映射 / api §2.19 / D-结算-B5/D-向欣-B2</td></tr><tr><td>TC058</td><td>结算</td><td>结算</td><td>F-SET-07</td><td>服务商结算单多维筛选分页（接口17，正向）</td><td>闪欣动力索赔专员 / 服务商售后专员</td><td>存在多张服务商结算单，覆盖不同状态/周期/服务商/区域</td><td></td><td>GET /settle/order/provider/page 传 settleNo/payeeName/providerId/region/status/周期区间/pageNo/pageSize
+固定 settle_type=PROVIDER AND deleted_at IS NULL 查询</td><td>返回 PageResult：total/pageNo/pageSize/list，各行含 settleNo/payeeName/region/周期/payableAmount（可正可负）/status
+deductTotal 由 SUM(claim_settle_detail.deduct_amount WHERE deduct_amount&lt;&gt;0) 汇总、负号展示
+按角色+区域数据范围权限过滤</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD §2/§七 / api §2.17 / PRD §4.3 F-SET-07</td></tr><tr><td>TC059</td><td>结算</td><td>结算</td><td>F-SET-07</td><td>闪欣结算单多维筛选分页（接口18，正向）</td><td>闪欣动力索赔专员 / 欣旺达索赔专员</td><td>存在多张闪欣结算单</td><td></td><td>GET /settle/order/shanxin/page 传 settleNo/counterpartName/status/周期区间/pageNo/pageSize
+固定 settle_type=SHANXIN AND deleted_at IS NULL</td><td>返回 PageResult，各行含 settleNo(SXJS)/counterpartName(欣旺达售后)/周期/payableAmount/status/reconConfirmTime/settleTime（未结算为 null）
+数据范围权限过滤</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD §2 / api §2.18 / P07</td></tr><tr><td>TC060</td><td>结算</td><td>结算</td><td>F-SET-07</td><td>结算单详情含明细+发票+合计（接口19，正向）</td><td>闪欣动力索赔专员</td><td>存在一张结算单（任意状态可查）</td><td></td><td>GET /settle/order/{id}
+读主档+明细（settle_id=? AND deleted_at IS NULL）+发票四字段+合计行</td><td>返回基本信息+details 逐行（claim_settle_detail）+summary 合计行
+summary.claimTotalSum=payableAmount（一致性）；未开票时 invoice 四字段为 null（前端显示待开票）
+invoicePermissionFlag/forceSettleFlag/reconConfirmTime/settleTime 按单状态返回</td><td>功能测试</td><td>P1</td><td>待执行</td><td>LLD §2 详情映射 / api §2.19 / P06/P08</td></tr><tr><td>TC061</td><td>结算</td><td>结算</td><td>F-SET-07</td><td>结算单列表异步导出（接口20，正向）</td><td>闪欣动力索赔专员</td><td>存在满足筛选条件的结算单列表</td><td></td><td>POST /settle/order/export 传 settleType 及筛选条件
+按筛选（含 settle_type、deleted_at IS NULL）拉取，提交异步导出任务</td><td>返回 exportTaskId（异步导出任务，进度轮询+下载）
+导出列逐列对齐 §2 列表映射（结算单号/收款方或对方主体/区域/周期/应付总金额/责任抵扣/状态/对账确认时间/结算时间）
+数据范围权限过滤</td><td>功能测试</td><td>P1</td><td>待执行</td><td>LLD §七 导出 / api §2.20</td></tr><tr><td>TC062</td><td>结算</td><td>结算</td><td>F-SET-07</td><td>迟到滚入项导出带原归属日期（边界）</td><td>闪欣动力索赔专员</td><td>结算单/明细含 D-结算-B6 迟到滚入项（执行周期≠原归属周期）</td><td></td><td>对含迟到滚入项的结算单执行列表/明细导出</td><td>导出展示「执行周期 + 原归属日期」：服务商/闪欣索赔取原审核通过记录 audit_time、抵扣取原 settle_period_belong
+不改写源值</td><td>边界测试</td><td>P2</td><td>待执行</td><td>LLD §七 导出 / D-结算-B6</td></tr><tr><td>TC063</td><td>结算</td><td>结算</td><td>F-SET-07</td><td>数据范围权限过滤（权限）</td><td>服务商售后专员</td><td>服务商售后专员仅有本服务商数据权限</td><td></td><td>服务商售后专员查询服务商结算单分页/详情</td><td>仅返回本服务商范围内结算单，越权数据不可见（按角色+区域数据范围过滤）</td><td>权限测试</td><td>P2</td><td>待执行</td><td>api §2.17/§2.19 业务处理逻辑 / PRD §2.1 数据范围</td></tr></tbody></table></div></div><div class="sheet" data-s="3"><div class="meta">工作表「付款申请」· 31 条用例 · 14 列（测试数据列按 SDD 规则留空）</div><div class="tablewrap"><table><thead><tr><th>测试用例ID</th><th>测试模块</th><th>模块核心功能</th><th>测试功能点</th><th>测试标题</th><th>角色</th><th>测试前置条件</th><th>测试数据</th><th>测试步骤</th><th>预期结果</th><th>测试类型</th><th>优先级</th><th>执行状态</th><th>备注</th></tr></thead><tbody><tr><td>TC001</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>在已核验服务商结算单上申请付款生成草稿（正向）</td><td>闪欣索赔员</td><td>1. 存在一张 settle_type=PROVIDER、status=VERIFIED、payable_amount&gt;0 的服务商结算单
+2. 该 settle_id 下不存在 status≠VOIDED 的付款申请</td><td></td><td>1. 在该已核验结算单详情点「申请付款」
+2. 调用 POST /payment/apply/create-from-settle 传 settleId
+3. 查看返回及新生成付款申请主档</td><td>1. 结算单状态不变（VERIFIED，不耦合）
+2. 返回 success=true、code=0，data 含新 id、applyNo（JSFK 编号）、status=PENDING_SUBMIT
+3. 主档带出 settle_no/payee_name/apply_amount(=payable_amount)/currency，fee_owner=SHANXIN，has_invoice=1，invoice_info_id/payee_bank/payee_account/payee_account_name/pay_content/grade_level/current_node/applicant/apply_time 均 NULL，version=0</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作1 / api §2.1 / A-23 带出 / A-28 人工触发 / D-付款-B2 fee_owner=SHANXIN</td></tr><tr><td>TC002</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>源结算单不满足申请付款条件被拦截（异常）</td><td>闪欣索赔员</td><td>1. 源结算单为下列之一：非 settle_type=PROVIDER / 非 VERIFIED / payable_amount&lt;=0</td><td></td><td>1. 对该结算单调用 POST /payment/apply/create-from-settle</td><td>1. 前置校验不通过，不生成付款申请
+2. 返回 code=400、错误码 PAY_4001（结算单不满足申请付款条件）</td><td>异常测试</td><td>P0</td><td>待执行</td><td>LLD 操作1 前置/校验 / api §2.1-1、错误码 PAY_4001</td></tr><tr><td>TC003</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>同一结算单已存在有效付款申请时不重复生成（异常·一结算单仅一张有效单）</td><td>闪欣索赔员</td><td>1. 该 settle_id 下已存在一张 status≠VOIDED 的付款申请</td><td></td><td>1. 再次对同一结算单调用 POST /payment/apply/create-from-settle</td><td>1. 命中查重，不重复生成新草稿
+2. 返回 code=409、错误码 PAY_4002，并返回既有付款申请单 id</td><td>异常测试</td><td>P0</td><td>待执行</td><td>LLD 操作1 前置（一结算单仅一张有效付款申请）/ 并发去重 / api §2.1-1、错误码 PAY_4002</td></tr><tr><td>TC004</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>付款申请作废后同一结算单可再次生成新草稿（边界）</td><td>闪欣索赔员</td><td>1. 该 settle_id 下原付款申请已 status=VOIDED
+2. 结算单仍 settle_type=PROVIDER、VERIFIED、payable_amount&gt;0</td><td></td><td>1. 再次对该结算单调用 POST /payment/apply/create-from-settle</td><td>1. VOIDED 不计入有效单，查重放行
+2. 成功生成新草稿，status=PENDING_SUBMIT</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD 操作7（作废后可再次申请付款，VOIDED 不计入有效单）/ api §2.7-3</td></tr><tr><td>TC005</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>草稿态补录收款银行信息与付款内容（正向·编辑）</td><td>索赔专员</td><td>1. 存在一张 status=PENDING_SUBMIT 的付款申请草稿</td><td></td><td>1. 调用 PUT /payment/apply/{id} 传 payeeBank/payeeAccount/payeeAccountName/payContent（可含 attachmentIds）</td><td>1. 返回 success=true、code=0
+2. 主档 payee_bank/payee_account/payee_account_name/pay_content 落库为录入值，version+1，status 不变（PENDING_SUBMIT）
+3. 基础信息（settle_no/payee_name/fee_owner/apply_amount/currency）不被修改
+4. 传 attachmentIds 时写入 attachment（biz_type=PAYMENT、biz_id=付款申请 id）</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作2 / api §2.2 / 原型11 付款信息表单</td></tr><tr><td>TC006</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>编辑时收款字段格式非法被拦截（异常）</td><td>索赔专员</td><td>1. 存在一张 status=PENDING_SUBMIT 的付款申请草稿</td><td></td><td>1. 调用 PUT /payment/apply/{id}，payeeAccount 含非数字或超 64 位，或 payeeBank&gt;100、payeeAccountName&gt;128、payContent&gt;300</td><td>1. 字段校验不通过，不落库
+2. 返回 code=400</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作2 校验（payeeAccount ^[0-9]+$≤64、payeeBank≤100、payeeAccountName≤128、payContent≤300）/ api §2.2-2 / 原型11</td></tr><tr><td>TC007</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>账户名与收款方全称不一致触发二次确认但不阻断（边界）</td><td>索赔专员</td><td>1. 存在一张 status=PENDING_SUBMIT 的付款申请草稿
+2. 拟录入 payeeAccountName 与主档 payee_name 不一致</td><td></td><td>1. 编辑填入与收款方全称不一致的账户名
+2. 前端弹风险提示，用户二次确认后保存</td><td>1. 前端给出风险提示需二次确认
+2. 二次确认后不阻断，PUT /payment/apply/{id} 正常落库账户名</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD 操作2 校验（账户名与 payee_name 不一致弹提示、不阻断）/ api §2.2 payeeAccountName 说明 / 原型11</td></tr><tr><td>TC008</td><td>付款申请</td><td>付款申请</td><td>F-PAY-01</td><td>非草稿态编辑被状态守卫拦截（异常）</td><td>索赔专员</td><td>1. 付款申请当前 status≠PENDING_SUBMIT（如 APPROVING）</td><td></td><td>1. 调用 PUT /payment/apply/{id} 尝试编辑</td><td>1. 乐观锁双条件（WHERE id=? AND status=?）命中 0 行
+2. 返回 code=409、错误码 PAY_4004，提示刷新</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作2 前置 / 状态机非法迁移拦截 / api §2.2-1、错误码 PAY_4004</td></tr><tr><td>TC009</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>草稿信息齐全提交发起分级审批（正向）</td><td>索赔专员</td><td>1. 付款申请 status=PENDING_SUBMIT
+2. payee_bank/payee_account/payee_account_name/pay_content 均非空、账户名与 payee_name 一致
+3. 关联结算单 invoice_code/invoice_no/invoice_date/invoice_amount/invoice_attachment_id 齐全
+4. payment_approval_flow_config 中存在与 apply_amount 匹配的启用档位</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit</td><td>1. 全量校验通过，匹配到金额档
+2. 主档 status=APPROVING、grade_level=匹配档、current_node=node_chain[0]、applicant/apply_dept/apply_time 写入、version+1
+3. 按 node_chain 顺序逐条生成 payment_approval_node（node_seq=1..n、approve_result=PENDING）
+4. 返回 data 含 status=APPROVING、gradeLevel、currentNode</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作3 / api §2.3 / A-17 内建审批流 / A-24 分级</td></tr><tr><td>TC010</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>提交时必填付款信息缺失或账户名不一致未确认被拦截（异常）</td><td>索赔专员</td><td>1. 付款申请 status=PENDING_SUBMIT
+2. payee_bank/payee_account/payee_account_name/pay_content 存在空值，或账户名与 payee_name 不一致且未二次确认</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit</td><td>1. 全量校验不通过，不发起审批、不生成节点
+2. 返回 code=400，状态仍 PENDING_SUBMIT</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作3 全量校验 / api §2.3-2</td></tr><tr><td>TC011</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>申请金额低于下档临界匹配 L1 档（边界·&lt;5万）</td><td>索赔专员</td><td>1. 付款申请 status=PENDING_SUBMIT、信息齐全
+2. apply_amount 落于 &lt;5万 区间（低于 L2 下界）
+3. 已配置 L1/L2/L3 三档</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit</td><td>1. 按 amount_min&lt;=apply_amount AND apply_amount&lt;amount_max 匹配到 grade_level=L1
+2. 生成 L1 档 node_chain 节点链，status=APPROVING</td><td>边界测试</td><td>P0</td><td>待执行</td><td>LLD 操作3 匹配档位 / api §2.3-3 / 附录4.3 L1（apply_amount&lt;5万）/ A-24</td></tr><tr><td>TC012</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>申请金额恰等于 L2 下界落 L2 档（边界·左闭右开=5万落L2）</td><td>索赔专员</td><td>1. 付款申请 status=PENDING_SUBMIT、信息齐全
+2. apply_amount 恰等于 L2 区间左临界（5万，左闭）
+3. 已配置 L1/L2/L3 三档</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit</td><td>1. 左闭右开匹配：临界值 5万 落 L2（不落 L1），grade_level=L2
+2. 生成 L2 档节点链，status=APPROVING</td><td>边界测试</td><td>P0</td><td>待执行</td><td>LLD 操作3 匹配档位（左闭右开，=5万落 L2）/ api §2.3-3 / 附录4.3 / A-24</td></tr><tr><td>TC013</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>申请金额恰等于 L3 下界落 L3 档（边界·左闭=20万落L3）</td><td>索赔专员</td><td>1. 付款申请 status=PENDING_SUBMIT、信息齐全
+2. apply_amount 恰等于 L3 区间左临界（20万，左闭）
+3. 已配置 L1/L2/L3 三档</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit</td><td>1. 临界值 20万 落 L3（不落 L2），grade_level=L3
+2. 生成 L3 档节点链，status=APPROVING</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD 操作3 匹配档位 / api §2.3-3 / 附录4.3 L3（apply_amount≥20万）/ A-24</td></tr><tr><td>TC014</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>申请金额匹配不到金额档被拦截（异常·未配置金额档）</td><td>索赔专员</td><td>1. 付款申请 status=PENDING_SUBMIT、信息齐全
+2. payment_approval_flow_config 中无 enabled=1 且区间覆盖该 apply_amount 的档位</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit</td><td>1. 匹配不到档位，拦截报错「未配置金额档」
+2. 返回 code=400、错误码 PAY_4003，不迁移状态、不生成节点</td><td>异常测试</td><td>P0</td><td>待执行</td><td>LLD 操作3 匹配档位（匹配不到则拦截）/ api §2.3-3、错误码 PAY_4003</td></tr><tr><td>TC015</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>非草稿态提交被状态守卫拦截（异常）</td><td>索赔专员</td><td>1. 付款申请当前 status≠PENDING_SUBMIT（如 APPROVING）</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit</td><td>1. 乐观锁双条件命中 0 行
+2. 返回 code=409、错误码 PAY_4004</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作3 前置 / 状态机拦截 / api §2.3-1、错误码 PAY_4004</td></tr><tr><td>TC016</td><td>付款申请</td><td>付款申请</td><td>F-PAY-02</td><td>驳回退回后修改重提旧节点软删并重建节点链（边界·重提）</td><td>索赔专员</td><td>1. 付款申请曾被驳回、当前已回到 status=PENDING_SUBMIT
+2. 存在上一轮 payment_approval_node（含 REJECT 与 PENDING 节点）
+3. 信息已修改齐全</td><td></td><td>1. 调用 POST /payment/apply/{id}/submit 重新提交</td><td>1. 同一事务内先将上一轮 payment_approval_node.deleted_at=NOW() 软删
+2. 再按重新匹配档位的 node_chain 重建节点链（node_seq 从 1 起、approve_result=PENDING）
+3. status=APPROVING、current_node=新链首</td><td>边界测试</td><td>P1</td><td>待执行</td><td>LLD 操作3 重提场景（本期 Mock 软删旧节点后重建）/ api §2.3-6 / D-付款-B1 待文档</td></tr><tr><td>TC017</td><td>付款申请</td><td>付款申请</td><td>F-PAY-03</td><td>当前节点审批人通过·非末节点前进下一节点（正向·逐节点审批）</td><td>当前节点审批人（approver_role）</td><td>1. 付款申请 status=APPROVING
+2. 当前节点 approve_result=PENDING 且 node_name=current_node，其后存在下一节点
+3. 操作人角色=当前节点 approver_role</td><td></td><td>1. 调用 POST /payment/apply/{id}/approve（可带 opinion/attachmentIds）</td><td>1. 当前节点 approve_result=PASS、approver/approve_time 回写、version+1
+2. 主档 current_node=下一节点 node_name、status 仍 APPROVING、version+1
+3. 返回 data 含 status=APPROVING、currentNode=下一节点</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作4（非末节点）/ api §2.4</td></tr><tr><td>TC018</td><td>付款申请</td><td>付款申请</td><td>F-PAY-03</td><td>末节点审批通过·单据迁入审批通过（边界·末节点）</td><td>当前节点审批人（approver_role）</td><td>1. 付款申请 status=APPROVING
+2. 当前节点为末节点（无 node_seq+1）、approve_result=PENDING
+3. 操作人角色=末节点 approver_role</td><td></td><td>1. 调用 POST /payment/apply/{id}/approve</td><td>1. 末节点 approve_result=PASS 回写
+2. 主档 status=APPROVED、current_node=NULL、version+1
+3. 返回 data 中 status=APPROVED、currentNode=null</td><td>边界测试</td><td>P0</td><td>待执行</td><td>LLD 操作4（末节点通过→APPROVED）/ api §2.4</td></tr><tr><td>TC019</td><td>付款申请</td><td>付款申请</td><td>F-PAY-03</td><td>审批目标非当前节点或已处理节点被拦截（异常）</td><td>审批人</td><td>1. 付款申请 status=APPROVING
+2. 目标节点非 current_node，或该节点 approve_result≠PENDING（已 PASS/REJECT）</td><td></td><td>1. 调用 POST /payment/apply/{id}/approve</td><td>1. 前置校验不通过，不推进
+2. 返回 code=409、错误码 PAY_4005（非当前节点或已处理节点）</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作4 前置（仅当前节点可审）/ api §2.4-1、错误码 PAY_4005</td></tr><tr><td>TC020</td><td>付款申请</td><td>付款申请</td><td>F-PAY-03</td><td>操作人角色与当前节点审批角色不符被拒（异常）</td><td>非该节点角色用户</td><td>1. 付款申请 status=APPROVING，当前节点 approve_result=PENDING
+2. 操作人角色≠当前节点 approver_role</td><td></td><td>1. 调用 POST /payment/apply/{id}/approve</td><td>1. 权限校验不通过，不回写节点、不推进
+2. 返回 code=403</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作4 校验（操作人角色匹配 approver_role）/ api §2.4-2</td></tr><tr><td>TC021</td><td>付款申请</td><td>付款申请</td><td>F-PAY-03</td><td>当前节点驳回·单据退回待提交不驻留 REJECTED（正向·驳回）</td><td>当前节点审批人（approver_role）</td><td>1. 付款申请 status=APPROVING
+2. 当前节点 approve_result=PENDING、node_name=current_node
+3. 操作人角色=当前节点 approver_role</td><td></td><td>1. 调用 POST /payment/apply/{id}/reject（建议填 opinion 驳回原因）</td><td>1. 当前节点 approve_result=REJECT、approver/approve_time/opinion 回写、version+1
+2. 主档 status=PENDING_SUBMIT（退回待提交，不落 REJECTED 驻留态）、current_node=NULL、version+1
+3. 返回 data 中 status=PENDING_SUBMIT</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作5 / api §2.5 / D-付款-D1（驳回回退待提交，不驻留 REJECTED）/ 状态机</td></tr><tr><td>TC022</td><td>付款申请</td><td>付款申请</td><td>F-PAY-03</td><td>驳回目标非当前节点或单据非审批中被拦截（异常）</td><td>审批人</td><td>1. 付款申请 status≠APPROVING，或目标节点非当前节点/approve_result≠PENDING</td><td></td><td>1. 调用 POST /payment/apply/{id}/reject</td><td>1. 前置校验不通过，不迁移状态
+2. 返回 code=409、错误码 PAY_4005</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作5 前置 / api §2.5-1、错误码 PAY_4005</td></tr><tr><td>TC023</td><td>付款申请</td><td>付款申请</td><td>F-PAY-04</td><td>审批通过后录凭证付款并联动结算单已结算（正向·联动 SETTLED）</td><td>财务 / 出纳</td><td>1. 付款申请 status=APPROVED
+2. 已上传付款凭证附件（voucherAttachmentId）</td><td></td><td>1. 调用 POST /payment/apply/{id}/pay 传 voucherAttachmentId</td><td>1. 主档 status=PAID、voucher_attachment_id/pay_finish_time 写入、version+1
+2. 写入 attachment（biz_type=PAYMENT）
+3. 同一事务内关联 claim_settle_order status=SETTLED、settle_time 写入，其名下 claim_order 由结算 OP10 批量置 SETTLED
+4. 返回 data 含 status=PAID、settleStatus=SETTLED</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作6 / api §2.6 / D-付款-B4（结算 SETTLED 与付款同事务，索赔单批量置位由结算归口）</td></tr><tr><td>TC024</td><td>付款申请</td><td>付款申请</td><td>F-PAY-04</td><td>付款未上传凭证附件被拦截（异常）</td><td>财务 / 出纳</td><td>1. 付款申请 status=APPROVED
+2. 未传 voucherAttachmentId</td><td></td><td>1. 调用 POST /payment/apply/{id}/pay</td><td>1. 凭证附件必传校验不通过，不置 PAID、不联动结算单
+2. 返回 code=400、错误码 PAY_4006（付款凭证缺失）</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作6 校验（付款凭证必传）/ api §2.6-1、错误码 PAY_4006</td></tr><tr><td>TC025</td><td>付款申请</td><td>付款申请</td><td>F-PAY-04</td><td>非审批通过态付款被状态守卫拦截（异常）</td><td>财务 / 出纳</td><td>1. 付款申请 status≠APPROVED（如 APPROVING/PENDING_SUBMIT）</td><td></td><td>1. 调用 POST /payment/apply/{id}/pay 传 voucherAttachmentId</td><td>1. 乐观锁双条件命中 0 行，不迁移状态、不联动结算单
+2. 返回 code=409、错误码 PAY_4004</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作6 前置（status=APPROVED）/ 状态机拦截 / api §2.6-1、错误码 PAY_4004</td></tr><tr><td>TC026</td><td>付款申请</td><td>付款申请</td><td>F-PAY-04</td><td>草稿态付款申请作废（正向·仅草稿可作废）</td><td>索赔专员</td><td>1. 付款申请 status=PENDING_SUBMIT</td><td></td><td>1. 调用 POST /payment/apply/{id}/void</td><td>1. 主档 status=VOIDED（终态）、version+1
+2. 返回 data 中 status=VOIDED
+3. 该 settle_id 可再次点「申请付款」（VOIDED 不计入有效单）</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作7 / api §2.7 / A-25 已作废态</td></tr><tr><td>TC027</td><td>付款申请</td><td>付款申请</td><td>F-PAY-04</td><td>非草稿态作废被拦截（异常·仅草稿可作废反向）</td><td>索赔专员</td><td>1. 付款申请 status≠PENDING_SUBMIT（如 APPROVING/APPROVED/PAID）</td><td></td><td>1. 调用 POST /payment/apply/{id}/void</td><td>1. 乐观锁双条件命中 0 行，不作废
+2. 返回 code=409、错误码 PAY_4004</td><td>异常测试</td><td>P1</td><td>待执行</td><td>LLD 操作7 前置（仅草稿可作废，A-25）/ 状态机拦截 / api §2.7-1、错误码 PAY_4004</td></tr><tr><td>TC028</td><td>付款申请</td><td>付款申请</td><td>F-PAY-05</td><td>多维筛选分页查询付款申请列表（正向）</td><td>索赔专员 / 审批人</td><td>1. 存在多张不同状态的付款申请，处于操作人数据范围内</td><td></td><td>1. 调用 GET /payment/apply/page，传 applyNo/settleNo/payeeName/status/applyTimeStart/applyTimeEnd 组合 + pageNo/pageSize</td><td>1. 按筛选条件 + 数据范围权限过滤返回 PageResult
+2. data 含 total/pageNo/pageSize/list，list 行含 applyNo/settleNo/payeeName/applyAmount/gradeLevel/status/applyTime</td><td>功能测试</td><td>P0</td><td>待执行</td><td>LLD 操作8 说明 / api §2.9 / 原型09 列表筛选</td></tr><tr><td>TC029</td><td>付款申请</td><td>付款申请</td><td>F-PAY-05</td><td>查看付款申请详情含审批时间线且账号脱敏（正向·全状态可查）</td><td>索赔专员 / 审批人</td><td>1. 存在一张付款申请（任意状态），在操作人数据范围内</td><td></td><td>1. 调用 GET /payment/apply/{id}</td><td>1. 返回主档 + approvalNodes（按 node_seq 升序构成审批时间线）+ attachments（biz_type=PAYMENT）
+2. payeeAccount 展示脱敏
+3. 无副作用（只读）</td><td>功能测试</td><td>P1</td><td>待执行</td><td>LLD 操作8 / api §2.8（全状态可查、银行账号脱敏）/ 原型10</td></tr><tr><td>TC030</td><td>付款申请</td><td>付款申请</td><td>F-PAY-05</td><td>按筛选条件导出付款申请（正向）</td><td>索赔专员 / 审批人</td><td>1. 列表存在符合筛选条件的付款申请</td><td></td><td>1. 在列表设定筛选条件后点「导出」</td><td>1. 按当前筛选条件导出付款申请数据（沿用列表页通用规格）</td><td>功能测试</td><td>P1</td><td>待执行</td><td>F-PAY-05 列表/导出沿用通用规格 / api §2.9 描述 / 原型09 导出</td></tr><tr><td>TC031</td><td>付款申请</td><td>付款申请</td><td>F-PAY-05</td><td>勾选批量审核部分成功部分失败返回明细（边界）</td><td>审批人</td><td>1. 列表勾选多张付款申请，其中部分满足审核条件、部分不满足（如状态/权限不符）</td><td></td><td>1. 勾选多条后触发批量审核</td><td>1. 批量执行，逐条按业务规则处理
+2. 返回部分成功部分失败明细（沿用列表页通用规格）</td><td>边界测试</td><td>P1</td><td>待执行</td><td>F-PAY-05 批量审核沿用列表页通用规格（LLD 操作8 备注：本 LLD 不逐字段展开）/ api §2.9 描述 —— 批量审核对象状态/通过驳回口径未细化，见需回产品变更登记</td></tr></tbody></table></div></div><div class="sheet" data-s="4"><div class="meta">工作表「结算基础配置」· 8 条用例 · 14 列（测试数据列按 SDD 规则留空）</div><div class="tablewrap"><table><thead><tr><th>测试用例ID</th><th>测试模块</th><th>模块核心功能</th><th>测试功能点</th><th>测试标题</th><th>角色</th><th>测试前置条件</th><th>测试数据</th><th>测试步骤</th><th>预期结果</th><th>测试类型</th><th>优先级</th><th>执行状态</th><th>备注</th></tr></thead><tbody><tr><td>TC001</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[正向] 索赔业务管理员维护结算周期并保存生效</td><td>索赔业务管理员</td><td>1. 以索赔业务管理员登录
+2. 进入结算基础配置页（P11/P12）「结算周期」页签</td><td></td><td>1. 维护可编辑项：默认结算频率（每月）、自动生成结算单日、结算起止日期、手动提前结算开关
+2. 查看只读项：结算归属依据、零金额结算单处理（原型 12 标 class="input ro"，仅回显）
+3. 点「保存更改」</td><td>1. 可编辑项可修改并回显所填值
+2. 只读项（结算归属依据、零金额结算单处理）仅回显、不可编辑
+3. 保存成功，配置持久化生效</td><td>功能测试</td><td>P0</td><td>待执行</td><td>PRD §4.5 F-CFG-01 / 原型 12-结算基础配置.html「结算周期」页签 / 决策 config.lifecycle.effective_scope(A-16)、settle.state_gap.zero_amount(A-34)</td></tr><tr><td>TC002</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[正向] 维护开票权限白名单（添加/启用/停用服务商）并保存</td><td>索赔业务管理员</td><td>1. 以索赔业务管理员登录
+2. 进入结算基础配置页「开票权限白名单」页签</td><td></td><td>1. 点「＋添加服务商」加入一个服务商到白名单
+2. 对白名单内服务商执行启用/停用
+3. 点「保存更改」</td><td>1. 服务商成功加入白名单，状态可在已启用/未启用间切换
+2. 保存成功；白名单=开票权限口径生效（仅白名单内服务商正数结算单可开票）</td><td>功能测试</td><td>P0</td><td>待执行</td><td>PRD §4.5 F-CFG-02 / 原型「开票权限白名单」页签 / 决策 settle.state_gap.invoice_hold_whitelist(A-32)</td></tr><tr><td>TC003</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[正向] 维护付款审批流三档金额线与各档审批链并保存</td><td>索赔业务管理员</td><td>1. 以索赔业务管理员登录
+2. 进入结算基础配置页「付款审批流」页签</td><td></td><td>1. 维护三档金额档位（&lt;5万 / 5万≤x&lt;20万 / ≥20万）对应审批链
+2. 点「保存更改」</td><td>1. 三档金额档位与审批链可编辑并回显
+2. 保存成功，档位与链路作为付款分级审批（F-PAY-02）正式规则生效</td><td>功能测试</td><td>P0</td><td>待执行</td><td>PRD §4.5 F-CFG-03、§4.4 F-PAY-02 / 原型「付款审批流」页签 / 决策 payment.amount_formula.grade_threshold(A-24)</td></tr><tr><td>TC004</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[正向] 按服务商维度配置索赔系数并保存</td><td>索赔业务管理员</td><td>1. 以索赔业务管理员登录
+2. 进入结算基础配置页「服务商索赔系数」页签</td><td></td><td>1. 维护默认生效系数
+2. 按服务商维度为指定服务商配置差异化系数
+3. 点「保存更改」</td><td>1. 默认系数与各服务商系数可编辑并回显
+2. 保存成功，系数按服务商维度生效</td><td>功能测试</td><td>P0</td><td>待执行</td><td>PRD §4.5 F-CFG-04 / 原型「服务商索赔系数」页签 / 决策 claim.amount_formula.coefficient(A-2)</td></tr><tr><td>TC005</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[异常] 非索赔业务管理员访问/保存结算基础配置被拒</td><td>索赔专员（非索赔业务管理员）</td><td>1. 以非索赔业务管理员角色（如索赔专员）登录</td><td></td><td>1. 尝试进入结算基础配置页
+2. 尝试提交任一页签的配置保存请求</td><td>1. 前端不渲染该配置菜单/入口（按角色渲染）
+2. 后端接口鉴权拦截，返回 403 权限不足，配置不落库</td><td>权限测试</td><td>P0</td><td>待执行</td><td>PRD §2 角色表（结算基础配置仅索赔业务管理员）/ conventions §2 鉴权（403 无权限）</td></tr><tr><td>TC006</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[边界] 结算周期变更仅对下一周期/新单生效，进行中周期与历史不回溯</td><td>索赔业务管理员</td><td>1. 已存在进行中的结算周期与历史结算数据
+2. 以索赔业务管理员登录</td><td></td><td>1. 修改结算周期配置并保存
+2. 观察进行中周期与历史结算单的口径</td><td>1. 保存成功
+2. 新配置仅对下一周期/新单生效
+3. 进行中周期与历史结算数据不被回溯改写</td><td>功能测试</td><td>P1</td><td>待执行</td><td>决策 config.lifecycle.effective_scope(A-16) / 原型页头「配置变更仅对下一周期/新单生效，进行中周期与历史数据不回溯」</td></tr><tr><td>TC007</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[边界] 中途取消白名单对在开票中的结算单不回溯</td><td>索赔业务管理员</td><td>1. 某服务商在白名单内且其正数结算单已进入开票流程
+2. 以索赔业务管理员登录</td><td></td><td>1. 将该服务商从白名单停用/移除并保存
+2. 观察其在开票中的结算单</td><td>1. 保存成功
+2. 已在开票中的结算单按不回溯口径处理，不被强制关闭</td><td>功能测试</td><td>P1</td><td>待执行</td><td>PRD §4.5 F-CFG-02（中途取消按 A-16 不回溯）/ 决策 invoice_hold_whitelist(A-32)、effective_scope(A-16)</td></tr><tr><td>TC008</td><td>结算基础配置</td><td>结算基础配置</td><td>F-CFG-01</td><td>[边界] 变更服务商索赔系数不影响历史索赔（发起时点快照）</td><td>索赔业务管理员</td><td>1. 已存在按旧系数发起并存单的历史索赔
+2. 以索赔业务管理员登录</td><td></td><td>1. 修改该服务商索赔系数并保存
+2. 查看历史索赔单的系数取值
+3. 新建一张该服务商索赔单</td><td>1. 保存成功
+2. 历史索赔单系数保持发起时点快照值不变
+3. 新建索赔取变更后当前值</td><td>功能测试</td><td>P1</td><td>待执行</td><td>决策 claim.amount_formula.coefficient(A-2，新建取发起时点快照存单、不影响历史）/ PRD §4.5 F-CFG-04</td></tr></tbody></table></div></div><div class="sheet" data-s="5"><div class="meta">工作表「单据编码」· 7 条用例 · 14 列（测试数据列按 SDD 规则留空）</div><div class="tablewrap"><table><thead><tr><th>测试用例ID</th><th>测试模块</th><th>模块核心功能</th><th>测试功能点</th><th>测试标题</th><th>角色</th><th>测试前置条件</th><th>测试数据</th><th>测试步骤</th><th>预期结果</th><th>测试类型</th><th>优先级</th><th>执行状态</th><th>备注</th></tr></thead><tbody><tr><td>TC001</td><td>单据编码</td><td>单据编码（跨单据）</td><td>F-CODE-01</td><td>[正向] 同前缀日内流水递增零填充（通过连续新建服务商索赔草稿间接验证）</td><td>服务商（新建索赔）</td><td>1. doc_no_sequence 序列表已建
+2. 当日该前缀（SPCO）尚无发号或已知当前流水
+3. 编码无独立页面，经新建对应单据间接验证</td><td></td><td>1. 执行 F-CLAIM-01 新建索赔草稿保存（同事务 INSERT claim_order 取号写 claim_no）
+2. 再次执行 F-CLAIM-01 新建第二张索赔草稿保存</td><td>1. 第一张编号为 SPCO-yyyyMMdd-0001（格式=前缀-当日yyyyMMdd-4位流水）
+2. 第二张编号为 SPCO-yyyyMMdd-0002
+3. 流水日内从 0001 递增、零填充，全局唯一</td><td>功能测试</td><td>P0</td><td>待执行</td><td>conventions §7 统一格式/生成时机 / 详细设计-单据编码.md 编码总览+SPCO 生成时机（F-CLAIM-01 保存草稿取号）</td></tr><tr><td>TC002</td><td>单据编码</td><td>单据编码（跨单据）</td><td>F-CODE-01</td><td>[正向] 6 类前缀各按生成时机生成且格式统一（间接经各单据创建动作验证）</td><td>对应单据触发角色/系统</td><td>1. doc_no_sequence 序列表已建
+2. 各上游单据满足其生成时机前置条件</td><td></td><td>1. SPCO：F-CLAIM-01 新建索赔草稿保存 → claim_order.claim_no
+2. SXCO：F-CLAIM-07 业务审核通过（欣旺达件）逐单自动生成 → xw_claim_order.claim_no
+3. SPJS：F-SET-01 生成服务商结算单（settle_type=PROVIDER）→ claim_settle_order.settle_no
+4. SXJS：F-SET-06 生成闪欣结算单（settle_type=SHANXIN）→ claim_settle_order.settle_no
+5. JSFK：F-PAY-01 在已核验结算单点「申请付款」保存草稿 → payment_apply.apply_no
+6. DKD：F-CLAIM-08 责任判定=服务商责任自动生成抵扣单 → claim_deduct_order.deduct_no</td><td>1. 各单据编号前缀分别为 SPCO/SXCO/SPJS/SXJS/JSFK/DKD
+2. 均满足 &lt;前缀&gt;-yyyyMMdd-&lt;4位流水&gt; 格式，写入对应落库列
+3. SPJS 与 SXJS 同表 claim_settle_order.settle_no 但按 settle_type 区分前缀、各自号段独立</td><td>功能测试</td><td>P1</td><td>待执行</td><td>conventions §7 单据编号规则表 / 详细设计-单据编码.md 编码总览表+生成时机（逐单据）</td></tr><tr><td>TC003</td><td>单据编码</td><td>单据编码（跨单据）</td><td>F-CODE-01</td><td>[边界] 跨天流水重置从 0001（seq_date 隔离）</td><td>服务商（新建索赔）</td><td>1. doc_no_sequence 序列表已建
+2. 某前缀在当日 D 已发出若干流水</td><td></td><td>1. 于日期 D 通过新建对应单据发出该前缀若干流水
+2. 跨零点进入次日 D+1
+3. 于 D+1 再通过新建对应单据取号</td><td>1. D+1 在 doc_no_sequence 无对应行，取号走 INSERT 分支建新行、current_seq 从 1 起
+2. D+1 首张编号流水为 0001（日期段区隔、天然重置）
+3. 旧日期行保留不清理</td><td>功能测试</td><td>P1</td><td>待执行</td><td>conventions §7（跨天由日期段天然区隔、流水重置从0001）/ 详细设计-单据编码.md「跨天重置」</td></tr><tr><td>TC004</td><td>单据编码</td><td>单据编码（跨单据）</td><td>F-CODE-01</td><td>[正向] 业务事务提交成功才占号，连续提交号连续无跳号</td><td>服务商（新建索赔）</td><td>1. doc_no_sequence 序列表已建
+2. 编码取号与业务单据 INSERT 处于同一数据库事务</td><td></td><td>1. 连续两次执行会成功提交的单据创建（如 F-CLAIM-01 保存草稿并提交成功）
+2. 观察两次生成的编号</td><td>1. 业务事务提交成功 → 序列自增生效、编号落库，占号成立
+2. 两次编号流水连续（如 0001、0002），无空洞、无跳号</td><td>功能测试</td><td>P0</td><td>待执行</td><td>conventions §7 占号策略(D-编码-D2) / 详细设计-单据编码.md「回滚与占号」（提交成功才占号、无跳号）</td></tr><tr><td>TC005</td><td>单据编码</td><td>单据编码（跨单据）</td><td>F-CODE-01</td><td>[异常] 业务事务回滚退号、号可复用、无跳号空洞</td><td>服务商（新建索赔）</td><td>1. doc_no_sequence 序列表已建
+2. 取号与业务单据 INSERT 同一事务</td><td></td><td>1. 触发一次取号后业务单据 INSERT 失败/事务回滚的场景
+2. 随后执行一次会成功提交的同前缀同日取号</td><td>1. 回滚事务的 current_seq 自增随事务一并回滚，该号未消耗
+2. 下一次取号复用该流水值，不产生空洞
+3. 最终落库编号流水连续、无跳号</td><td>功能测试</td><td>P1</td><td>待执行</td><td>conventions §7 占号策略(D-编码-D2，回滚退号) / 详细设计-单据编码.md「回滚与占号」</td></tr><tr><td>TC006</td><td>单据编码</td><td>单据编码（跨单据）</td><td>F-CODE-01</td><td>[边界] 单前缀单日流水 &gt;9999 拒绝生成并告警</td><td>对应单据触发角色/系统</td><td>1. doc_no_sequence 序列表已建
+2. 构造某前缀当日 current_seq 已达 9999</td><td></td><td>1. 就该前缀当日再触发一次取号（新建对应单据）</td><td>1. ON DUPLICATE KEY UPDATE 自增至 10000，current_seq&gt;9999
+2. 取号抛业务异常并记告警日志，拒绝生成，业务单据不落库
+3. 编号不超出 4 位格式</td><td>边界测试</td><td>P2</td><td>待执行</td><td>conventions §7 边界(D-编码-B2，&gt;9999 拒绝并告警) / 详细设计-单据编码.md「边界与告警」</td></tr><tr><td>TC007</td><td>单据编码</td><td>单据编码（跨单据）</td><td>F-CODE-01</td><td>[异常] 并发同前缀同日取号串行化、编号唯一不重号</td><td>对应单据触发角色/系统</td><td>1. doc_no_sequence 序列表已建，唯一键 uk_prefix_date(prefix, seq_date) 生效
+2. 业务表唯一索引（uk_claim_no 等）生效</td><td></td><td>1. 并发多笔同前缀同日单据创建请求（同一取号路径）
+2. 收集各请求最终生成的编号</td><td>1. 同（前缀+日期）序列行被 InnoDB 行锁串行化取号，current_seq 单调递增
+2. 各并发请求获得互不相同的流水，无重号
+3. 业务表唯一索引兜底任何绕过序列表的写入（冲突触发唯一约束异常并回滚）</td><td>并发测试</td><td>P0</td><td>待执行</td><td>conventions §7 并发唯一(D-编码-D1，序列表+同事务行锁) / 详细设计-单据编码.md「流水维度与并发唯一方案」</td></tr></tbody></table></div></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script><script>document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){var s=t.dataset.s;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));document.querySelectorAll(".sheet").forEach(x=>x.classList.remove("on"));t.classList.add("on");document.querySelector(".sheet[data-s='"+s+"']").classList.add("on");});});</script></body></html>

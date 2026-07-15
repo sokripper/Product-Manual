@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>结算基础配置</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body data-active="config" data-crumb="系统配置 / 结算基础配置">
+<div class="app"><aside class="sidebar" id="sidebar"></aside>
+<div class="main"><header class="topbar" id="topbar"></header>
+<div class="content wrap-page">
+
+  <div class="card"><div class="card-hd"><h3>结算基础配置</h3>
+    <div style="display:flex;gap:8px"><button class="btn">取消</button><button class="btn btn--primary">保存更改</button></div></div>
+    <div class="card-bd">
+      <div class="tabs"><a class="on">结算周期</a><a>开票权限白名单</a><a>付款审批流</a><a>服务商索赔系数</a></div>
+      <div class="note-bar" style="margin-top:12px">配置变更仅对<b>下一周期 / 新单</b>生效，进行中周期与历史数据不回溯。</div>
+
+      <div class="form-grid" style="margin-top:8px">
+        <div class="fg"><label>默认结算频率</label><div class="input">每月（Monthly）▾</div></div>
+        <div class="fg"><label>自动生成结算单日</label><div class="input">每月 1 日 0 点</div></div>
+        <div class="fg"><label>结算归属依据</label><div class="input ro">闪欣内部审批通过时间</div></div>
+        <div class="fg"><label>结算起止日期</label><div class="input">1 日 ~ 月末</div></div>
+        <div class="fg"><label>零金额结算单</label><div class="input ro">不生成，索赔单 0 元核销置已结算</div></div>
+        <div class="fg"><label>手动提前结算</label><div class="input">允许 ✓</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card"><div class="card-hd"><h3>开票权限白名单</h3><button class="btn btn--sm">＋ 添加服务商</button></div><div class="card-bd">
+    <div class="hint" style="margin-bottom:8px">白名单 = 开票权限；仅正数结算单且服务商在白名单方可开票。负数结算单一律关闭开票权限。</div>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>服务商名称</th><th>所属区域</th><th>状态</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr><td>苏州星辉服务中心</td><td>华东区/江苏</td><td><span class="tag tag--succ-ghost">已启用</span></td><td><span class="link">编辑</span><span class="link danger">停用</span></td></tr>
+        <tr><td>杭州锐动服务点</td><td>华东区/浙江</td><td><span class="tag tag--succ-ghost">已启用</span></td><td><span class="link">编辑</span><span class="link danger">停用</span></td></tr>
+        <tr><td>无锡华翔售后</td><td>华东区/江苏</td><td><span class="tag tag--gray">未启用</span></td><td><span class="link">编辑</span></td></tr>
+      </tbody>
+    </table></div>
+  </div></div>
+
+  <div class="grid2">
+    <div class="card"><div class="card-hd"><h3>付款审批流（分级）</h3></div><div class="card-bd">
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>金额档位</th><th>审批链</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>&lt; 5 万</td><td>售后业务审批→经办会计→财务经理→出纳→总账</td><td><span class="link">编辑</span></td></tr>
+          <tr><td>5 万 ~ 20 万</td><td>…→财务经理→财务副总→体系负责人→运营部→董事长→出纳→总账</td><td><span class="link">编辑</span></td></tr>
+          <tr><td>≥ 20 万</td><td>…→财务经理→首席财务官→体系负责人→运营部→董事长→出纳→总账</td><td><span class="link">编辑</span></td></tr>
+        </tbody>
+      </table></div>
+    </div></div>
+    <div class="card"><div class="card-hd"><h3>服务商索赔系数</h3></div><div class="card-bd">
+      <div class="fg"><label>当前生效系数（默认）</label><div class="input" style="font-size:20px;font-weight:600">1.25 ×</div></div>
+      <div class="hint" style="margin:8px 0">按服务商维度可差异化配置；新建索赔时取<b>发起时点值快照</b>存单，变更不影响历史索赔。</div>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>服务商</th><th class="num">系数</th></tr></thead>
+        <tbody>
+          <tr><td>苏州星辉服务中心</td><td class="num">1.25</td></tr>
+          <tr><td>杭州锐动服务点</td><td class="num">1.20</td></tr>
+        </tbody>
+      </table></div>
+    </div></div>
+  </div>
+
+</div></div></div>
+<script src="../assets/app.js"></script></body></html>

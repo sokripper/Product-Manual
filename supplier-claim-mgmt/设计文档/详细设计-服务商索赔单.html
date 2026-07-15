@@ -1,0 +1,317 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>详细设计 · 服务商索赔单</title>
+<style>
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--cm:#6b7a90;--kw:#7aa2ff;--str:#e0a458;
+  --th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;
+  --ok:#1f9d55;--ok-soft:#e6f6ec;--warn:#b7791f;--warn-soft:#fdf3e2;--crit:#d64545;--crit-soft:#fbeaea;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}}
+:root[data-theme="dark"]{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}
+:root[data-theme="light"]{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-size:15px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{font-weight:680;color:var(--ink)}
+.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
+.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
+h1{font-size:30px;font-weight:760;margin:30px 0 8px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:21px;font-weight:710;margin:40px 0 12px;padding-top:18px;border-top:1px solid var(--line);letter-spacing:-.005em}
+h3{font-size:16.5px;font-weight:680;margin:26px 0 9px}
+h4{font-size:13.5px;font-weight:680;margin:18px 0 7px;color:var(--muted);font-family:var(--mono)}
+p{margin:11px 0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px}
+code{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);color:var(--accent-ink);padding:1.5px 6px;border-radius:5px}
+blockquote{margin:15px 0;padding:11px 16px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--muted);font-size:14px}
+blockquote p{margin:5px 0}blockquote strong{color:var(--ink)}
+ul,ol{margin:11px 0;padding-left:23px}li{margin:4px 0}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{background:var(--th-bg);color:var(--th-ink);font-weight:600;text-align:left;padding:9px 13px;white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.02em;position:sticky;top:0}
+td{padding:8px 13px;border-top:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+/* code walkthrough */
+.filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
+.filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.filecard .fh .tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px}
+.filecard .fh .tag.be{background:#8957e5}.filecard .fh .tag.fe{background:#1f9d55}.filecard .fh .tag.cfg{background:#b7791f}
+.filecard .fh .pth{font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+.filecard .role{padding:9px 15px;font-size:13px;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line-soft)}
+.filecard .role b{color:var(--accent-ink)}
+.codebox{background:var(--code-bg);overflow-x:auto;max-height:640px;overflow-y:auto}
+pre{margin:0;padding:14px 0}
+pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--code-ink);background:none;padding:0}
+.cl{display:block;counter-increment:l;padding:0 16px 0 0;white-space:pre}
+.cl::before{content:counter(l);display:inline-block;width:38px;padding-right:14px;margin-right:12px;text-align:right;color:#46536b;border-right:1px solid var(--code-line);user-select:none}
+.cl.cm{color:var(--cm)}
+/* tabs (xlsx sheets) */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.tab{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 13px;cursor:pointer}
+.tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sheet{display:none}.sheet.on{display:block}
+.sheet .meta{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:10px 0}
+.toc{display:flex;flex-direction:column;gap:2px;margin:12px 0 20px;font-family:var(--mono);font-size:12.5px}
+.toc a{color:var(--muted);padding:3px 0}.toc a:hover{color:var(--accent)}
+.doc-note{font-family:var(--mono);font-size:11px;color:var(--faint);margin:38px 0 0;padding-top:16px;border-top:1px dashed var(--line)}
+.p>*:first-child{margin-top:0}
+/* dashboard */
+.hero{padding:40px 0 8px}
+.hero .eb{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero p{font-size:16px;color:var(--muted);max-width:60ch;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:26px 0}
+.stat{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:14px 16px}
+.stat .n{font-size:22px;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .n.ok{color:var(--ok)}.stat .n.ac{color:var(--accent)}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px;margin:14px 0}
+.card{display:block;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 17px;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px)}
+.card .ct{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;display:inline-block}
+.card .ct.be{background:#8957e5}.card .ct.fe{background:#1f9d55}.card .ct.ui{background:#0e8a9c}.card .ct.doc{background:#b7791f}
+.card h3{margin:11px 0 5px;font-size:16px;color:var(--ink)}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.grouplabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:30px 0 4px}
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;background:var(--surface)}
+.shot .cap{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.shot .cap .t{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#0e8a9c;border-radius:5px;padding:2px 8px}
+.shot .cap b{font-size:14px}.shot .cap span{font-size:12.5px;color:var(--muted)}
+.shot img{display:block;width:100%;height:auto}
+.protolist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin:12px 0}
+.protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
+.protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+</style></head><body><div class="topbar"><div class="in">
+<span class="badge">服务商索赔管理</span><span class="nm">设计文档 / 详细设计 · 服务商索赔单</span>
+<div class="sp"><a class="tl" href="../../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+</div></div><main class="wrap"><h1>详细设计 · 服务商索赔单</h1><div class="p"><blockquote><p>版本：v1.0 ｜ 冻结版本 v1.0 ｜ 冻结 commit 88ed0f850780</p></blockquote>
+<h1>详细设计 · 服务商索赔单链（后端 LLD）</h1>
+<p>本文覆盖服务商索赔单从新建到结算入口的完整后端行为，字段级、可开发。范围表：<code>claim_order</code>（主单）、<code>claim_fee_labor</code>（工时费明细）、<code>claim_fee_part</code>（备件明细）、<code>claim_fee_other</code>（其它费用明细）、<code>claim_audit_record</code>（审核记录）、<code>claim_deduct_order</code>（索赔抵扣单）、<code>attachment</code>（附件）。工单库取数一律 Mock、标「待挂载」；向欣旺达索赔单、结算单、质保金账户、供应商索赔、OA 转嫁属于相邻链，本文只写触发点，不写其内部字段。</p>
+<p>技术底座：Spring Boot 3 + MyBatis-Plus + MySQL8；主单更新一律带乐观锁（<code>WHERE id=? AND status=? AND version=? AND deleted_at IS NULL</code>，命中 0 行即判为并发冲突/状态已变，抛业务码并整事务回滚）；一个操作涉及的多张表在同一数据库事务内提交，任一步失败全部回滚；所有查询附 <code>deleted_at IS NULL</code>。</p>
+<hr>
+<h2>一、先约定：这条链里反复用到的东西</h2>
+<ul>
+<li><strong>谁在操作</strong>：接口进来先做 RBAC 鉴权（未登录 401，越权 403）+ 数据范围过滤。服务商售后专员只看/只动本服务商单；区域负责人只动本区域单；索赔专员全国；质量部只动【待责任判定】的自采件单。数据范围过滤在 SQL 里拼 <code>provider_id</code> / <code>region</code> 条件，不靠前端。</li>
+<li><strong>状态取值</strong>：<code>claim_order.status</code> 只允许 <code>CLAIM_STATUS</code> 九个码值：<code>DRAFT / PENDING_REGION / PENDING_HQ / PENDING_LIABILITY / PENDING_SETTLE / REJECTED / DECLINED / SETTLED / VOIDED</code>。任何写状态的地方都先判「当前状态是否为该操作允许的前置状态」，不是就拦下（见第九节非法迁移）。</li>
+<li><strong>单号怎么来</strong>：<code>claim_no = SPCO-yyyyMMdd-4位日内流水</code>。落库前按已确认的 D-编码-D1/D2 方案，从 <code>doc_no_sequence</code> 以「前缀+日期」同事务行锁取号，业务 INSERT 成功才占号、回滚退号；<code>uk_claim_no</code> 唯一索引兜底。抵扣单号 <code>deduct_no = DKD-yyyyMMdd-4位流水</code>，同机制。序列表 DDL 仍待研发组长审定（D-编码-B1）。</li>
+<li><strong>金额恒等式</strong>（落单即算、只读）：<code>apply_total_amount = labor_fee_total + part_mgmt_fee + other_fee_total</code>。其中 <code>labor_fee_total = Σ claim_fee_labor.amount</code>，<code>part_mgmt_fee = Σ claim_fee_part.mgmt_fee</code>，<code>other_fee_total = Σ claim_fee_other.amount</code>。备件索赔金额 <code>claim_fee_part.claim_amount</code> 恒为 0。</li>
+<li><strong>系数快照</strong>：新建时把「发起时点的服务商索赔系数」写进 <code>claim_order.coefficient_snapshot</code>，之后系数配置变了也不动历史单（A-2）。备件管理费 <code>mgmt_fee = 备件销售价 × coefficient_snapshot</code>。</li>
+<li><strong>审计列</strong>：每次写主单都要带 <code>update_by / updated_at(NOW()) / version=version+1</code>；新建带 <code>create_by / created_at</code>。</li>
+<li><strong>附件挂哪</strong>：都进 <code>attachment</code> 表，用 <code>biz_type + biz_id</code> 定位。索赔单主体附件 <code>biz_type=CLAIM, biz_id=claim_order.id</code>；判责录入附件 <code>biz_type=LIABILITY, biz_id=claim_order.id</code>。回运单附件按 A-11 也落 <code>attachment</code>（判定见「提交」一节，B-3）。</li>
+</ul>
+<hr>
+<h2>二、新建暂存草稿（对应 F-CLAIM-01）</h2>
+<p><strong>谁能点 + 前置</strong>：服务商售后专员，在「新建索赔单」入口。无前置单据状态（是新建）。</p>
+<p><strong>校验（新建阶段从宽，只拦硬错）</strong>：</p>
+<ol>
+<li>关联工单必须是「本服务商 + 状态=已完工 + 保内」的维修工单（A-8）。工单状态/保内标识/服务商归属都从工单库取——<strong>待挂载/Mock</strong>，本期用 Mock 数据源判断。</li>
+<li>同一工单已存在一张状态非 <code>DECLINED/VOIDED</code> 的索赔单则拦下（A-15：只有已拒绝/已作废才允许重新发起；<code>REJECTED</code> 仍是可编辑重提的同一张有效单，不能另建）。为避免“先查后插”并发穿透，新建必须使用同一 DB 连接先取工单维度互斥锁 <code>SELECT GET_LOCK(CONCAT('claim-wo-',MD5(?)),5)</code>；取锁失败/超时直接返回“该工单正在发起索赔，请稍后重试”。取锁后在事务内再查 <code>claim_order WHERE work_order_id=? AND status NOT IN (DECLINED,VOIDED) AND deleted_at IS NULL</code>，通过后才插入；提交/回滚后在 <code>finally</code> 中用同连接 <code>RELEASE_LOCK</code>。该锁是连接级而非事务级，不得在取锁与放锁之间归还连接池。</li>
+<li>工时费合计必须 &gt; 0（A-1，S8.2「工时费&gt;0 必有」）；其它费用合计 ≥ 0。</li>
+<li>草稿阶段允许必填项暂缺（附件、claim_target 等留白），提交时再严格校验。</li>
+</ol>
+<p><strong>写哪些表哪些字段 = 什么值</strong>（同一事务）：</p>
+<ul>
+<li><code>claim_order</code> 插一行：</li>
+<ul>
+<li><code>id</code>=雪花；<code>claim_no</code>=生成的 SPCO 号；<code>status</code>='DRAFT'；<code>currency</code>='CNY'。</li>
+<li><code>work_order_id / work_order_no / work_order_biz_type / provider_id / provider_code / provider_name / region</code>=工单库带出（<strong>待挂载/Mock</strong>）。</li>
+<li><code>claim_type</code>=按 <code>work_order_biz_type</code> 查 <code>claim_type_mapping</code> 映射得到，只读带入（A-9）；映射查不到时留空并报「工单业务类型未配置映射」拦截（不可静默）。</li>
+<li><code>coefficient_snapshot</code>=发起时点服务商系数：优先取工单库系数（待挂载），无则查本模块 <code>claim_coefficient</code>（按 provider_id 命中，否则全局默认行）当前生效值。</li>
+<li><code>labor_fee_total / part_mgmt_fee / other_fee_total</code>=由三张明细汇总回填；<code>apply_total_amount</code>=三者之和。</li>
+<li><code>main_part_id / main_part_name</code>=工单主责件带出（<strong>待挂载/Mock</strong>），可为空（区域初审前允许）。</li>
+<li><code>claim_target</code>=NULL、<code>project_code</code>=NULL（区域初审才录）；<code>liability_*</code>=NULL；<code>supplier_claim_started</code>=0、<code>provider_deduct_started</code>=0。</li>
+<li>审计列：<code>create_by</code>=当前用户、<code>created_at</code>=NOW()、<code>version</code>=0。</li>
+</ul>
+<li><code>claim_fee_labor</code> 按工单维修项目逐行插：<code>claim_id</code>=主单 id、<code>project_name / labor_hours / labor_price</code>=工单带出（待挂载）、<code>amount</code>=<code>labor_hours × labor_price</code>。</li>
+<li><code>claim_fee_part</code> 按工单备件逐行插：<code>claim_id</code>、<code>part_name / part_attr / battery_sn / old_part_code</code>=工单带出（待挂载）、<code>claim_amount</code>=0.00（恒 0）、<code>mgmt_fee</code>=<code>销售价 × coefficient_snapshot</code>。</li>
+<li><code>claim_fee_other</code> 插工单带出的其它费用行：<code>claim_id</code>、<code>fee_type / amount / remark</code>；<code>editable</code>=物流费等可人工改的置 1，其余置 0（A-7）。</li>
+<li>附件此刻可传可不传；若传，<code>attachment</code> 逐个插（<code>biz_type=CLAIM</code>）。</li>
+<li><code>claim_audit_record</code> 插入新建操作事件：<code>biz_type='CLAIM'</code>、<code>biz_id</code>=新单 id、<code>audit_stage='OPERATION'</code>、<code>audit_result='CREATE'</code>、<code>auditor/audit_time</code>=操作人/时间，<code>remark='新建草稿'</code>。</li>
+</ul>
+<p><strong>状态变成</strong>：<code>DRAFT</code>（草稿）。</p>
+<p><strong>触发下游</strong>：无。</p>
+<p><strong>事务/回滚</strong>：主单+三张明细+附件同一事务；任一插入失败整体回滚，不留半张单。</p>
+<hr>
+<h2>三、提交（对应 F-CLAIM-02，也用于「已驳回」重新提交）</h2>
+<p><strong>谁能点 + 前置</strong>：服务商售后专员；前置状态 <code>DRAFT</code> 或 <code>REJECTED</code>（已驳回可编辑后重提，A-13）。</p>
+<p><strong>校验</strong>：</p>
+<ol>
+<li>走一遍新建的硬校验（工单仍为已完工保内、条件唯一、工时费&gt;0）。</li>
+<li><strong>旧件回运</strong>（A-11）：逐条看 <code>claim_fee_part</code> 是否「需回运」；需回运的必须「已发起回运」才放行，否则拦「存在需回运备件未发起回运，不能提交」。</li>
+<ul>
+<li>「是否需回运」判定：读 <code>claim_fee_part.part_attr</code> 是否含「需回运」标识（<strong>B-2</strong>：当前无结构化布尔位，暂按属性文本判定，建议工单取数补布尔字段）。</li>
+<li>「已发起回运」判定：本模块未登记回运单实体/回运状态；按 A-11「售后仓点确认+回运单附件即视为已发起」，暂以「该单存在回运单附件」作为已发起证据（<strong>B-3</strong>：回运单实体/在途状态待挂载，附件判定为临时口径）。</li>
+</ul>
+<li><strong>维修凭证附件必填（有据·硬校验）</strong>：提交时必须至少 1 张维修凭证类附件（维修照片/检测报告等），无维修凭证不可提交（原始 PRD S4.1.1 服务商索赔单字段表明文「维修凭证附件…提交时必填」）。旧件资料附件仍为选填（原始 S4.1.1 标非必填），不随此项一起强制。</li>
+</ol>
+<p><strong>写哪些表哪些字段</strong>（同一事务，乐观锁）：</p>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='PENDING_REGION'；审计列刷新。其余业务字段不动。</li>
+<li>提交动作在 <code>claim_audit_record</code> 写一条操作事件：<code>biz_type='CLAIM'</code>、<code>audit_stage='OPERATION'</code>、<code>audit_result='SUBMIT'</code>（已驳回重提为 <code>RESUBMIT</code>）、<code>auditor/audit_time</code>=操作人/时间，<code>remark</code>=操作摘要。</li>
+</ul>
+<p><strong>状态变成</strong>：<code>PENDING_REGION</code>（待区域初审）。从 <code>REJECTED</code> 重提同样回到 <code>PENDING_REGION</code>（从头走，A-13）。</p>
+<p><strong>触发下游</strong>：无（等区域初审）。</p>
+<p><strong>回滚</strong>：单表更新，乐观锁未命中（并发/状态已变）即回滚报冲突。</p>
+<hr>
+<h2>四、编辑（对应 F-CLAIM-03）</h2>
+<p><strong>谁能点 + 前置</strong>：服务商售后专员；前置状态 <code>DRAFT</code> 或 <code>REJECTED</code>。其它状态一律不可编辑。</p>
+<p><strong>能改什么</strong>：只能动「其它费用明细」（物流费等，A-7）。工时费明细、备件明细、备件管理费一律<strong>不可改</strong>（工时费/备件管理费按 S8.2 固定，来源工单+系数）。</p>
+<ul>
+<li>允许对 <code>claim_fee_other</code> 中 <code>editable=1</code> 的行做改金额/备注/增行/删行；<code>editable=0</code> 的行禁止改删（D-索赔-B8 已确认）。</li>
+</ul>
+<p><strong>写哪些表哪些字段</strong>（同一事务）：</p>
+<ul>
+<li><code>claim_fee_other</code>：按编辑结果 upsert/删除对应行。</li>
+<li><code>claim_order</code>：重算 <code>other_fee_total</code>=<code>Σ claim_fee_other.amount</code>，随后 <code>apply_total_amount</code>=<code>labor_fee_total + part_mgmt_fee + other_fee_total</code>（labor 和 part 两项不变）；审计列刷新。<code>status</code> 不变（草稿仍草稿、已驳回仍已驳回）。</li>
+<li><code>claim_audit_record</code>：插入 <code>audit_stage='OPERATION'</code>、<code>audit_result='EDIT'</code>，<code>auditor/audit_time</code>=操作人/时间，<code>remark</code> 记录本次其它费用增删改摘要。</li>
+</ul>
+<p><strong>状态变成</strong>：不变（编辑不改状态；改完可再走「提交」）。</p>
+<p><strong>触发下游</strong>：无。</p>
+<p><strong>回滚</strong>：明细与主单汇总在同一事务，金额必须一致回写，失败全回滚。</p>
+<hr>
+<h2>五、作废（对应 F-CLAIM-04）</h2>
+<p><strong>谁能点 + 前置</strong>：服务商售后专员；前置状态<strong>仅</strong> <code>DRAFT</code>。非草稿点作废一律拦下。</p>
+<p><strong>写哪些表哪些字段</strong>：</p>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='VOIDED'；<code>deleted_at</code> 保持 NULL，审计列刷新。已作废是可查看的业务终态，不以技术软删除隐藏。</li>
+<li>明细行 <code>claim_fee_*</code> 与附件保留不删，确保 F-CLAIM-05 的全状态查看、附件和操作留痕仍可访问。同一工单重新发起由条件唯一规则排除 <code>VOIDED</code> 实现，不依赖软删除。</li>
+</ul>
+<p><strong>状态变成</strong>：<code>VOIDED</code>（已作废，终态）。</p>
+<p><strong>触发下游</strong>：无。作废后该工单可重新发起新单（条件唯一放行，A-15）。</p>
+<p><strong>操作留痕</strong>：与头表状态更新同事务写 <code>claim_audit_record</code>：<code>audit_stage='OPERATION'</code>、<code>audit_result='VOID'</code>、<code>auditor/audit_time</code>=操作人/时间，<code>remark</code>=作废原因或“作废”。</p>
+<hr>
+<h2>六、区域初审（对应 F-CLAIM-06）</h2>
+<p><strong>谁能点 + 前置</strong>：区域负责人（只限本区域）；前置状态 <code>PENDING_REGION</code>。</p>
+<p><strong>要核查/要录的</strong>：</p>
+<ol>
+<li>核查工单真实性、资料完整性（人工，不入库字段，通过与否体现在结果里）。</li>
+<li>录 <code>claim_target</code>（<code>XW</code>=欣旺达件 / <code>SELF</code>=自采件，即主责件归属，A-6）。</li>
+<li><code>claim_target=XW</code> 时 <code>project_code</code>（项目编码）必填；<code>=SELF</code> 时 project_code 置 NULL。</li>
+<li><strong>电池包 SN 自动预判责任</strong>（A-26，可覆盖、非终判）：对含 <code>battery_sn</code> 的备件，系统按 SN 预判一个责任倾向给质量部参考。预判规则来源为 QMS，本期 <strong>Mock/待挂载</strong>；预判值无专用登记字段，本期写入本次 <code>claim_audit_record.remark</code>，不新增专列；QMS 正式契约到位后再补预判字段与口径（D-索赔-B4 已确认）。此预判不写 <code>claim_order.liability_result</code>（终判专用）。</li>
+<li><strong>汽车电子自由填报工时把关</strong>（A-14）：一级分类=汽车电子的单，工时为自由填报，区域负责人在此判合理性，不合理可<strong>驳回</strong>。</li>
+</ol>
+<p><strong>三种结果分别写什么</strong>（同一事务，乐观锁）：</p>
+<ul>
+<li><strong>通过</strong>：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='PENDING_HQ'；<code>claim_target</code>=录入值；<code>project_code</code>=录入值(XW) 或 NULL(SELF)；审计列刷新。</li>
+<li><code>claim_audit_record</code> 插一行：<code>biz_type</code>='CLAIM'、<code>biz_id</code>=主单 id、<code>audit_stage</code>='区域初审'、<code>auditor</code>=当前用户、<code>audit_time</code>=NOW()、<code>audit_result</code>='通过'、<code>remark</code>=核查意见（含本期 Mock 的 SN 预判倾向，D-索赔-B4）、<code>approved_amount</code>=NULL、<code>attachment_ids</code>=如有。</li>
+</ul>
+<li><strong>驳回</strong>（退回服务商，A-13）：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='REJECTED'；<code>claim_target/project_code</code> 若已录可保留也可留空（不影响，重提会从头再录）；审计列刷新。</li>
+<li><code>claim_audit_record</code>：同上但 <code>audit_result</code>='驳回'、<code>remark</code>=驳回原因（必填）。</li>
+</ul>
+<li><strong>拒绝</strong>（终止，A-15 已关闭=已拒绝）：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='DECLINED'；审计列刷新。</li>
+<li><code>claim_audit_record</code>：<code>audit_result</code>='拒绝'、<code>remark</code>=拒绝原因（必填）。</li>
+</ul>
+</ul>
+<p><strong>状态变成</strong>：<code>PENDING_HQ</code> / <code>REJECTED</code> / <code>DECLINED</code>。</p>
+<p><strong>触发下游</strong>：无（等业务审核）。已驳回可编辑重提（回 <code>PENDING_REGION</code>）；已拒绝终态不可再动。</p>
+<p><strong>回滚</strong>：主单状态 + 审核记录同一事务，乐观锁保并发。</p>
+<hr>
+<h2>七、业务审核（对应 F-CLAIM-07）</h2>
+<p><strong>谁能点 + 前置</strong>：闪欣索赔专员（全国）；前置状态 <code>PENDING_HQ</code>。</p>
+<p><strong>核心：通过后按主责件归属唯一分流</strong>（A-6/A-12/A-36）。分流看 <code>claim_order.claim_target</code>（区域初审已录）。</p>
+<p><strong>三种结果</strong>（同一事务，乐观锁）：</p>
+<ul>
+<li><strong>通过 · claim_target=XW（欣旺达件）</strong>：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='PENDING_SETTLE'（进待结算）；审计列刷新。</li>
+<li><code>claim_audit_record</code> 插：<code>audit_stage</code>='业务审核'、<code>audit_result</code>='通过'、<code>auditor/audit_time/remark</code>。</li>
+<li><strong>触发下游</strong>：逐单自动生成一张向欣旺达索赔单（A-36，<code>xw_claim_order</code> + <code>xw_claim_detail</code> 草稿，金额=本单对应金额不乘系数 A-37）。该生成动作与主单状态更新放在<strong>同一事务</strong>保证「审核通过即有下游单」；<code>xw_claim_order</code> 的字段填充规则属向欣旺达链 LLD，本文只登记触发与关联键 <code>provider_claim_id=claim_order.id / provider_claim_no=claim_no</code>。<code>claim_order</code> 侧无回写字段（无 xw 关联列）。</li>
+</ul>
+<li><strong>通过 · claim_target=SELF（自采/外采件）</strong>：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='PENDING_LIABILITY'（进待责任判定，A-12）；审计列刷新。</li>
+<li><code>claim_audit_record</code> 插：<code>audit_stage</code>='业务审核'、<code>audit_result</code>='通过'。</li>
+<li><strong>触发下游</strong>：无自动生成，等质量部判责。</li>
+</ul>
+<li><strong>驳回 / 拒绝</strong>：同区域初审的驳回/拒绝语义——<code>status</code>='REJECTED'（可重提，回 PENDING_REGION 从头）或 <code>status</code>='DECLINED'（终态）；<code>claim_audit_record</code> 记 <code>audit_stage</code>='业务审核'、<code>audit_result</code>='驳回'/'拒绝'、<code>remark</code>=原因（必填）。</li>
+</ul>
+<p><strong>状态变成</strong>：<code>PENDING_SETTLE</code>（XW）/ <code>PENDING_LIABILITY</code>（SELF）/ <code>REJECTED</code> / <code>DECLINED</code>。</p>
+<p><strong>回滚</strong>：主单 + 审核记录 +（XW 时）向欣旺达单生成，全在一个事务；向欣旺达单生成失败则整个审核回滚，主单不置通过（避免「通过了但没生成下游单」）。</p>
+<hr>
+<h2>八、判责录入（对应 F-CLAIM-08）</h2>
+<p><strong>谁能点 + 前置</strong>：质量部责任判定专员（只限【待责任判定】的自采件单）；前置状态 <code>PENDING_LIABILITY</code>。</p>
+<p><strong>要录的</strong>：责任判定结果 <code>liability_result</code>（三选一：<code>SUPPLIER</code> 供应商 / <code>PROVIDER</code> 服务商 / <code>INTERNAL</code> 内部，A-27）、责任说明 <code>liability_desc</code>（必填，≤200）、承担比例 <code>liability_ratio</code>（%，<code>DECIMAL(5,2)</code>；校验 <code>0 &lt; ratio ≤ 100</code>，不允许 0；<code>PROVIDER</code> 责任必填，其余按需，D-索赔-B7 已确认）。可传判责附件（<code>attachment</code>，<code>biz_type=LIABILITY</code>）。</p>
+<p><strong>公共写入</strong>（三种结果都写，同一事务，乐观锁）：</p>
+<ul>
+<li><code>claim_order</code>：<code>liability_result</code>=录入值、<code>liability_desc</code>=录入值、<code>liability_ratio</code>=录入值、<code>liability_by</code>=当前用户、<code>liability_time</code>=NOW()、<code>status</code>='PENDING_SETTLE'；审计列刷新。</li>
+<li>判责附件若有 → <code>attachment</code> 逐条插（<code>biz_type=LIABILITY, biz_id=claim_order.id</code>）。</li>
+</ul>
+<p><strong>按结果分别再做</strong>：</p>
+<ul>
+<li><strong>PROVIDER（服务商责任）→ 自动生成索赔抵扣单</strong>：</li>
+<ul>
+<li><code>claim_order</code>：<code>provider_deduct_started</code>=1。</li>
+<li><code>claim_deduct_order</code> 插一行：<code>id</code>=雪花；<code>deduct_no</code>=生成 DKD 号；<code>claim_id</code>=主单 id；<code>claim_no</code>=主单号；<code>provider_id</code>=主单 provider_id；<code>work_order_no</code>=主单 work_order_no；<code>liability_result</code>='PROVIDER'；<code>liability_ratio</code>=录入比例；<code>claim_liable_amount = claim_order.apply_total_amount</code>（抵扣针对服务商全额应付，D-索赔-D1 已确认）；<code>deduct_amount</code>=<code>claim_liable_amount × liability_ratio / 100</code>（A-30）；<code>settle_period_belong</code>=该索赔单 <code>claim_audit_record</code> 中「业务审核通过」的 <code>DATE(audit_time)</code>（A-30，按闪欣审批通过时间归入同周期，不得写 NULL）；<code>status</code>='UNSETTLED'。</li>
+<li>抵扣单被结算链汇总时冲减服务商应付（本链只负责生成，不管结算）。</li>
+</ul>
+<li><strong>SUPPLIER（供应商责任）→ 触发供应商索赔流程</strong>：</li>
+<ul>
+<li><code>claim_order</code>：<code>supplier_claim_started</code>=1。</li>
+<li>供应商索赔子流程为 V2 范围（PRD S5「9月项」）；本期只置 <code>supplier_claim_started=1</code>、标记<strong>待挂载</strong>，不生成实际单据或占位单（D-索赔-B5 已确认）。备件费走供应商索赔（S8.3），本期不落单。</li>
+</ul>
+<li><strong>INTERNAL（内部责任）→ 记录比例，内部转嫁</strong>：</li>
+<ul>
+<li>仅记录 <code>liability_result/liability_ratio/liability_desc</code>（公共写入已含）；费用内部转嫁交 OA，本期<strong>待挂载</strong>，不生成转嫁单（<strong>B-6</strong>，A-19）。</li>
+</ul>
+</ul>
+<p><strong>状态变成</strong>：三种结果统一 <code>PENDING_SETTLE</code>（判责完成即进待结算，S6.1）。</p>
+<p><strong>触发下游</strong>：PROVIDER 生成抵扣单（本事务内）；SUPPLIER/INTERNAL 仅置标志/记录，实际下游待挂载。</p>
+<p><strong>回滚</strong>：主单判责字段 + 抵扣单 + 附件同一事务；抵扣单生成失败则判责整体回滚，主单不置待结算（避免「判了服务商责任却没抵扣单」）。</p>
+<hr>
+<h2>九、查看（对应 F-CLAIM-05）</h2>
+<p><strong>谁能点 + 前置</strong>：全部相关角色（按数据范围）；任意状态可查看。</p>
+<p><strong>读什么</strong>（只读，不写库）：主单 <code>claim_order</code> + 三张费用明细 + <code>claim_audit_record</code>（审核记录与 <code>audit_stage='OPERATION'</code> 的操作事件，按 <code>audit_time,id</code> 升序）+ <code>attachment</code>（按 biz_type 分组：维修凭证/旧件/回运单/判责）+ 责任判定字段 + 抵扣单（如有）。操作日志不再用“最后修改人/时间”代替历史；新建、编辑、提交、重提、作废均一次动作一条事件。无状态变更。</p>
+<hr>
+<h2>十、九态迁移总表（谁触发 + 条件 + 写哪些字段 + 拦截）</h2>
+<div class="tablewrap"><table><thead><tr><th>起态</th><th>事件（谁）</th><th>终态</th><th>迁移条件</th><th>迁移时写的关键字段</th></tr></thead><tbody><tr><td>—（新建）</td><td>新建（服务商专员）</td><td><code>DRAFT</code></td><td>工单已完工保内+条件唯一+工时费&gt;0</td><td>建 claim_order(status=DRAFT)+三明细+系数快照</td></tr><tr><td><code>DRAFT</code></td><td>提交（服务商专员）</td><td><code>PENDING_REGION</code></td><td>需回运件已发起回运+维修凭证附件在+硬校验</td><td>claim_order.status=PENDING_REGION</td></tr><tr><td><code>DRAFT</code></td><td>编辑（服务商专员）</td><td><code>DRAFT</code></td><td>仅改其它费用</td><td>claim_fee_other + 重算 other_fee_total/apply_total_amount</td></tr><tr><td><code>DRAFT</code></td><td>作废（服务商专员）</td><td><code>VOIDED</code></td><td>仅草稿</td><td>status=VOIDED；主单/明细/附件保留供全状态查看</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审通过（区域负责人）</td><td><code>PENDING_HQ</code></td><td>核查通过+录 claim_target（XW 必录 project_code）</td><td>status=PENDING_HQ、claim_target、project_code、audit_record(区域初审/通过)</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审驳回</td><td><code>REJECTED</code></td><td>资料不实/汽车电子工时不合理等</td><td>status=REJECTED、audit_record(区域初审/驳回+原因)</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审拒绝</td><td><code>DECLINED</code></td><td>判定不予受理</td><td>status=DECLINED、audit_record(区域初审/拒绝+原因)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核通过·XW（索赔专员）</td><td><code>PENDING_SETTLE</code></td><td>claim_target=XW</td><td>status=PENDING_SETTLE、audit_record(业务审核/通过)、<strong>生成向欣旺达单</strong></td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核通过·SELF（索赔专员）</td><td><code>PENDING_LIABILITY</code></td><td>claim_target=SELF</td><td>status=PENDING_LIABILITY、audit_record(业务审核/通过)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核驳回</td><td><code>REJECTED</code></td><td>复核不通过</td><td>status=REJECTED、audit_record(业务审核/驳回+原因)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核拒绝</td><td><code>DECLINED</code></td><td>终止</td><td>status=DECLINED、audit_record(业务审核/拒绝+原因)</td></tr><tr><td><code>PENDING_LIABILITY</code></td><td>判责录入（质量部）</td><td><code>PENDING_SETTLE</code></td><td>三结果之一+说明</td><td>liability_result/desc/ratio/by/time、status=PENDING_SETTLE；PROVIDER 建抵扣单+provider_deduct_started=1；SUPPLIER 置 supplier_claim_started=1；INTERNAL 仅记录</td></tr><tr><td><code>REJECTED</code></td><td>编辑（服务商专员）</td><td><code>REJECTED</code></td><td>仅改其它费用</td><td>claim_fee_other + 重算金额（状态不变）</td></tr><tr><td><code>REJECTED</code></td><td>重新提交（服务商专员）</td><td><code>PENDING_REGION</code></td><td>同提交校验（从头，A-13）</td><td>status=PENDING_REGION</td></tr><tr><td><code>PENDING_SETTLE</code></td><td>结算完成（结算链，非本链动作）</td><td><code>SETTLED</code></td><td>由结算链驱动</td><td>status=SETTLED（字段属结算链）</td></tr></tbody></table></div>
+<p><strong>非法迁移拦截</strong>（统一策略）：每个写状态的操作，先用乐观锁 SQL 限定「前置状态白名单」——<code>UPDATE ... WHERE id=? AND status IN (&lt;该操作允许的前置态&gt;) AND version=? AND deleted_at IS NULL</code>。命中 0 行有两种原因：并发导致 version 变了、或状态已不在白名单（如对已结算单点作废、对草稿单点判责、对已拒绝/已作废终态做任何流转）。一律回滚并返回业务码「当前状态不允许该操作，请刷新」（HTTP 200，<code>Result.success=false</code>，S12 乐观锁+二次校验）。终态 <code>DECLINED / VOIDED / SETTLED</code> 不作为任何流转事件的前置态。<code>SETTLED</code> 由结算链负责，本链不主动写。</p>
+<hr>
+<h2>十一、事务与并发小结</h2>
+<ul>
+<li><strong>多表同事务的操作</strong>：新建（工单互斥下主单+3 明细+附件+操作事件）、编辑（明细+主单汇总+操作事件）、提交/重提（主单+操作事件）、作废（只改主单状态+操作事件，主单/明细/附件均不软删）、各审核（主单+审核记录）、业务审核 XW（主单+审核记录+向欣旺达单）、判责 PROVIDER（主单+抵扣单+附件）。任一步失败整体回滚。</li>
+<li><strong>非审核操作事件</strong>：新建/编辑/提交/重提/作废分别写 <code>audit_result=CREATE/EDIT/SUBMIT/RESUBMIT/VOID</code>，统一 <code>audit_stage='OPERATION'</code>；审核节点仍使用原审核阶段和 PASS/REJECT/DECLINE/PARTIAL。</li>
+<li><strong>乐观锁</strong>：<code>claim_order</code> 每次状态/金额更新走 <code>version</code> 比对，未命中即冲突回滚；核心动作（提交/审核/判责）叠加分布式锁按 <code>claim_order.id</code> 串行化，避免同单并发双审（S12、S15）。</li>
+<li><strong>幂等</strong>：向欣旺达单生成以「一张服务商单仅可纳入一张闪欣单」约束兜底（下游 <code>xw_claim_detail.uk_provider_claim</code>）；抵扣单以 <code>deduct_no</code> 唯一 + 判责仅 <code>PENDING_LIABILITY→PENDING_SETTLE</code> 单向迁移，天然防重复生成。</li>
+<li><strong>金额一致性</strong>：任何改明细的操作，必须在同事务内把 <code>claim_order</code> 的四个汇总字段重算回写，禁止只改明细不改主单。</li>
+</ul>
+<hr>
+<h2>十二、留白与取数边界（本链）</h2>
+<ul>
+<li>工单库全部取数字段（工单状态/保内标识/业务类型/维修项目工时/备件明细/主责件/系数/VIN·SN·条码）本期 <strong>Mock/待挂载</strong>，物理表列未登记，禁止自造；真库到位走变更登记回填。</li>
+<li>回运单实体/在途状态与 OA 内部转嫁契约仍<strong>待挂载</strong>；本期分别以回运附件和仅记录比例/说明作为 Mock/临时边界。QMS 预判值本期写审核备注，供应商责任本期仅置启动标志，均已在决策表确认。</li>
+<li>本链 D4 已决口径与仍挂起的待文档/待契约项集中登记在配套溯源表 C 表及 <code>docs/decisions/待确认决策表.xlsx</code>。</li>
+</ul></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script></body></html>

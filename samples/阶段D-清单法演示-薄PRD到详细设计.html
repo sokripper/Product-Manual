@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阶段 D 清单法演示：从薄 PRD → 完善详细设计（经销商新能源订单管理）</title>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+    --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+    --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+    --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+  --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+  --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+  --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.7; font-size:15px;
+  letter-spacing:.01em;
+}
+.wrap{max-width:900px; margin:0 auto; padding:0 24px 120px}
+.topbar{
+  position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line); margin-bottom:40px;
+}
+.topbar .inner{max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:14px}
+.badge{
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:5px;
+  padding:3px 9px; white-space:nowrap;
+}
+.topbar .name{font-size:13px; color:var(--muted); font-family:var(--mono)}
+.back{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent); text-decoration:none}
+.back:hover{text-decoration:underline}
+h1{font-size:29px; line-height:1.25; font-weight:750; margin:28px 0 8px; text-wrap:balance; letter-spacing:-.01em}
+h2{font-size:21px; font-weight:700; margin:44px 0 12px; padding-top:16px; border-top:1px solid var(--line); letter-spacing:-.005em}
+h3{font-size:17px; font-weight:680; margin:30px 0 10px; color:var(--ink)}
+h4{font-size:14.5px; font-weight:680; margin:22px 0 8px; color:var(--muted); font-family:var(--mono)}
+p{margin:12px 0}
+a{color:var(--accent)}
+strong{font-weight:680; color:var(--ink)}
+code{font-family:var(--mono); font-size:.86em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
+pre{background:var(--code-bg); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:16px 0}
+pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.6}
+blockquote{
+  margin:16px 0; padding:12px 18px; background:var(--quote-bg);
+  border-left:3px solid var(--quote-bar); border-radius:0 8px 8px 0; color:var(--muted); font-size:14px;
+}
+blockquote p{margin:6px 0}
+blockquote strong{color:var(--ink)}
+ul,ol{margin:12px 0; padding-left:24px}
+li{margin:5px 0}
+ul ul,ol ol,ul ol,ol ul{margin:4px 0}
+hr{border:none; border-top:1px solid var(--line); margin:36px 0}
+.tablewrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums}
+th{background:var(--th-bg); color:var(--th-ink); font-weight:640; text-align:left; padding:9px 13px; white-space:nowrap; font-family:var(--mono); font-size:12px; letter-spacing:.02em}
+td{padding:9px 13px; border-top:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.doc-note{
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  margin:34px 0 0; padding-top:16px; border-top:1px dashed var(--line);
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+  <span class="badge">SDD V8 · 生成产物</span>
+  <span class="name">阶段D-清单法演示-薄PRD到详细设计.md</span>
+  <a class="back" href="../SDD-V8-使用手册.html">← 返回使用手册</a>
+</div></div>
+<main class="wrap">
+<h1>阶段 D 清单法演示：从薄 PRD → 完善详细设计（经销商新能源订单管理）</h1>
+<blockquote><p>回答"那份完善设计是怎么从薄 PRD 得来的、清单法能否到达那个精细度"。</p>
+<p>输入 = 薄 PRD（代提报只有一句"提交时匹配资源，只匹配现车，全部成功才提交否则拒绝"）。</p>
+<p>证明 = 清单能把这一句展开成完整设计的<strong>每一个格子</strong>，并标清每格答案的来源。</p></blockquote>
+<h2>精度公式</h2>
+<pre><code>完善详细设计 = 薄PRD结构 + 参考已有节点逻辑(燃油车订单管理/审批单审批) + 既有库schema(表名/字段/码)
+清单法 = 保证"每一格都被列出 + 每格标清来源"，不漏格、不瞎填</code></pre>
+<p>来源记号：【P】薄 PRD 已给｜【参考】需读参考节点(燃油车订单管理/审批单审批)｜【S】需既有库 schema(db-schema 纳管)｜【产品】需产品/OTD 决策</p>
+<hr>
+<h2>演示：把「代提报」一句话，展开成完整设计的所有格子</h2>
+<p>薄 PRD 原文只有：</p>
+<blockquote><p>提交订单时匹配资源（只匹配现车），若全部匹配成功，则可以提交，否则直接拒绝；OTD可代提报；增补订单有经销商车系限制，无 AIC 限制。</p></blockquote>
+<p>清单法逐格展开 ↓（右栏是这些格子在<strong>完整版设计里最终的答案</strong>，用来证明清单确实覆盖到了那个精细度）</p>
+<h3>格子组 1：可用条件 / 触发</h3>
+<div class="tablewrap"><table><thead><tr><th>问</th><th>来源</th><th>完整版最终答案</th></tr></thead><tbody><tr><td>哪些状态可代提报？</td><td>【P】暗示+【参考】</td><td>仅"新建"</td></tr><tr><td>是否二次确认？文案？</td><td>【参考】</td><td>是，「您确认要提报选择的数据吗？」</td></tr></tbody></table></div>
+<h3>格子组 2：资源匹配的<strong>精确条件</strong>（薄 PRD 只说"匹配现车"）</h3>
+<div class="tablewrap"><table><thead><tr><th>问</th><th>来源</th><th>完整版最终答案</th></tr></thead><tbody><tr><td>查哪张库表？</td><td>【S】</td><td>车辆主数据 <code>T_M_Z_BD_CAR</code></td></tr><tr><td>"现车"的精确判定条件？</td><td>【参考】【S】</td><td>CAR_STATE∈{2,12} &amp;&amp; ONECAR_FLAG(No/null) &amp;&amp; WAREHOUSE_CODE='A' &amp;&amp; EXPECT_SUB_WAREHOUSE=null &amp;&amp; LOGISTICS_CAR_FLAG=Yes &amp;&amp; IS_SALE_CLOSED=Yes &amp;&amp; 整车共享经销商=null &amp;&amp; OFFLINE_DATE≠null</td></tr><tr><td>还要 join 哪张仓库表、加什么条件？</td><td>【参考】【S】</td><td><code>VLS_T_WH_VIN</code>：ISDISTRIBUTION=未分车 &amp;&amp; VLS_STATE=已入库 &amp;&amp; CAR_QUALITY_STATUS=正常 &amp;&amp; IS_LOGISTICS_SEPARABLE=否 &amp;&amp; ISMODEL=否 &amp;&amp; ZEBRASTATE=否 &amp;&amp; ISLEND∈{空,归还} &amp;&amp; INV_FROZEN=否</td></tr><tr><td>"经销商车系限制"怎么落？</td><td>【P】+【S】</td><td>产品查询车系限制表 <code>T_M_Z_PRODUCT_SERIES_LIMIT</code>（DLR_CODE+SERIES_CODE）</td></tr><tr><td>占用顺序？</td><td>【参考】</td><td>按 OFFLINE_DATE 升序</td></tr></tbody></table></div>
+<h3>格子组 3：分支（薄 PRD 只说"全成功/否则拒绝" → 实际是三分支）</h3>
+<div class="tablewrap"><table><thead><tr><th>问</th><th>来源</th><th>完整版最终答案</th></tr></thead><tbody><tr><td>分支有几个？</td><td>⚠️【产品】</td><td><strong>三个</strong>：全匹配 / 部分匹配 / 无匹配（薄 PRD 只写了"全/否则"两个 → 这是薄 PRD 的缺口，清单逼出来）</td></tr><tr><td>无匹配怎么办？</td><td>【P】</td><td>不更新，提示「系统可用资源不足！」</td></tr><tr><td>部分匹配单据置什么状态？</td><td>【参考】</td><td>"部分待审批"</td></tr></tbody></table></div>
+<h3>格子组 4：副作用——<strong>写哪些表 × 每表每字段每分支写什么值</strong></h3>
+<blockquote><p>薄 PRD 一个字没提"写表"。清单逼出 5 张表，每张的字段级写入：</p></blockquote>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>来源</th><th>全匹配分支最终答案（节选）</th></tr></thead><tbody><tr><td><code>T_V_Z_BU_DLR_ORDER</code></td><td>【S】【参考】</td><td>STATE=待审批, SUBMIT_TIME=当前, 修改人/时间</td></tr><tr><td><code>T_V_Z_BU_DLR_ORDER_D</code></td><td>【S】【参考】</td><td>行状态=待审批, 是否分车=Yes, 分车时间, VIN/APPROVE_VIN=匹配VIN, APPROVE_SON←生产计划</td></tr><tr><td><code>T_M_Z_BD_CAR</code></td><td>【S】【参考】</td><td>CAR_STATE=4, DLR_CODE=订单经销商, STOCK_LOCK_STATE=Yes, LOCK_BILL_NO/ID</td></tr><tr><td><code>T_M_Z_BD_CAR_CHANGE_HIS</code></td><td>【参考】</td><td>INSERT 异动类型=增补订单分配, 原状态→新状态4</td></tr><tr><td><code>T_V_Z_BU_PRODUCT_PLAN</code></td><td>【S】【参考】</td><td>ASSIGN_FLAG=Yes, ASSIGN_TYPE=12, 业务单据号/ID</td></tr></tbody></table></div>
+<h3>格子组 5：编码</h3>
+<div class="tablewrap"><table><thead><tr><th>问</th><th>来源</th><th>完整版最终答案</th></tr></thead><tbody><tr><td>采购订单号规则？</td><td>【参考】</td><td>参考经销商订单管理编码（考古项，形如 A17997OR...）</td></tr></tbody></table></div>
+<h3>格子组 6：逆向（薄 PRD 没提"拒绝要回滚"）</h3>
+<div class="tablewrap"><table><thead><tr><th>问</th><th>来源</th><th>完整版最终答案</th></tr></thead><tbody><tr><td>OTD 拒绝后，已占的车/生产计划怎么释放？</td><td>【参考】</td><td>逐表逆向：CAR 状态回滚(取异动历史原状态)、锁定清空、PRODUCT_PLAN ASSIGN 清空、写"分配拒绝"异动</td></tr></tbody></table></div>
+<hr>
+<h2>这份演示证明了什么</h2>
+<ol>
+<li><strong>清单能到达那个精细度</strong>：代提报从"一句话"被展开成 6 组、约 20 个格子，<strong>和完整版设计的结构一一对上</strong>（资源匹配条件、三分支、五表字段级、编码、逆向）。没有漏。</li>
+<li><strong>精度来自来源，不来自空想</strong>：上表右栏那些具体值，来源几乎都是【参考】+【S】——即<strong>参考节点逻辑 + 既有 schema</strong>。薄 PRD（【P】）只贡献了结构和少数大逻辑。</li>
+<li><strong>薄 PRD 的真实缺口也被逼出来</strong>：如"三分支"（薄 PRD 只写了两个）、"车系限制怎么落表"——这些进【产品】待决。</li>
+</ol>
+<h2>我要到达完整版精度，需要的输入</h2>
+<div class="tablewrap"><table><thead><tr><th>输入</th><th>对应 SDD 机制</th><th>现状</th></tr></thead><tbody><tr><td>参考节点(燃油车订单管理/审批单审批)的规格或代码</td><td>phase-D 第 7 节「依赖既有逻辑(考古项)」</td><td>❌ 待提供</td></tr><tr><td>既有库 schema(表名/字段/枚举码)</td><td>db-schema 纳管（提案第三节，<strong>尚未落地</strong>）</td><td>❌ 待落地</td></tr><tr><td>薄 PRD 的少数产品决策(如三分支/车系限制)</td><td>补充需求清单</td><td>🟡 少量</td></tr></tbody></table></div>
+<p><strong>给齐前两项，我就能把这份薄 PRD 产出成和样例同精度的详细设计；给不齐，我产出的是"格子全、来源标清、待填项明确"的清单——不编造表名。</strong></p>
+<p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/阶段D-清单法演示-薄PRD到详细设计.md · 内容为真实生成产物样例</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>付款申请单详情</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body data-active="pay" data-crumb="支付管理 / 付款申请单详情">
+<div class="app"><aside class="sidebar" id="sidebar"></aside>
+<div class="main"><header class="topbar" id="topbar"></header>
+<div class="content wrap-page">
+
+  <div class="card"><div class="card-bd">
+    <div class="doc-head">
+      <div><div class="no mono">JSFK-20260702-0012　<span class="tag tag--proc">审批中</span></div>
+        <div class="muted" style="margin-top:4px">关联结算单号 <a href="06-服务商结算单详情.html">SPJS-20260701-0015</a> · 收款方 南京恒卓维保 · 费用归属 闪欣动力</div></div>
+      <div class="amt money">¥9,860.00<small>申请付款总金额（玖仟捌佰陆拾元整）· 付款方式 银行转账</small></div>
+    </div>
+  </div></div>
+
+  <div class="grid2">
+   <div>
+    <div class="card"><div class="card-hd"><h3>基础信息</h3></div><div class="card-bd">
+      <div class="form-grid">
+        <div class="fg"><label>申请单号</label><div class="val mono">JSFK-20260702-0012</div></div>
+        <div class="fg"><label>费用归属方</label><div class="val">闪欣动力</div></div>
+        <div class="fg"><label>结算周期</label><div class="val">2026-06-01 ~ 06-30</div></div>
+        <div class="fg"><label>发票校验状态</label><div class="val"><span class="tag tag--succ-ghost">已校验</span></div></div>
+        <div class="fg"><label>申请人 / 部门</label><div class="val">李索赔 / 售后索赔部</div></div>
+        <div class="fg"><label>申请时间</label><div class="val">2026-07-02 09:12</div></div>
+      </div>
+    </div></div>
+
+    <div class="card"><div class="card-hd"><h3>付款信息</h3></div><div class="card-bd">
+      <div class="form-grid">
+        <div class="fg"><label>开户银行全称</label><div class="val">中国工商银行南京城北支行</div></div>
+        <div class="fg"><label>银行账号</label><div class="val mono">6222 **** **** 8892 <span class="muted">（脱敏）</span></div></div>
+        <div class="fg"><label>账户名称</label><div class="val">南京恒卓维保有限公司</div></div>
+        <div class="fg" style="grid-column:span 3"><label>付款内容</label><div class="val">2026年6月保内维修索赔月度结算付款。</div></div>
+        <div class="fg"><label>附件</label><div class="chips"><span class="chip">📄 结算确认单.pdf</span><span class="chip">🖼 发票.jpg</span></div></div>
+      </div>
+    </div></div>
+
+    <div class="card"><div class="card-hd"><h3>结算明细</h3><button class="btn btn--sm">⬇ 导出明细</button></div><div class="card-bd">
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>索赔单号</th><th>工单号</th><th class="num">应付金额</th><th class="num">抵扣金额</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">SPCO-...0031</td><td class="mono">WO-...8120</td><td class="num money">¥5,180.00</td><td class="num money">¥0.00</td></tr>
+          <tr><td class="mono">SPCO-...0052</td><td class="mono">WO-...8340</td><td class="num money">¥5,500.00</td><td class="num money neg">-¥820.00</td></tr>
+          <tr class="total"><td colspan="2">合计</td><td class="num money">¥10,680.00</td><td class="num money neg">-¥820.00</td></tr>
+        </tbody>
+      </table></div>
+    </div></div>
+   </div>
+
+   <div class="card"><div class="card-hd"><h3>审批流程</h3><span class="muted">＜5万档</span></div><div class="card-bd">
+    <ul class="timeline">
+      <li class="done"><span class="dot"></span><div class="t">付款申请已创建</div><div class="m">2026-07-02 09:12 · 李索赔（售后索赔部）</div></li>
+      <li class="done"><span class="dot"></span><div class="t">售后业务审批</div><div class="m">2026-07-02 10:30 · 王强（部门经理）</div><div class="cmt">"已核实结算数据，均在预算范围内。"</div></li>
+      <li class="done"><span class="dot"></span><div class="t">经办会计</div><div class="m">2026-07-02 11:05 · 赵会计</div></li>
+      <li class="cur"><span class="dot"></span><div class="t">财务经理审批</div><div class="m">待处理 · 指派给 财务经理</div></li>
+      <li><span class="dot"></span><div class="t">出纳</div><div class="m">待审批 · 出纳</div></li>
+      <li><span class="dot"></span><div class="t">总账</div><div class="m">待审批 · 总账会计</div></li>
+    </ul>
+    <div class="hint">分级链按申请金额匹配（&lt;5万 / 5万~20万 / ≥20万，可在结算基础配置维护）。</div>
+   </div></div>
+  </div>
+
+  <div class="card"><div class="actionbar">
+    <button class="btn">返回</button>
+    <button class="btn">编辑</button>
+    <button class="btn btn--primary">审批</button>
+  </div></div>
+
+</div></div></div>
+<script src="../assets/app.js"></script></body></html>

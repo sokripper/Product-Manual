@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>闪欣结算单详情</title><link rel="stylesheet" href="../assets/style.css"></head>
+<body data-active="settle" data-crumb="结算管理 / 闪欣结算单详情">
+<div class="app"><aside class="sidebar" id="sidebar"></aside>
+<div class="main"><header class="topbar" id="topbar"></header>
+<div class="content wrap-page">
+
+  <div class="card"><div class="card-bd">
+    <div class="doc-head">
+      <div><div class="no mono">SXJS-20260701-0005　<span class="tag tag--proc">待对账</span></div>
+        <div class="muted" style="margin-top:4px">结算类型 闪欣动力结算 · 对方主体 欣旺达售后</div></div>
+      <div class="amt money">¥28,600.00<small>应付总金额 · 人民币</small></div>
+    </div>
+  </div></div>
+
+  <div class="note-bar">统一一张结算单，不在售后系统拆分开票；内部费用归属由财务共享系统/OA 自动分账。</div>
+
+  <div class="card"><div class="card-hd"><h3>基本信息</h3><span class="muted">仅【待确认】可调周期/增删明细</span></div><div class="card-bd">
+    <div class="form-grid">
+      <div class="fg"><label>结算单号</label><div class="val mono">SXJS-20260701-0005</div></div>
+      <div class="fg"><label>结算类型</label><div class="val">闪欣动力结算</div></div>
+      <div class="fg"><label>结算周期</label><div class="val">2026-06-01 ~ 2026-06-30</div></div>
+      <div class="fg"><label>应付总金额</label><div class="val money">¥28,600.00</div></div>
+      <div class="fg"><label>结算状态</label><div class="val"><span class="tag tag--proc">待对账</span></div></div>
+      <div class="fg"><label>对账确认时间</label><div class="val muted">—</div></div>
+    </div>
+  </div></div>
+
+  <div class="card"><div class="card-hd"><h3>索赔单明细</h3></div><div class="card-bd">
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>闪欣索赔单号</th><th>服务商索赔单号</th><th>工单号</th><th>类型</th><th>服务商</th><th class="num">索赔总金额</th><th class="num">工时费</th><th class="num">其它费用</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">SXCO-20260601-0001</td><td class="mono">SPCO-...0002</td><td class="mono">WO-...5510</td><td>保内维修</td><td>苏州星辉</td><td class="num money">¥750.00</td><td class="num money">¥600.00</td><td class="num money">¥150.00</td></tr>
+        <tr><td class="mono">SXCO-20260609-0011</td><td class="mono">SPCO-...0021</td><td class="mono">WO-...6033</td><td>保内维修</td><td>杭州锐动</td><td class="num money">¥14,850.00</td><td class="num money">¥14,700.00</td><td class="num money">¥150.00</td></tr>
+        <tr><td class="mono">SXCO-20260618-0020</td><td class="mono">SPCO-...0044</td><td class="mono">WO-...7180</td><td>服务活动</td><td>南京恒卓</td><td class="num money">¥13,000.00</td><td class="num money">¥12,880.00</td><td class="num money">¥120.00</td></tr>
+        <tr class="total"><td colspan="5">合计</td><td class="num money">¥28,600.00</td><td class="num money">¥28,180.00</td><td class="num money">¥420.00</td></tr>
+      </tbody>
+    </table></div>
+  </div></div>
+
+  <div class="card"><div class="card-hd"><h3>发票信息</h3></div><div class="card-bd">
+    <div class="form-grid">
+      <div class="fg"><label>发票代码</label><div class="val muted">待开票</div></div>
+      <div class="fg"><label>发票号码</label><div class="val muted">待开票</div></div>
+      <div class="fg"><label>开票日期</label><div class="val muted">—</div></div>
+      <div class="fg"><label>开票金额</label><div class="val muted">—</div></div>
+      <div class="fg"><label>发票附件</label><div class="val muted">—</div></div>
+    </div>
+  </div></div>
+
+  <div class="card"><div class="actionbar">
+    <button class="btn">返回</button>
+    <button class="btn btn--primary">对账确认</button>
+    <span class="muted" style="align-self:center;font-size:12px">（待对账-闪欣显示对账确认/开票；待确认-欣旺达显示确认结算/作废；待核验-欣旺达显示发票确认；已核验-欣旺达显示申请付款）</span>
+  </div></div>
+
+</div></div></div>
+<script src="../assets/app.js"></script></body></html>

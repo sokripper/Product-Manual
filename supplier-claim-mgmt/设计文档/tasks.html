@@ -1,0 +1,385 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>任务清单 tasks.md</title>
+<style>
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--cm:#6b7a90;--kw:#7aa2ff;--str:#e0a458;
+  --th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;
+  --ok:#1f9d55;--ok-soft:#e6f6ec;--warn:#b7791f;--warn-soft:#fdf3e2;--crit:#d64545;--crit-soft:#fbeaea;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}}
+:root[data-theme="dark"]{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}
+:root[data-theme="light"]{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-size:15px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{font-weight:680;color:var(--ink)}
+.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
+.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
+h1{font-size:30px;font-weight:760;margin:30px 0 8px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:21px;font-weight:710;margin:40px 0 12px;padding-top:18px;border-top:1px solid var(--line);letter-spacing:-.005em}
+h3{font-size:16.5px;font-weight:680;margin:26px 0 9px}
+h4{font-size:13.5px;font-weight:680;margin:18px 0 7px;color:var(--muted);font-family:var(--mono)}
+p{margin:11px 0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px}
+code{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);color:var(--accent-ink);padding:1.5px 6px;border-radius:5px}
+blockquote{margin:15px 0;padding:11px 16px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--muted);font-size:14px}
+blockquote p{margin:5px 0}blockquote strong{color:var(--ink)}
+ul,ol{margin:11px 0;padding-left:23px}li{margin:4px 0}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{background:var(--th-bg);color:var(--th-ink);font-weight:600;text-align:left;padding:9px 13px;white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.02em;position:sticky;top:0}
+td{padding:8px 13px;border-top:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+/* code walkthrough */
+.filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
+.filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.filecard .fh .tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px}
+.filecard .fh .tag.be{background:#8957e5}.filecard .fh .tag.fe{background:#1f9d55}.filecard .fh .tag.cfg{background:#b7791f}
+.filecard .fh .pth{font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+.filecard .role{padding:9px 15px;font-size:13px;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line-soft)}
+.filecard .role b{color:var(--accent-ink)}
+.codebox{background:var(--code-bg);overflow-x:auto;max-height:640px;overflow-y:auto}
+pre{margin:0;padding:14px 0}
+pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--code-ink);background:none;padding:0}
+.cl{display:block;counter-increment:l;padding:0 16px 0 0;white-space:pre}
+.cl::before{content:counter(l);display:inline-block;width:38px;padding-right:14px;margin-right:12px;text-align:right;color:#46536b;border-right:1px solid var(--code-line);user-select:none}
+.cl.cm{color:var(--cm)}
+/* tabs (xlsx sheets) */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.tab{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 13px;cursor:pointer}
+.tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sheet{display:none}.sheet.on{display:block}
+.sheet .meta{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:10px 0}
+.toc{display:flex;flex-direction:column;gap:2px;margin:12px 0 20px;font-family:var(--mono);font-size:12.5px}
+.toc a{color:var(--muted);padding:3px 0}.toc a:hover{color:var(--accent)}
+.doc-note{font-family:var(--mono);font-size:11px;color:var(--faint);margin:38px 0 0;padding-top:16px;border-top:1px dashed var(--line)}
+.p>*:first-child{margin-top:0}
+/* dashboard */
+.hero{padding:40px 0 8px}
+.hero .eb{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero p{font-size:16px;color:var(--muted);max-width:60ch;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:26px 0}
+.stat{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:14px 16px}
+.stat .n{font-size:22px;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .n.ok{color:var(--ok)}.stat .n.ac{color:var(--accent)}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px;margin:14px 0}
+.card{display:block;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 17px;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px)}
+.card .ct{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;display:inline-block}
+.card .ct.be{background:#8957e5}.card .ct.fe{background:#1f9d55}.card .ct.ui{background:#0e8a9c}.card .ct.doc{background:#b7791f}
+.card h3{margin:11px 0 5px;font-size:16px;color:var(--ink)}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.grouplabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:30px 0 4px}
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;background:var(--surface)}
+.shot .cap{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.shot .cap .t{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#0e8a9c;border-radius:5px;padding:2px 8px}
+.shot .cap b{font-size:14px}.shot .cap span{font-size:12.5px;color:var(--muted)}
+.shot img{display:block;width:100%;height:auto}
+.protolist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin:12px 0}
+.protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
+.protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+</style></head><body><div class="topbar"><div class="in">
+<span class="badge">服务商索赔管理</span><span class="nm">设计文档 / 任务清单 tasks.md</span>
+<div class="sp"><a class="tl" href="../../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+</div></div><main class="wrap"><h1>任务清单 tasks.md</h1><div class="p"><h1>开发任务清单 — 服务商索赔管理模块</h1>
+<blockquote><p>项目类型：web｜生成：2026-07-14</p>
+<p>冻结版本：v1.0｜冻结 commit：88ed0f850780e2f012229395c4fa6d109c2d04b7</p>
+<p>来源：docs/PRD.md、docs/Plan.md、docs/api-contracts/接口文档-服务商索赔单.md（S2.8/S2.9）、docs/detail-design/详细设计-服务商索赔单.md（第九节）、docs/db-schema/表结构文档.md + ddl/supplier-claim-mgmt.sql、docs/test-cases/测试用例.xlsx（TC018/TC019）、docs/conventions.md、docs/feature-signoff.md</p>
+<p><strong>本轮范围声明（最小场景验证）</strong>：本轮 Orchestrator 明确只对 <strong>F-CLAIM-05 查看</strong>（服务商索赔单详情 + 分页列表）生成实现任务。其余 26 个功能点本轮不开发，登记在本文件末尾「本轮不开发（pass）」一节，保留可溯性，不排任何实现任务。</p></blockquote>
+<h2>外部服务</h2>
+<div class="tablewrap"><table><thead><tr><th>服务</th><th>必需</th><th>配置字段</th><th>Tester 联调权限</th><th>允许降级</th><th>状态</th></tr></thead><tbody><tr><td>无</td><td>—</td><td>—</td><td>—</td><td>—</td><td>本轮任务均为只读查看（详情 + 分页列表），不触发任何外部服务/Mock 适配层调用（工单库等取数字段已随 seed 数据直接落库，不经过实时 Mock 适配层）。完整外部服务清单见 <code>docs/Plan.md</code> 二点五节（EXT-01~06），供后续功能开发使用。</td></tr></tbody></table></div>
+<h2>任务总览</h2>
+<div class="tablewrap"><table><thead><tr><th>编号</th><th>类型</th><th>标题</th><th>功能编码</th><th>优先级</th><th>用户门禁</th><th>状态</th><th>依赖</th></tr></thead><tbody><tr><td>T-001</td><td>frontend</td><td>服务商索赔单列表 + 详情 Mock（P01/P02 查看视图）</td><td>F-CLAIM-05</td><td>1</td><td>是</td><td>awaiting_user</td><td>-</td></tr><tr><td>T-002</td><td>backend</td><td>Java 多模块骨架（acme-parent+common+starter+claim 域）</td><td>-</td><td>2</td><td>否</td><td>accepted</td><td>T-001</td></tr><tr><td>T-003</td><td>backend</td><td>统一响应与全局异常（Result/PageResult/BizException/i18n）</td><td>-</td><td>3</td><td>否</td><td>accepted</td><td>T-002</td></tr><tr><td>T-004</td><td>backend</td><td>数据库连接（不建表）+ MyBatis-Plus 插件注册</td><td>-</td><td>4</td><td>否</td><td>accepted</td><td>T-003</td></tr><tr><td>T-005</td><td>backend</td><td>鉴权骨架（JWT + 拦截器 + 测试 token 签发）</td><td>-</td><td>5</td><td>否</td><td>accepted</td><td>T-004</td></tr><tr><td>T-006</td><td>backend</td><td>健康检查与启动验证</td><td>-</td><td>6</td><td>否</td><td>accepted</td><td>T-005</td></tr><tr><td>T-007</td><td>backend</td><td>claim 只读数据模型（entity/mapper）</td><td>F-CLAIM-05</td><td>7</td><td>否</td><td>accepted</td><td>T-006</td></tr><tr><td>T-008</td><td>backend</td><td>seed 数据（DML，样例索赔单）</td><td>F-CLAIM-05</td><td>8</td><td>否</td><td>accepted</td><td>T-007</td></tr><tr><td>T-009</td><td>integration</td><td>F-CLAIM-05 查看功能闭环（详情+分页真实 API + 前端联调）</td><td>F-CLAIM-05</td><td>9</td><td>是</td><td>awaiting_user</td><td>T-001、T-008</td></tr></tbody></table></div>
+<hr>
+<h2>T-001 · 服务商索赔单列表 + 详情 Mock（P01/P02 查看视图）</h2>
+<ul>
+<li><strong>类型</strong>：frontend ｜ <strong>优先级</strong>：1 ｜ <strong>用户门禁(user_gate)</strong>：是</li>
+<li><strong>功能编码(source_feature)</strong>：F-CLAIM-05 ｜ <strong>依赖</strong>：无</li>
+<li><strong>状态</strong>：awaiting_user ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：项目 greenfield，先从零搭建前端工程（React + TypeScript + Vite + Ant Design，桌面 Web 后台）。实现两个只读页面：</li>
+<ol>
+<li>服务商索赔单列表（对应原型 P01，只取「查看」相关的表格展示部分，不做搜索栏/批量勾选/新建按钮——这些属于本轮不开发的 F-CLAIM-09/F-CLAIM-10/F-CLAIM-01）；</li>
+<li>服务商索赔单详情（对应原型 P02，只取「查看」相关的只读展示部分，不做编辑/提交/作废/审核/判责表单与按钮——这些属于本轮不开发的 F-CLAIM-02/03/04/06/07/08）。</li>
+</ol>
+</ul>
+<p>列表行点击索赔单号或「查看」进入详情（抽屉或独立页面均可）。Mock 数据放 <code>frontend/src/mocks/</code>，字段名/类型/JSON 结构须与 <code>docs/api-contracts/接口文档-服务商索赔单.md</code> S2.8（详情）与 S2.9（分页列表）逐字一致，包括 <code>Result&lt;T&gt;</code>/<code>PageResult&lt;T&gt;</code> 信封、<code>laborFees</code>/<code>partFees</code>/<code>otherFees</code>/<code>auditRecords</code>/<code>attachmentsByType</code>/<code>deductOrder</code> 各分组结构。</p>
+<p>同时完成 <code>vite.config.ts</code> 的 <code>/api</code> 代理预配置与 <code>.env</code>（<code>VITE_API_BASE_URL=/api</code>、<code>VITE_USE_MOCK=true</code>），避免闭环任务时才补基础设施。</p>
+<ul>
+<li><strong>验收标准（用户可感知）</strong>：</li>
+<ol>
+<li>用户打开"服务商索赔单列表"页面，看到分页表格，列包含：索赔单号、工单编号、服务商名称、所属区域、索赔类型、主责件归属、申请总金额、单据状态、创建时间，布局与原型 P01 一致</li>
+<li>用户点击列表中任意一行的索赔单号，页面展示该单详情：基本信息（服务商/区域/索赔类型/主责件归属/系数快照/币种/状态等）、工时费/备件/其它费用三张明细表格、按时间先后排列的审核记录与操作时间线、附件按分组展示（维修凭证类/判责类）、责任判定信息（若示例数据有）、关联抵扣单信息（若示例数据有）</li>
+<li>列表页与详情页均不出现"新建/编辑/提交/作废/审核/批量操作/判责录入"等按钮或入口</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>npm run type-check</code> 通过</li>
+<li><code>npm run lint</code> 通过</li>
+<li><code>npm run build</code> 通过</li>
+<li>Mock 数据格式（字段名/类型/JSON 结构，含 <code>Result&lt;T&gt;</code>/<code>PageResult&lt;T&gt;</code> 信封）与 <code>docs/api-contracts/接口文档-服务商索赔单.md</code> S2.8/S2.9 完全一致</li>
+<li><code>frontend/vite.config.ts</code> 已配置 <code>server.proxy['/api']</code> 指向后端端口（默认 8099，用户门禁验收时可用 <code>VITE_BACKEND_PROXY_TARGET</code> 切到 8003）</li>
+<li><code>frontend/.env</code> 的 <code>VITE_API_BASE_URL=/api</code>（相对路径，禁止写完整 URL）、<code>VITE_USE_MOCK=true</code></li>
+<li>响应式布局在 1440px / 1920px 桌面分辨率下正常展示</li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<ul>
+<li>pages：- ｜ services：- ｜ realApiEndpoints：- ｜ mockExitCriteria：-</li>
+</ul>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/frontend.md</code></li>
+<li><strong>备注(notes)</strong>：<code>[PASS] T-001 - 待用户门禁验收；第 2 次验收 PASS（第 1 次 FAIL 的 auditRecords 未登记枚举值问题已由 Developer 删除伪造条目修复，Tester 真实浏览器复验 008/009/010 三张详情+全量枚举扫描+type-check/lint/build 复跑+回归抽查均确认无误）；详见 .sdd/test-reports/test-T-001.md</code></li>
+</ul>
+<hr>
+<h2>T-002 · Java 多模块骨架（acme-parent+common+starter+claim 域）</h2>
+<ul>
+<li><strong>类型</strong>：backend ｜ <strong>优先级</strong>：2 ｜ <strong>用户门禁(user_gate)</strong>：否</li>
+<li><strong>功能编码(source_feature)</strong>：- ｜ <strong>依赖</strong>：T-001</li>
+<li><strong>状态</strong>：accepted ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：在 <code>&lt;active_project_path&gt;/backend/</code> 下按 <code>dev-standards/java/研发工程模块与SDK-Service拆分指南.md</code> 第 7 节现场搭建：<code>acme-parent</code>（父 POM/dependencyManagement）+ <code>common</code>（JDK-only）+ <code>starter</code>（框架自动配置）+ 首个业务域 <code>claim/claim-sdk</code>（api/dto/event/enums/constant/code）+ <code>claim/claim-service</code>（扁平分包 <code>controller/service/mapper/entity/assembler/config/advise/util</code>；本域本轮只读、无跨域调用/MQ/定时任务，<code>feign/job/mq</code> 包可不建，不得因此偏离整体模块拓扑）。启用 ArchUnit / Spotless（或 Checkstyle）/ JaCoCo 插件与门禁，随 <code>$MVN -q verify</code> 生效。<strong>禁止</strong>拆子模块、建 <code>app/domain/infra/provider</code> 分层包、另起响应包装/异常体系（R-SPLIT-001/002）。</li>
+</ul>
+<p>数据库不新起：直接对接用户已提供的本地 docker 容器 <code>sdd-mysql</code>（localhost:3306，database=<code>supplier_claim</code>），无需额外 <code>docker-compose.dev.yml</code> 起库；如需该文件承载其它本地中间件（本轮无），留空占位说明"MySQL 复用宿主已运行的 sdd-mysql 容器"。</p>
+<ul>
+<li><strong>验收标准（技术视角，user_gate=否）</strong>：</li>
+<ol>
+<li><code>backend/</code> 为 <code>acme-parent</code> + <code>common</code> + <code>starter</code> + <code>claim/claim-sdk</code> + <code>claim/claim-service</code> 多模块拓扑，符合拆分指南 §7</li>
+<li>ArchUnit/Spotless（或 Checkstyle）/JaCoCo 插件已接入，随 <code>$MVN -q verify</code> 生效</li>
+<li><code>mvn -v</code>/<code>java -version</code> 已确认运行时命令（本项目非默认 PATH，须先 <code>source /Users/koma/.sdd-runtime/env.sh</code> 才有 java17/mvn）</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>source /Users/koma/.sdd-runtime/env.sh</code> 后 <code>$MVN -q verify</code> 通过（此阶段无业务代码，验空骨架编译 + 门禁插件生效）</li>
+<li>MyBatis-Plus 分页插件需显式加 <code>mybatis-plus-jsqlparser</code> 依赖（3.5.9+ 起从 starter 拆出为独立工件，官方 starter 不再传递依赖，否则注册分页插件时 <code>NoClassDefFound</code>）</li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/backend-java.md</code>、<code>dev-standards/java/Java项目工程规范.md</code>、<code>dev-standards/java/研发工程模块与SDK-Service拆分指南.md</code>、<code>dev-standards/java/研发自测规范指南.md</code></li>
+<li><strong>备注(notes)</strong>：</li>
+</ul>
+<hr>
+<h2>T-003 · 统一响应与全局异常（Result/PageResult/BizException/i18n）</h2>
+<ul>
+<li><strong>类型</strong>：backend ｜ <strong>优先级</strong>：3 ｜ <strong>用户门禁(user_gate)</strong>：否</li>
+<li><strong>功能编码(source_feature)</strong>：- ｜ <strong>依赖</strong>：T-002</li>
+<li><strong>状态</strong>：accepted ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：<code>common</code> 模块实现 <code>Result&lt;T&gt;</code>（<code>success</code>/<code>code</code>/<code>message</code>/<code>data</code>/<code>traceId</code>）、<code>PageResult&lt;T&gt;</code>（<code>list</code>/<code>total</code>/<code>pageNo</code>/<code>pageSize</code>）、<code>ErrorCode</code> 接口、<code>BizException</code>；<code>starter</code> 模块实现 <code>@RestControllerAdvice</code> 全局异常处理器 + i18n 文案解析。<strong>starter 的自动配置类必须注册进 <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code></strong>（starter 包名与消费方 <code>@SpringBootApplication</code> 扫描基础包天然不同子树，组件扫描覆盖不到，是常见坑）。</li>
+<li><strong>验收标准（技术视角）</strong>：</li>
+<ol>
+<li><code>Result&lt;T&gt;</code>/<code>PageResult&lt;T&gt;</code> 字段与 <code>docs/conventions.md</code> S4/S4.1 逐字一致</li>
+<li>全局异常处理器真实生效（有 <code>@SpringBootTest</code> 验证真实装配链路，不能只靠单测里手动 <code>new</code> advice——那样绕开了装配）</li>
+<li>业务码通用错误码（400/401/403/404/409/500）与 <code>docs/conventions.md</code> S6 一致</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>$MVN -q verify</code> 通过</li>
+<li>有 <code>@SpringBootTest</code> 真实触发一次 advice 路径（非手工 new）</li>
+<li>不硬编码密钥</li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/backend-java.md</code>、<code>dev-standards/java/Java项目工程规范.md</code>、<code>dev-standards/java/研发工程模块与SDK-Service拆分指南.md</code>、<code>dev-standards/java/研发自测规范指南.md</code>、<code>dev-standards/java/接口设计与文档规范指南.md</code></li>
+<li><strong>备注(notes)</strong>：<code>claim-sdk</code>/<code>claim-service</code> 尚未绑定 JaCoCo 85% 覆盖率门禁（当前均无真实业务类，绑定无意义）；T-007/T-009 落地首个真实业务类后，Tester 须核实这两模块是否已补上 JaCoCo <code>check</code> 门禁，详见 .sdd/test-reports/test-T-003.md「关注点复核」</li>
+</ul>
+<hr>
+<h2>T-004 · 数据库连接（不建表）+ MyBatis-Plus 插件注册</h2>
+<ul>
+<li><strong>类型</strong>：backend ｜ <strong>优先级</strong>：4 ｜ <strong>用户门禁(user_gate)</strong>：否</li>
+<li><strong>功能编码(source_feature)</strong>：- ｜ <strong>依赖</strong>：T-003</li>
+<li><strong>状态</strong>：accepted ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：<code>claim-service</code> 配置 <code>application-dev.yml</code> 连接 docker 容器 <code>sdd-mysql</code>（localhost:3306，database=<code>supplier_claim</code>，账号 root，真实口令写入 <code>backend/.env</code>，不进 yml 明文/不进任何 <code>docs/**</code>/<code>.sdd/**</code>）；<code>application-test.yml</code> 指向独立测试库（库名须与 dev 不同，如 <code>supplier_claim_test</code>）。注册 MyBatis-Plus 分页插件（<code>PaginationInnerInterceptor</code>）、雪花 ID（<code>ASSIGN_ID</code>）、乐观锁插件（<code>OptimisticLockerInnerInterceptor</code>，对应 <code>version</code> 列）。<strong>不建表</strong>：本项目 20 张表（含本轮涉及的 <code>claim_order</code>/<code>claim_fee_labor</code>/<code>claim_fee_part</code>/<code>claim_fee_other</code>/<code>claim_audit_record</code>/<code>claim_deduct_order</code>/<code>attachment</code>）已由 Orchestrator/人执行 <code>docs/db-schema/ddl/supplier-claim-mgmt.sql</code> 建好；本任务只验证连接与表存在，缺表则停下报告"需人先执行建表 SQL"，不自建、不写 DDL 补齐。</li>
+<li><strong>验收标准（技术视角）</strong>：</li>
+<ol>
+<li>能连上 <code>supplier_claim</code> 库；上述 7 张目标表已存在（真实 <code>SHOW TABLES</code>/<code>DESC</code> 验证，非只看实体定义）；如缺表停下报告，不自造表</li>
+<li>MyBatis-Plus 分页/乐观锁插件已注册，分页响应映射为 <code>PageResult&lt;T&gt;</code> 统一结构</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>$MVN -q verify</code> 通过</li>
+<li>真实连接 <code>supplier_claim</code> 库验证目标表存在</li>
+<li><code>application.yml</code> 无真实口令，敏感配置走 <code>backend/.env</code></li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/backend-java.md</code>、<code>dev-standards/java/多数据库研发规范-实体与SQL编写指南.md</code>、<code>dev-standards/java/研发工程模块与SDK-Service拆分指南.md</code>、<code>dev-standards/java/研发自测规范指南.md</code></li>
+<li><strong>备注(notes)</strong>：</li>
+</ul>
+<hr>
+<h2>T-005 · 鉴权骨架（JWT + 拦截器 + 测试 token 签发）</h2>
+<ul>
+<li><strong>类型</strong>：backend ｜ <strong>优先级</strong>：5 ｜ <strong>用户门禁(user_gate)</strong>：否</li>
+<li><strong>功能编码(source_feature)</strong>：- ｜ <strong>依赖</strong>：T-004</li>
+<li><strong>状态</strong>：accepted ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：实现 JWT 工具类（签发/校验）+ <code>HandlerInterceptor</code> 路由级拦截（校验 <code>Authorization: Bearer &lt;token&gt;</code>，无凭证/无效凭证 401）+ <code>@RequireRole</code> 注解权限控制（无权限 403）+ CORS 配置（放行 <code>localhost</code>/<code>127.0.0.1</code> 的 <code>5199</code> 与 <code>5175</code>，见 <code>protocols/development-rules.md</code> 端口约定）。<code>JWT_SECRET</code> 等真实密钥写入 <code>backend/.env</code>。</li>
+</ul>
+<p><strong>本轮无正式登录功能</strong>（<code>docs/Plan.md</code> 功能清单未列登录相关功能点，本轮只做 F-CLAIM-05 查看）。为支撑 F-CLAIM-05 详情/列表接口按角色数据范围（<code>provider_id</code>/<code>region</code>）过滤，以及测试用例 TC019（越权数据范围过滤）的可验证性，额外提供一个<strong>仅 <code>dev</code>/<code>test</code> profile 开放</strong>的测试 token 签发端点（如 <code>POST /dev/test-token</code>，入参 <code>role</code>/<code>providerId</code>/<code>region</code>，出参 JWT），生产 profile 下不注册该端点。这是技术验证脚手架，不是设计正式登录功能，未来正式登录功能设计留待产品后续补齐（记入 notes，非业务 schema 臆造）。</p>
+<ul>
+<li><strong>验收标准（技术视角）</strong>：</li>
+<ol>
+<li>无 <code>Authorization</code> 或 token 无效访问受保护接口返回 401（<code>Result.success=false</code>）</li>
+<li>携带有效 token 但角色权限不足返回 403</li>
+<li><code>/actuator/health</code> 与 <code>/dev/test-token</code>（仅 dev/test profile）在 <code>excludePathPatterns</code> 声明，无需 token</li>
+<li>CORS 允许 <code>localhost</code>/<code>127.0.0.1</code> 的 <code>5199</code> 与 <code>5175</code></li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>$MVN -q verify</code> 通过</li>
+<li><code>HandlerInterceptor</code> 对真实业务路由（非未暴露的 actuator 端点）验证 401/403</li>
+<li><code>preHandle</code> 校验全部通过后才写 <code>ThreadLocal</code>，<code>afterCompletion</code> 无条件 <code>clear</code>（防止校验中途抛异常导致上一请求身份残留到下一请求，线程复用坑）</li>
+<li><code>/dev/test-token</code> 仅当 <code>spring.profiles.active</code> 含 <code>dev</code>/<code>test</code> 时注册，生产 profile 下路由不存在</li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/backend-java.md</code>、<code>dev-standards/java/Java项目工程规范.md</code>、<code>dev-standards/java/接口设计与文档规范指南.md</code>、<code>dev-standards/java/研发自测规范指南.md</code></li>
+<li><strong>备注(notes)</strong>：<code>claim-sdk</code>/<code>claim-service</code> 仍未绑定 JaCoCo 85% 覆盖率门禁（两模块除测试探针外仍无真实业务类）；T-007 落地首个真实业务类（entity/mapper）后须补 <code>claim-service</code> 的 <code>service</code> 分支覆盖率门禁，详见 .sdd/test-reports/test-T-005.md「JaCoCo 覆盖率」。<code>/dev/test-token</code> 用于 Tester 换取不同 <code>provider_id</code>/<code>region</code> 的测试 token，验证 T-009 的 TC018（本服务商范围可查）/TC019（越权被过滤）；不是产品需求功能点，不写入 <code>docs/api-contracts.md</code>。</li>
+</ul>
+<hr>
+<h2>T-006 · 健康检查与启动验证</h2>
+<ul>
+<li><strong>类型</strong>：backend ｜ <strong>优先级</strong>：6 ｜ <strong>用户门禁(user_gate)</strong>：否</li>
+<li><strong>功能编码(source_feature)</strong>：- ｜ <strong>依赖</strong>：T-005</li>
+<li><strong>状态</strong>：accepted ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：引入 <code>spring-boot-starter-actuator</code>，暴露 <code>/actuator/health</code>；完成短时启动验证。启动前须 <code>source backend/.env</code>（或等价方式）注入 <code>JWT_SECRET</code> 等，因为 <code>spring-boot:run</code> 不自动读 <code>.env</code>，强制占位缺失会导致 Bean 装配抛异常启动失败。</li>
+<li><strong>验收标准（技术视角）</strong>：</li>
+<ol>
+<li><code>/actuator/health</code> 返回 UP</li>
+<li><code>claim-service</code> 可用 <code>$MVN -q -pl claim/claim-service spring-boot:run -Dspring-boot.run.arguments=--server.port=8099</code> 短时启动成功（Agent/Tester 自动验证端口 8099；用户门禁验收环境端口 8003）</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>$MVN -q verify</code> 通过</li>
+<li>短时启动 + <code>curl http://localhost:8099/actuator/health</code> 返回 <code>{"status":"UP"}</code></li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/backend-java.md</code>、<code>dev-standards/java/研发自测规范指南.md</code></li>
+<li><strong>备注(notes)</strong>：<code>claim-sdk</code>/<code>claim-service</code> 仍未绑定 JaCoCo 85% 覆盖率门禁（连续 T-002~T-006 五个任务保留此跟踪，两模块除测试探针外仍无真实业务类）；T-007 落地首个真实业务类（entity/mapper）后必须补 <code>claim-service</code> 的 <code>service</code> 分支覆盖率门禁，不得遗忘，详见 .sdd/test-reports/test-T-006.md</li>
+</ul>
+<hr>
+<h2>T-007 · claim 只读数据模型（entity/mapper）</h2>
+<ul>
+<li><strong>类型</strong>：backend ｜ <strong>优先级</strong>：7 ｜ <strong>用户门禁(user_gate)</strong>：否</li>
+<li><strong>功能编码(source_feature)</strong>：F-CLAIM-05 ｜ <strong>依赖</strong>：T-006</li>
+<li><strong>状态</strong>：accepted ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：在 <code>claim-service</code> 的 <code>entity</code>/<code>mapper</code> 包下，为已建好的 7 张表编写 MyBatis-Plus PO 实体 + Mapper 接口（继承 <code>BaseMapper</code>）：<code>claim_order</code>、<code>claim_fee_labor</code>、<code>claim_fee_part</code>、<code>claim_fee_other</code>、<code>claim_audit_record</code>、<code>claim_deduct_order</code>、<code>attachment</code>。字段名/类型/长度/审计列<strong>严格对齐</strong> <code>docs/db-schema/表结构文档.md</code> 与 <code>docs/db-schema/ddl/supplier-claim-mgmt.sql</code> 的实际列名（<code>create_by</code>/<code>created_at</code>/<code>update_by</code>/<code>updated_at</code>/<code>deleted_at</code>/<code>version</code>——<strong>注意不是</strong> <code>dev-standards/backend-java.md</code> §5 示例里的 <code>CREATION_BY</code>/<code>CREATION_DATE</code> 等占位命名，那是通用规约的示例写法，非本项目实际约定，以本项目 db-schema 文档/DDL 为准）。本任务只建只读数据模型，不写 Service 业务查询组装逻辑（组装逻辑放 T-009）。</li>
+<li><strong>验收标准（技术视角）</strong>：</li>
+<ol>
+<li>7 个 PO 实体与 Mapper 接口存在，字段/类型与已建好表结构逐列一致（真实 <code>DESC</code> 对照，非凭记忆/凭文档臆测）</li>
+<li>主键、审计列（<code>create_by</code>/<code>created_at</code>/<code>update_by</code>/<code>updated_at</code>/<code>deleted_at</code>/<code>version</code>）映射正确，<code>version</code> 走 <code>@Version</code> 乐观锁注解</li>
+<li>简单查询（如按 <code>id</code> 查 <code>claim_order</code>）可真实命中已建好表返回数据</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>$MVN -q verify</code> 通过</li>
+<li>Mapper 与真实库字段核对一致，不出现未登记表列（出现即 FAIL）</li>
+<li>所有查询附 <code>deleted_at IS NULL</code> 条件（MyBatis-Plus 逻辑删除或显式 Wrapper 条件）</li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/backend-java.md</code>、<code>dev-standards/java/多数据库研发规范-实体与SQL编写指南.md</code>、<code>dev-standards/java/研发工程模块与SDK-Service拆分指南.md</code>、<code>dev-standards/java/研发自测规范指南.md</code></li>
+<li><strong>备注(notes)</strong>：权威表结构 <code>docs/db-schema/表结构文档.md</code>（S65~S144 区段：<code>claim_order</code>/<code>claim_fee_labor</code>/<code>claim_fee_part</code>/<code>claim_fee_other</code>/<code>claim_audit_record</code>）+ S238（<code>claim_deduct_order</code>）+ S370（<code>attachment</code>）。<strong>文档漂移待产品侧登记</strong>（不影响本任务判定，PO 已按真实库/DDL 正确实现）：①<code>表结构文档.md:129</code> <code>claim_fee_other.remark</code> 应从 255 更正为 500（与 DDL/真实库一致）；②<code>表结构文档.md:248</code> <code>claim_deduct_order.liability_ratio</code> 默认值应从"0.00"更正为"无默认"（与 DDL/真实库一致）。<strong>强约束</strong>：<code>claim-service</code> 的 <code>jacoco-check</code>（<code>pom.xml</code>）当前阈值占位 0.00（entity 排除+mapper 空体无可插桩代码，暂无 service/controller 业务逻辑，判定合理），<strong>T-009 落地 service/controller 后必须调至研发自测规范指南 §8.3 分层阈值（service≥85%/controller≥70%）并真实通过，否则 T-009 不得 accepted</strong>，详见 .sdd/test-reports/test-T-007.md「重点判断项 B」。</li>
+</ul>
+<hr>
+<h2>T-008 · seed 数据（DML，样例索赔单）</h2>
+<ul>
+<li><strong>类型</strong>：backend ｜ <strong>优先级</strong>：8 ｜ <strong>用户门禁(user_gate)</strong>：否</li>
+<li><strong>功能编码(source_feature)</strong>：F-CLAIM-05 ｜ <strong>依赖</strong>：T-007</li>
+<li><strong>状态</strong>：accepted ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：通过 <strong>DML INSERT</strong>（非 DDL，子智能体禁止执行任何建表/改表语句）向 <code>supplier_claim</code> 库插入两张样例索赔单及其关联数据，供 T-009 联调与 TC018/TC019 验收使用：</li>
+<ul>
+<li><strong>索赔单 A</strong>：<code>provider_id</code>=<code>PV0001</code>（服务商名"深圳某服务商有限公司"）、<code>region</code>=<code>华东区/江苏</code>、<code>claim_target</code>=<code>SELF</code>、<code>status</code>=<code>PENDING_SETTLE</code>、<code>liability_result</code>=<code>PROVIDER</code>（含完整判责字段：<code>liability_desc</code>/<code>liability_ratio</code>/<code>liability_by</code>/<code>liability_time</code>，及对应 <code>claim_deduct_order</code> 一行）；<code>claim_fee_labor</code>/<code>claim_fee_part</code>/<code>claim_fee_other</code> 各至少 1 行且金额恒等式成立（<code>apply_total_amount = labor_fee_total + part_mgmt_fee + other_fee_total</code>）；<code>claim_audit_record</code> 覆盖 <code>CREATE</code>/<code>SUBMIT</code>/区域初审「通过」/业务审核「通过」/判责相关 <code>OPERATION</code> 事件（<code>audit_time</code> 递增，构成完整时间线）；<code>attachment</code> 覆盖 <code>CLAIM</code> 与 <code>LIABILITY</code> 两个 <code>biz_type</code> 分组各至少 1 条（<code>file_path</code> 可为占位相对路径，无需真实物理文件，本轮不测下载）。</li>
+<li><strong>索赔单 B</strong>：<code>provider_id</code>=<code>PV0002</code>（与 A 不同的服务商，用于 TC019 越权过滤验证）、<code>region</code>=<code>华南区/广东</code>、<code>claim_target</code>=NULL（尚未区域初审）、<code>status</code>=<code>DRAFT</code>、无判责字段、无抵扣单；<code>claim_audit_record</code> 仅 1 条 <code>CREATE</code> 事件；用于验证详情页"最小字段/无判责/无抵扣单"分支。</li>
+<li>两单的 <code>claim_no</code> 按 <code>docs/conventions.md</code> S7 编号规则手工构造示例值（<code>SPCO-yyyyMMdd-4位流水</code>），不经取号器（seed 数据非业务流程产生）。</li>
+</ul>
+<li><strong>验收标准（技术视角）</strong>：</li>
+<ol>
+<li>索赔单 A、B 及其关联明细/审核记录/附件/抵扣单真实存在于 <code>supplier_claim</code> 库（真实 <code>SELECT</code> 验证，非凭声明）</li>
+<li>覆盖「有判责+有抵扣单+多条审核记录」与「无判责+无抵扣单+单条审核记录」两种展示分支</li>
+<li>A、B 分属不同 <code>provider_id</code>，满足 TC019 越权测试前置条件</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li>真实查询 <code>supplier_claim</code> 库验证行数与关键字段值（<code>apply_total_amount</code> 恒等式、<code>audit_time</code> 升序、<code>liability_ratio</code> 范围等）</li>
+<li>子智能体仅执行 DML INSERT，不执行任何 DDL/ALTER/DROP/TRUNCATE</li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=false</li>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/java/多数据库研发规范-实体与SQL编写指南.md</code></li>
+<li><strong>备注(notes)</strong>：<code>work_order_id</code>/<code>work_order_no</code>/<code>main_part_id</code> 等"待挂载"字段本期无真实工单库，seed 时直接手工填固定示例值（如 <code>WO20260712000001</code>/<code>WO-20260712-001</code>），不经工单 Mock 适配层——这是 seed 数据的合理简化，不代表新建索赔单业务流程本身已挂载工单库（新建索赔单 F-CLAIM-01 本轮不开发）。判责动作不写 <code>claim_audit_record</code>（Tester 已核实 LLD 第八/九/十节三处一致确认，详见 .sdd/test-reports/test-T-008.md）；本任务描述中"判责相关 OPERATION 事件"一句与 LLD 实际不符，属 Planner 任务描述措辞层面的轻微出入，以 LLD 为准，不影响本任务判定，建议后续任务描述引用 LLD 时避免此类过度解读。</li>
+</ul>
+<hr>
+<h2>T-009 · F-CLAIM-05 查看功能闭环（详情+分页真实 API + 前端联调）</h2>
+<ul>
+<li><strong>类型</strong>：integration ｜ <strong>优先级</strong>：9 ｜ <strong>用户门禁(user_gate)</strong>：是</li>
+<li><strong>功能编码(source_feature)</strong>：F-CLAIM-05 ｜ <strong>依赖</strong>：T-001、T-008</li>
+<li><strong>状态</strong>：awaiting_user ｜ <strong>blocked</strong>：false ｜ <strong>retry_count</strong>：0 ｜ <strong>developer</strong>：- ｜ <strong>tester</strong>：-</li>
+<li><strong>描述</strong>：实现 <code>claim-service</code> 的两个真实 GET 端点（权威规格 <code>docs/detail-design/详细设计-服务商索赔单.md</code> 第九节 + <code>docs/api-contracts/接口文档-服务商索赔单.md</code> S2.8/S2.9）：</li>
+<ol>
+<li><code>GET /claim/order/{id}</code>（详情）：装配主档 <code>claim_order</code> + 三张费用明细 + <code>claim_audit_record</code>（审核记录与 <code>audit_stage='OPERATION'</code> 的操作事件，按 <code>audit_time,id</code> 升序，构成完整操作时间线）+ <code>attachment</code>（按 <code>biz_type</code> 分组）+ 判责字段 + <code>claim_deduct_order</code>（如有），按角色数据范围（<code>provider_id</code>/<code>region</code>）过滤，任意状态可查，无状态变更/无副作用。</li>
+<li><code>GET /claim/order/page</code>（分页列表）：按 <code>claimNo</code>/<code>workOrderNo</code>/<code>providerName</code>/<code>region</code>/<code>claimType</code>/<code>claimTarget</code>/<code>status</code>/<code>createdAtStart</code>/<code>createdAtEnd</code> 过滤（接口层完整实现，本轮前端 UI 不做搜索交互——筛选栏交互属 F-CLAIM-09，本轮不开发），按角色数据范围过滤，返回 <code>PageResult&lt;索赔单列表行&gt;</code>。</li>
+</ol>
+</ul>
+<p>前端列表页与详情页从 Mock 切换到真实 API 调用（<code>VITE_USE_MOCK=false</code>），关闭对应 Mock 分支。使用 T-005 提供的测试 token（不同 <code>provider_id</code>）完成真实浏览器点击验证 TC018（任意状态查看全量详情，P0）与 TC019（越权数据范围过滤，P2）。</p>
+<ul>
+<li><strong>验收标准（用户可感知，Tester 逐条验，含 TC018/TC019）</strong>：</li>
+<ol>
+<li>用户使用索赔单 A 所属服务商（<code>PV0001</code>）范围的测试 token 打开列表页，看到索赔单 A；点击索赔单号进入详情，页面展示完整信息：基本信息、三张费用明细表、按时间升序排列的审核/操作记录时间线、按分组展示的附件列表、责任判定信息（<code>PROVIDER</code>）、关联抵扣单信息；浏览器网络面板显示请求命中真实后端 <code>/claim/order/{id}</code> 与 <code>/claim/order/page</code>，非 <code>frontend/src/mocks/*</code>（对应 TC018）</li>
+<li>用户切换为索赔单 B 所属服务商（<code>PV0002</code>）范围的测试 token，列表页只能看到索赔单 B，看不到索赔单 A（数据范围过滤生效，对应 TC019）</li>
+<li>页面不展示 <code>[Mock]</code> 字样或任何 Mock 专属提示文案</li>
+<li>刷新页面后详情/列表数据仍来自真实后端（非本地缓存的 Mock 数据）</li>
+</ol>
+<li><strong>技术检查(technicalChecks)</strong>：</li>
+<ul>
+<li><code>$MVN -q verify</code> 通过，<code>service</code> 分支覆盖率 ≥ 85%</li>
+<li>前端 <code>npm run type-check</code>/<code>npm run lint</code>/<code>npm run build</code> 通过</li>
+<li><code>VITE_USE_MOCK=false</code> 时该功能不再走 Mock 分支（<code>frontend/src/mocks/*</code> 未被调用）</li>
+<li>真实浏览器（非纯代码论证）完成：用 A 范围 token → 列表 → 点击 → 详情 → 校验字段完整性；切 B 范围 token → 列表只见 B——纯前端交互（列表点击行→详情展示、跨角色数据过滤）必须真实浏览器点击验证，不接受纯代码层论证</li>
+<li>TC018（P0）/TC019（P2）两条测试用例逐条 PASS，测试报告标注对应用例 ID（测试数据列执行时才填，来源 <code>docs/test-cases/测试用例.xlsx</code>「服务商索赔单」sheet）</li>
+<li><code>frontend/vite.config.ts</code> 的 <code>/api</code> 代理仍指向后端端口，若本任务改动过该配置须重启 Vite dev server 复核</li>
+<li>详情响应字段与 S2.8 响应参数表逐项核对（含 <code>laborFees</code>/<code>partFees</code>/<code>otherFees</code>/<code>auditRecords</code>/<code>attachmentsByType</code>/<code>deductOrder</code> 各分组字段名与类型）；列表响应字段与 S2.9 逐项核对</li>
+<li>金额恒等式 <code>apply_total_amount = labor_fee_total + part_mgmt_fee + other_fee_total</code> 在详情响应中成立</li>
+</ul>
+<li><strong>前端联调(frontendIntegration)</strong>：required=true</li>
+<ul>
+<li>pages：服务商索赔单列表页（P01 查看视图）、服务商索赔单详情页（P02 查看视图）</li>
+<li>services：<code>frontend/src/services/claimOrder.ts</code>（或等价 service 文件）</li>
+<li>realApiEndpoints：<code>GET /claim/order/{id}</code>、<code>GET /claim/order/page</code></li>
+<li>mockExitCriteria：<code>VITE_USE_MOCK=false</code> 时上述两个页面的数据获取均调用真实后端且返回数据结构与展示正确，无 Mock 残留</li>
+</ul>
+<li><strong>外部服务(externalServices)</strong>：无</li>
+<li><strong>规则文件(rules_files)</strong>：<code>dev-standards/frontend.md</code>、<code>dev-standards/backend-java.md</code>、<code>dev-standards/java/接口设计与文档规范指南.md</code>、<code>dev-standards/java/多数据库研发规范-实体与SQL编写指南.md</code>、<code>dev-standards/java/研发自测规范指南.md</code></li>
+<li><strong>备注(notes)</strong>：<code>[PASS] T-009 - 待用户门禁验收；TC018/TC019 真实浏览器全通过，S2.8/S2.9 字段逐项对齐，claim-service JaCoCo service/controller 均真实 100%（阈值 85%/70%），详见 .sdd/test-reports/test-T-009.md</code>。<strong>登记待产品侧/后续轮次处理（不阻塞本轮）</strong>：LLD 第二节（新建暂存草稿）要求 DRAFT 建单即写入 <code>coefficient_snapshot</code> 与三张费用明细，但 T-008 seed B 单留空——Tester 核实冲突真实存在，根因属 F-CLAIM-01（新建，本轮 pass/超范围）建单逻辑保证与 T-008 seed 真实度的取舍问题，非 F-CLAIM-05 查看端点缺陷（查看端点"任意状态可查"+前端防御渲染已验证对空字段容错正确）；后续排 F-CLAIM-01 任务时一并决策"调整 seed 贴近真实建单"或"LLD 第九节补容错说明"。权威规格 <code>docs/detail-design/详细设计-服务商索赔单.md</code> 第九节 +「查看」<code>docs/api-contracts/接口文档-服务商索赔单.md</code> S2.8/S2.9；验收基线 <code>docs/test-cases/测试用例.xlsx</code>「服务商索赔单」sheet TC018/TC019。F-CLAIM-09（搜索/导出）、F-CLAIM-10（批量审核）对应的前端交互（筛选栏、批量勾选按钮、导出按钮）本轮不开发；<code>GET /claim/order/page</code> 的查询参数虽完整实现，但本轮前端不提供筛选 UI，供后续功能复用同一接口。</li>
+</ul>
+<hr>
+<h2>本轮不开发（pass）</h2>
+<blockquote><p>以下 26 个功能点已在 <code>docs/feature-signoff.md</code> 冻结确认（v1.0），但本轮 Orchestrator 明确只做 F-CLAIM-05 最小场景验证，其余功能点本轮 <strong>不排任何实现任务</strong>，登记状态 <code>pass / 超范围</code>，保留可溯性，待后续轮次按 Plan.md 开发顺序建议逐个排入。</p></blockquote>
+<div class="tablewrap"><table><thead><tr><th>功能编码</th><th>功能名称</th><th>权威设计来源</th><th>状态</th></tr></thead><tbody><tr><td>F-CLAIM-01</td><td>新建索赔</td><td>detail-design 第二节 / api-contracts S2.1</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-02</td><td>提交索赔</td><td>detail-design 第三节 / api-contracts S2.3</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-03</td><td>编辑</td><td>detail-design 第四节 / api-contracts S2.2</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-04</td><td>作废</td><td>detail-design 第五节 / api-contracts S2.4</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-06</td><td>区域初审</td><td>detail-design 第六节 / api-contracts S2.5</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-07</td><td>业务审核</td><td>detail-design 第七节 / api-contracts S2.6</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-08</td><td>责任判定</td><td>detail-design 第八节 / api-contracts S2.7</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-09</td><td>搜索/导出</td><td>api-contracts（列表筛选/导出）</td><td>pass / 超范围</td></tr><tr><td>F-CLAIM-10</td><td>批量审核</td><td>api-contracts（批量审核）</td><td>pass / 超范围</td></tr><tr><td>F-XW-01</td><td>向欣单生成</td><td>详细设计-向欣旺达索赔单.md</td><td>pass / 超范围</td></tr><tr><td>F-XW-02</td><td>提交/审批</td><td>详细设计-向欣旺达索赔单.md</td><td>pass / 超范围</td></tr><tr><td>F-XW-03</td><td>查看/导出</td><td>详细设计-向欣旺达索赔单.md</td><td>pass / 超范围</td></tr><tr><td>F-SET-01</td><td>自动生成结算单</td><td>详细设计-结算.md</td><td>pass / 超范围</td></tr><tr><td>F-SET-02</td><td>结算确认/对账</td><td>详细设计-结算.md</td><td>pass / 超范围</td></tr><tr><td>F-SET-03</td><td>正数结算-开票</td><td>详细设计-结算.md</td><td>pass / 超范围</td></tr><tr><td>F-SET-04</td><td>发票核验/申请付款</td><td>详细设计-结算.md</td><td>pass / 超范围</td></tr><tr><td>F-SET-05</td><td>负数结算-强制结算</td><td>详细设计-结算.md</td><td>pass / 超范围</td></tr><tr><td>F-SET-06</td><td>闪欣结算</td><td>详细设计-结算.md</td><td>pass / 超范围</td></tr><tr><td>F-SET-07</td><td>查询/导出</td><td>详细设计-结算.md</td><td>pass / 超范围</td></tr><tr><td>F-PAY-01</td><td>付款申请生成</td><td>详细设计-付款申请.md</td><td>pass / 超范围</td></tr><tr><td>F-PAY-02</td><td>提交/分级审批</td><td>详细设计-付款申请.md</td><td>pass / 超范围</td></tr><tr><td>F-PAY-03</td><td>审批/驳回</td><td>详细设计-付款申请.md</td><td>pass / 超范围</td></tr><tr><td>F-PAY-04</td><td>付款/作废</td><td>详细设计-付款申请.md</td><td>pass / 超范围</td></tr><tr><td>F-PAY-05</td><td>查询/导出/批量审核</td><td>详细设计-付款申请.md</td><td>pass / 超范围</td></tr><tr><td>F-CFG-01</td><td>结算基础配置</td><td>结算配置接口（P12）</td><td>pass / 超范围</td></tr><tr><td>F-CODE-01</td><td>单据编码（跨单据）</td><td>详细设计-单据编码.md</td><td>pass / 超范围</td></tr></tbody></table></div></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script></body></html>

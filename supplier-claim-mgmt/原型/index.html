@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>服务商索赔管理模块 · 原型总览</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+ body{padding:32px}
+ .hero{max-width:1200px;margin:0 auto 24px}
+ .hero h1{font-size:24px;margin-bottom:6px}
+ .hero p{color:var(--text-2)}
+ .grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+ .pcard{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);
+   padding:16px;display:block;color:var(--text)}
+ .pcard:hover{border-color:var(--primary);box-shadow:0 4px 12px rgba(22,119,255,.12)}
+ .pcard .no{color:var(--text-3);font-size:12px}
+ .pcard h3{font-size:15px;margin:2px 0 6px}
+ .pcard p{color:var(--text-2);font-size:13px}
+ .grp{max-width:1200px;margin:22px auto 8px;font-weight:600;color:var(--text-2)}
+</style></head>
+<body>
+<div class="hero">
+  <h1>服务商索赔管理模块 · 原型总览</h1>
+  <p>设计验证用 · 桌面 Web 1440×900 · 字段/状态以 <b>docs/PRD.md S4/S7</b> 为准 · 保内维修索赔域</p>
+</div>
+<div class="grp">理赔管理</div>
+<div class="grid">
+  <a class="pcard" href="pages/01-服务商索赔单列表.html"><div class="no">P01</div><h3>服务商索赔单列表</h3><p>筛选 + 表格 + 九态 Tag + 行操作 + 批量审核 + 合计</p></a>
+  <a class="pcard" href="pages/02-服务商索赔单详情.html"><div class="no">P02</div><h3>服务商索赔单 详情/表单</h3><p>基础/费用明细/附件/审核记录/责任判定卡 + 判责录入弹窗</p></a>
+  <a class="pcard" href="pages/03-向欣旺达索赔单列表.html"><div class="no">P03</div><h3>向欣旺达索赔单列表</h3><p>闪欣→欣旺达 索赔单，逐单自动生成</p></a>
+  <a class="pcard" href="pages/04-闪欣索赔单详情.html"><div class="no">P04</div><h3>闪欣索赔单 详情/编辑</h3><p>勾选明细 + 部分通过核准金额 + 审核弹窗</p></a>
+</div>
+<div class="grp">结算管理</div>
+<div class="grid">
+  <a class="pcard" href="pages/05-服务商结算单列表.html"><div class="no">P05</div><h3>服务商结算单列表</h3><p>正/负数结算、抵扣列、强制结算、合并结算</p></a>
+  <a class="pcard" href="pages/06-服务商结算单详情.html"><div class="no">P06</div><h3>服务商结算单详情</h3><p>索赔明细含抵扣单 + 发票卡 + 状态×角色操作</p></a>
+  <a class="pcard" href="pages/07-闪欣结算单列表.html"><div class="no">P07</div><h3>闪欣结算单列表</h3><p>欣旺达↔闪欣，统一一张不拆分</p></a>
+  <a class="pcard" href="pages/08-闪欣结算单详情.html"><div class="no">P08</div><h3>闪欣结算单详情</h3><p>闪欣/服务商明细 + 财务共享分账提示</p></a>
+</div>
+<div class="grp">支付管理</div>
+<div class="grid">
+  <a class="pcard" href="pages/09-付款申请单列表.html"><div class="no">P09</div><h3>付款申请单列表</h3><p>当前审批节点 + 六态 + 分角色操作</p></a>
+  <a class="pcard" href="pages/10-付款申请单详情.html"><div class="no">P10</div><h3>付款申请单详情</h3><p>审批流时间线（签名交互）+ 结算明细</p></a>
+  <a class="pcard" href="pages/11-付款申请单新建.html"><div class="no">P10</div><h3>付款申请单 新建/编辑</h3><p>结算带出只读 + 付款信息校验 + 账户名一致风险提示</p></a>
+</div>
+<div class="grp">系统配置</div>
+<div class="grid">
+  <a class="pcard" href="pages/12-结算基础配置.html"><div class="no">P11</div><h3>结算基础配置</h3><p>结算周期 / 开票白名单 / 审批流 / 索赔系数</p></a>
+</div>
+</body></html>

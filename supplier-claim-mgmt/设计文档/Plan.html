@@ -1,0 +1,176 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>开发计划 Plan.md</title>
+<style>
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--cm:#6b7a90;--kw:#7aa2ff;--str:#e0a458;
+  --th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;
+  --ok:#1f9d55;--ok-soft:#e6f6ec;--warn:#b7791f;--warn-soft:#fdf3e2;--crit:#d64545;--crit-soft:#fbeaea;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}}
+:root[data-theme="dark"]{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}
+:root[data-theme="light"]{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-size:15px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{font-weight:680;color:var(--ink)}
+.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
+.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
+h1{font-size:30px;font-weight:760;margin:30px 0 8px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:21px;font-weight:710;margin:40px 0 12px;padding-top:18px;border-top:1px solid var(--line);letter-spacing:-.005em}
+h3{font-size:16.5px;font-weight:680;margin:26px 0 9px}
+h4{font-size:13.5px;font-weight:680;margin:18px 0 7px;color:var(--muted);font-family:var(--mono)}
+p{margin:11px 0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px}
+code{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);color:var(--accent-ink);padding:1.5px 6px;border-radius:5px}
+blockquote{margin:15px 0;padding:11px 16px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--muted);font-size:14px}
+blockquote p{margin:5px 0}blockquote strong{color:var(--ink)}
+ul,ol{margin:11px 0;padding-left:23px}li{margin:4px 0}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{background:var(--th-bg);color:var(--th-ink);font-weight:600;text-align:left;padding:9px 13px;white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.02em;position:sticky;top:0}
+td{padding:8px 13px;border-top:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+/* code walkthrough */
+.filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
+.filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.filecard .fh .tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px}
+.filecard .fh .tag.be{background:#8957e5}.filecard .fh .tag.fe{background:#1f9d55}.filecard .fh .tag.cfg{background:#b7791f}
+.filecard .fh .pth{font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+.filecard .role{padding:9px 15px;font-size:13px;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line-soft)}
+.filecard .role b{color:var(--accent-ink)}
+.codebox{background:var(--code-bg);overflow-x:auto;max-height:640px;overflow-y:auto}
+pre{margin:0;padding:14px 0}
+pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--code-ink);background:none;padding:0}
+.cl{display:block;counter-increment:l;padding:0 16px 0 0;white-space:pre}
+.cl::before{content:counter(l);display:inline-block;width:38px;padding-right:14px;margin-right:12px;text-align:right;color:#46536b;border-right:1px solid var(--code-line);user-select:none}
+.cl.cm{color:var(--cm)}
+/* tabs (xlsx sheets) */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.tab{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 13px;cursor:pointer}
+.tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sheet{display:none}.sheet.on{display:block}
+.sheet .meta{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:10px 0}
+.toc{display:flex;flex-direction:column;gap:2px;margin:12px 0 20px;font-family:var(--mono);font-size:12.5px}
+.toc a{color:var(--muted);padding:3px 0}.toc a:hover{color:var(--accent)}
+.doc-note{font-family:var(--mono);font-size:11px;color:var(--faint);margin:38px 0 0;padding-top:16px;border-top:1px dashed var(--line)}
+.p>*:first-child{margin-top:0}
+/* dashboard */
+.hero{padding:40px 0 8px}
+.hero .eb{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero p{font-size:16px;color:var(--muted);max-width:60ch;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:26px 0}
+.stat{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:14px 16px}
+.stat .n{font-size:22px;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .n.ok{color:var(--ok)}.stat .n.ac{color:var(--accent)}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px;margin:14px 0}
+.card{display:block;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 17px;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px)}
+.card .ct{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;display:inline-block}
+.card .ct.be{background:#8957e5}.card .ct.fe{background:#1f9d55}.card .ct.ui{background:#0e8a9c}.card .ct.doc{background:#b7791f}
+.card h3{margin:11px 0 5px;font-size:16px;color:var(--ink)}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.grouplabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:30px 0 4px}
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;background:var(--surface)}
+.shot .cap{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.shot .cap .t{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#0e8a9c;border-radius:5px;padding:2px 8px}
+.shot .cap b{font-size:14px}.shot .cap span{font-size:12.5px;color:var(--muted)}
+.shot img{display:block;width:100%;height:auto}
+.protolist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin:12px 0}
+.protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
+.protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+</style></head><body><div class="topbar"><div class="in">
+<span class="badge">服务商索赔管理</span><span class="nm">设计文档 / 开发计划 Plan.md</span>
+<div class="sp"><a class="tl" href="../../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+</div></div><main class="wrap"><h1>开发计划 Plan.md</h1><div class="p"><h1>开发计划</h1>
+<blockquote><p>设计阶段与开发阶段的衔接文件。所有开发进度以本文件为准。</p>
+<p>项目：服务商索赔管理模块（单模块，V1/MVP）。上游：<code>docs/PRD.md</code>、<code>docs/prototypes/</code>、<code>docs/detail-design/</code>、<code>docs/api-contracts/</code>、<code>docs/conventions.md</code>、<code>docs/db-schema/</code>。</p></blockquote>
+<h2>一、功能清单总览</h2>
+<div class="tablewrap"><table><thead><tr><th>序号</th><th>功能名称</th><th>一句话描述</th><th>对应页面</th><th>优先级</th><th>状态</th></tr></thead><tbody><tr><td>F-CLAIM-01</td><td>新建索赔</td><td>关联已完工保内工单，带出费用明细，暂存草稿</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-02</td><td>提交索赔</td><td>维修凭证附件必填、回运校验，进区域初审</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-03</td><td>编辑</td><td>仅草稿/驳回可编辑，仅其它费用明细可改</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-04</td><td>作废</td><td>仅草稿可作废</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-05</td><td>查看</td><td>全状态可查，含审核记录/附件/日志/判责</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-06</td><td>区域初审</td><td>录索赔对象+SN 预判，通过→待总部审核</td><td>P02/审核弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-07</td><td>业务审核</td><td>主责件归属决定流向（欣旺达件逐单生成向欣单/外采件进判责）</td><td>P02/审核弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-08</td><td>责任判定</td><td>外采件三项判责，服务商责任自动生成抵扣单</td><td>P02/判责弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-09</td><td>搜索/导出</td><td>多维筛选、按筛选导出</td><td>P01</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-10</td><td>批量审核</td><td>勾选批量审核，部分成功部分失败</td><td>P01</td><td>MVP</td><td>待开发</td></tr><tr><td>F-XW-01</td><td>向欣单生成</td><td>业务审核通过（欣旺达件）逐单自动生成，补附件提交</td><td>P04</td><td>MVP</td><td>待开发</td></tr><tr><td>F-XW-02</td><td>提交/审批</td><td>欣旺达审批（通过/驳回/拒绝/部分通过），内建角色</td><td>P04/审批弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-XW-03</td><td>查看/导出</td><td>全量明细、关联服务商单、审批记录、批量导出</td><td>P03</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-01</td><td>自动生成结算单</td><td>定时/手动按服务商维度汇总，应付=0 零元核销</td><td>P05</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-02</td><td>结算确认/对账</td><td>可增删索赔单据→确认结算→对账</td><td>P06</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-03</td><td>正数结算-开票</td><td>校验开票权限白名单，服务商上传发票</td><td>P06/发票上传弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-04</td><td>发票核验/申请付款</td><td>闪欣发票确认→人工申请付款生成付款单</td><td>P06</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-05</td><td>负数结算-强制结算</td><td>负数关闭开票权限，发起强制结算扣质保金</td><td>P06</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-06</td><td>闪欣结算</td><td>统一一张单不拆分，内部分账交财务共享/OA（Mock）</td><td>P08</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-07</td><td>查询/导出</td><td>多维筛选、明细导出</td><td>P05/P07</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-01</td><td>付款申请生成</td><td>结算单人工点申请付款，系统带出信息生成草稿</td><td>P11</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-02</td><td>提交/分级审批</td><td>按金额匹配三档审批链（内建审批流）</td><td>P10</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-03</td><td>审批/驳回</td><td>逐节点审批，驳回退回待提交</td><td>P10/审批弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-04</td><td>付款/作废</td><td>审批通过录凭证付款，草稿可作废</td><td>P10</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-05</td><td>查询/导出/批量审核</td><td>多维筛选、导出、批量审核</td><td>P09</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CFG-01</td><td>结算基础配置</td><td>周期/开票权限白名单/审批流/索赔系数/付款金额档维护</td><td>P12</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CODE-01</td><td>单据编码（跨单据）</td><td>6 类单据编号生成（序列表+行锁），非独立页面</td><td>—</td><td>MVP</td><td>待开发</td></tr></tbody></table></div>
+<blockquote><p>V2+（不在本期开发范围）：QMS 判责真实对接（EXT-01）、财务共享付款对接（EXT-03）、OA 三级组织同步与自动分账（EXT-04）、里程地图自动计算与限次、美元/汇率、供应商索赔子流程完整化（PRD「9月」项）、欣旺达售后系统间实时对接（替代内建角色）。</p></blockquote>
+<h2>二、数据契约摘要</h2>
+<blockquote><p>完整数据契约见 <code>docs/PRD.md S10 数据契约</code> 与 <code>docs/db-schema/表结构文档.md</code>（20 表，四段式，雪花 id + 审计列）；统一响应格式与接口契约见 <code>docs/conventions.md</code> + <code>docs/api-contracts/接口文档-&lt;模块&gt;.md</code>（唯一权威源，不在本文件重复列出）。</p>
+<p>编号规则见 <code>docs/conventions.md S7</code>。乐观锁 <code>version</code> 由后端维护、不入接口体（conventions S2/S5）。</p>
+<p><strong>建表由人执行</strong>：<code>docs/db-schema/ddl/supplier-claim-mgmt.sql</code> 为交付物；新增序列表 <code>doc_no_sequence</code> 的建表 SQL（<code>docs/db-schema/ddl/doc_no_sequence.sql</code>）<strong>待研发组长审定</strong>（单据编码 B-1），审定并由人执行后方可开发依赖它的编码逻辑。子智能体全程零 DDL。</p></blockquote>
+<h2>二点五、外部服务与测试权限清单</h2>
+<blockquote><p><strong>开发硬门禁</strong>：本清单是 PRD「A5-3 外部依赖」落定版，与 <code>docs/external-interfaces/待料清单.md</code>（EXT-01~06）一致。本期无需任何真实外部 Key/Token（全部走 Mock/内建/待挂载），故无真实密钥落入文档。状态列均为已决策略，无「待确认」。</p></blockquote>
+<div class="tablewrap"><table><thead><tr><th>服务</th><th>用途</th><th>配置项字段</th><th>MVP 必需</th><th>Tester 完整联调权限</th><th>缺失时策略</th><th>状态</th></tr></thead><tbody><tr><td>QMS 判责系统（EXT-01）</td><td>索赔单推送/责任判定回传</td><td>无（本期人工录入判责/SN 预判，落 <code>claim_audit_record.remark</code>）</td><td>否</td><td>无需（Mock）</td><td>人工/Mock 适配层，真接口到位再替换实现</td><td>Mock（已决）</td></tr><tr><td>欣旺达售后系统（EXT-02）</td><td>向欣单审批/对账</td><td>无（本系统内建欣旺达角色，A-22）</td><td>否</td><td>无需（内建角色）</td><td>内建角色，无跨系统接口</td><td>内建（已决）</td></tr><tr><td>财务共享系统（EXT-03）</td><td>闪欣结算付款推送/回传</td><td>无（本期人工回填付款结果，A-18）</td><td>否</td><td>无需（Mock）</td><td>人工回填，真接口到位再替换</td><td>Mock（已决）</td></tr><tr><td>OA 系统（EXT-04）</td><td>内部费用转嫁/分账</td><td>无（本期仅本系统记录转嫁单/分账意图）</td><td>否</td><td>无需</td><td>仅本系统记录，不外呼</td><td>待挂载（已决）</td></tr><tr><td>闪欣财务系统（EXT-05）</td><td>闪欣侧付款审批</td><td>无（本系统内建可配置审批流，S6.8/S7.9）</td><td>否</td><td>无需（内建）</td><td>内建审批流</td><td>内建（已决）</td></tr><tr><td>维修工单管理模块（EXT-06）</td><td>带出工单状态/保内标识/维修项目/工时/备件/主责件/系数</td><td>无（本期 Mock 数据集/固定夹具）</td><td>是（取数依赖）</td><td>Mock 夹具</td><td>Mock 取数适配层，字段契约明确后替换</td><td>Mock/待挂载（已决）</td></tr></tbody></table></div>
+<blockquote><p>附件存储：本地磁盘，DB 存相对路径，抽象存储层（<code>ATTACHMENT_ROOT_PATH</code> 配置项，V2 可迁 OSS/S3）。真实路径配置进 <code>.env</code>，不入 <code>docs/**</code>。</p></blockquote>
+<h2>三、前端开发清单</h2>
+<h3>前端技术选型</h3>
+<div class="tablewrap"><table><thead><tr><th>层级</th><th>选择</th><th>说明</th></tr></thead><tbody><tr><td>框架</td><td>React</td><td>桌面 Web 后台</td></tr><tr><td>语言</td><td>TypeScript</td><td>组件/service/DTO 全类型化</td></tr><tr><td>构建工具</td><td>Vite</td><td>本地开发、代理、构建</td></tr><tr><td>路由</td><td>react-router</td><td>页面路由 + 角色鉴权守卫</td></tr><tr><td>状态管理</td><td>Zustand</td><td>登录态/全局 UI/跨页面状态</td></tr><tr><td>请求库</td><td>Axios</td><td>统一实例、拦截器、<code>Result&lt;T&gt;</code> 解包、错误处理</td></tr><tr><td>组件库</td><td>Ant Design</td><td>桌面 Web 后台</td></tr><tr><td>工程化</td><td>ESLint + Prettier + type-check + build</td><td>自动验收覆盖</td></tr><tr><td>可选增强</td><td>TanStack Query</td><td>列表分页/缓存/筛选刷新</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>序号</th><th>页面名称</th><th>涉及功能</th><th>Mock 数据来源</th><th>状态</th></tr></thead><tbody><tr><td>P01</td><td>服务商索赔单列表</td><td>F-CLAIM-05/09/10</td><td>接口文档-服务商索赔单 S2.9/2.8</td><td>待开发</td></tr><tr><td>P02</td><td>服务商索赔单 新建/编辑/详情</td><td>F-CLAIM-01~08</td><td>接口文档-服务商索赔单 各接口</td><td>待开发</td></tr><tr><td>P03</td><td>向欣旺达索赔单列表</td><td>F-XW-03</td><td>接口文档-向欣旺达索赔单 分页/详情</td><td>待开发</td></tr><tr><td>P04</td><td>闪欣索赔单 详情/编辑</td><td>F-XW-01/02</td><td>接口文档-向欣旺达索赔单 各接口</td><td>待开发</td></tr><tr><td>P05</td><td>服务商结算单列表</td><td>F-SET-01/07</td><td>接口文档-结算 列表</td><td>待开发</td></tr><tr><td>P06</td><td>服务商结算单详情</td><td>F-SET-02/03/04/05</td><td>接口文档-结算 详情/对账/开票/申请付款</td><td>待开发</td></tr><tr><td>P07</td><td>闪欣结算单列表</td><td>F-SET-07</td><td>接口文档-结算 列表</td><td>待开发</td></tr><tr><td>P08</td><td>闪欣结算单详情</td><td>F-SET-06</td><td>接口文档-结算 闪欣结算</td><td>待开发</td></tr><tr><td>P09</td><td>付款申请单列表</td><td>F-PAY-05</td><td>接口文档-付款申请 S2.9</td><td>待开发</td></tr><tr><td>P10</td><td>付款申请单 详情/编辑</td><td>F-PAY-02/03/04</td><td>接口文档-付款申请 S2.2~2.8</td><td>待开发</td></tr><tr><td>P11</td><td>付款申请单 新建</td><td>F-PAY-01</td><td>接口文档-付款申请 S2.1</td><td>待开发</td></tr><tr><td>P12</td><td>结算基础配置</td><td>F-CFG-01</td><td>结算配置接口（周期/白名单/审批流/系数/金额档）</td><td>待开发</td></tr><tr><td>弹窗</td><td>审核/审批/导出/判责录入/发票上传</td><td>各审核类操作</td><td>对应模块接口</td><td>待开发</td></tr></tbody></table></div>
+<blockquote><p>原型 HTML 全套 12 页在 <code>docs/prototypes/pages/</code>，前端 Mock 页面须与原型一致、Mock 数据格式与 api-contracts 完全一致。</p></blockquote>
+<h3>前端自动验收标准</h3>
+<ul>
+<li>[ ] 所有页面 UI 与原型一致</li>
+<li>[ ] 所有页面使用 Mock 数据可正常交互</li>
+<li>[ ] Mock 数据格式与 api-contracts 完全一致（<code>Result&lt;T&gt;</code>/<code>PageResult&lt;T&gt;</code> 信封）</li>
+<li>[ ] Agent/Tester 自动验收通过</li>
+</ul>
+<h2>四、后端开发清单</h2>
+<div class="tablewrap"><table><thead><tr><th>序号</th><th>功能名称</th><th>依赖</th><th>对应接口</th><th>状态</th></tr></thead><tbody><tr><td>B00</td><td>基础设施（多模块骨架 + Result/异常 + 鉴权拦截器 + DB 连接）</td><td>无</td><td>GET /actuator/health</td><td>待开发</td></tr><tr><td>B01</td><td>单据编码组件（doc_no_sequence 取号，序列表+行锁）</td><td>B00 + doc_no_sequence 表已建</td><td>conventions S7（无独立 REST）</td><td>待开发</td></tr><tr><td>B02</td><td>结算基础配置（周期/白名单/审批流/系数/金额档）</td><td>B00</td><td>配置类接口（P12）</td><td>待开发</td></tr><tr><td>B03</td><td>服务商索赔单链</td><td>B00/B01</td><td>接口文档-服务商索赔单（9 接口）</td><td>待开发</td></tr><tr><td>B04</td><td>向欣旺达索赔单链</td><td>B03（业务审核触发生成）</td><td>接口文档-向欣旺达索赔单（7 接口+内部生成）</td><td>待开发</td></tr><tr><td>B05</td><td>结算链（服务商+闪欣结算、质保金账户）</td><td>B01/B02/B03/B04</td><td>接口文档-结算（20 接口，含定时作业 OP1）</td><td>待开发</td></tr><tr><td>B06</td><td>付款申请链（内建分级审批流）</td><td>B02/B05</td><td>接口文档-付款申请（9 接口）</td><td>待开发</td></tr></tbody></table></div>
+<h3>后端任务验收规则</h3>
+<ul>
+<li><strong>基础设施按企业多模块拓扑搭建</strong>（parent + common + starter + 域 sdk/service，脚手架见 <code>dev-standards/java/研发工程模块与SDK-Service拆分指南.md S7</code>，权威 <code>dev-standards/backend-java.md</code>）：禁止自建 pom / 响应包装 / 异常体系。</li>
+<li><strong>建表/改表由人执行、子智能体零 DDL</strong>：建表 SQL 是设计侧交付物（<code>docs/db-schema/ddl/</code>）；<code>doc_no_sequence</code> DDL 待研发组长审定并由人执行后，B01 编码组件方可开发。后端任务前置假设"目标表已由人建好"。</li>
+<li>基础设施任务由 Agent 自动连续执行，不触发用户门禁；验收：<code>$MVN -q verify</code> 通过（ArchUnit/Spotless/JaCoCo 门禁）、<code>/actuator/health</code> 返回 UP。</li>
+<li>业务任务必须在任务内完成真实联调验收（后端真实 API + 前端 <code>VITE_USE_MOCK=false</code> 切真实、页面核心操作可用、不展示 <code>[Mock]</code> 数据、Tester 能证明命中真实后端）。</li>
+<li>涉及外部服务（QMS/财务共享/OA/工单）的后端任务：本期一律走 Mock/内建适配层，标记 Mock 验收，不得宣称真实外部联调通过。Mock 必须可被同一适配接口的真实实现替换，不把外部地址/鉴权/正式枚举写死在业务层。</li>
+</ul>
+<h2>五、功能详情（开发时逐个展开）</h2>
+<blockquote><p>以下详情在开发阶段由 Developer 和 Tester 逐个展开和验收，权威规格见对应 LLD（<code>docs/detail-design/</code>）与接口契约（<code>docs/api-contracts/</code>）。</p></blockquote>
+<hr>
+<h2>六、开发顺序建议</h2>
+<blockquote><p>默认推荐节奏，实际开发以 Planner 产出的 <code>.sdd/tasks.md</code> 为准。</p></blockquote>
+<p><strong>阶段1：前端 MVP（Mock，用户先验收 UI/UX）</strong></p>
+<ol>
+<li>P01~P12 全部页面用 Mock 数据完成（Mock 格式对齐 api-contracts）</li>
+<li>验收（用户门禁）：布局/配色/交互与原型一致</li>
+</ol>
+<p><strong>阶段2：后端基础设施（自动连续执行，不触发用户门禁）</strong></p>
+<ol>
+<li>按拆分指南 S7 初始化多模块骨架 + 统一响应/异常（Result/BizException + i18n）+ DB 连接（不建表）+ 鉴权拦截器；B01 单据编码组件（依赖 doc_no_sequence 已建）</li>
+<li>验收（Agent 自动）：<code>$MVN -q verify</code> 通过、<code>/actuator/health</code> UP</li>
+</ol>
+<p><strong>阶段3：逐功能闭环开发（每个功能完成后触发用户门禁）</strong></p>
+<ol>
+<li>业务依赖顺序：结算基础配置 → 服务商索赔单 → 向欣旺达索赔单 → 结算链 → 付款申请链</li>
+<li>每个功能 = 后端真实 API + 前端 Mock 切真实 + 联调验收</li>
+<li>验收（用户门禁）：用户从前端页面操作验证功能可用</li>
+</ol>
+<p><strong>阶段4：E2E 回归测试</strong></p>
+<ol>
+<li>完整流程走通（新建索赔 → 初审 → 业务审核 →（向欣/判责）→ 结算 → 付款）</li>
+<li>验收（用户门禁）：全流程通过，无阻塞性 Bug</li>
+</ol></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script></body></html>

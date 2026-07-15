@@ -1,0 +1,257 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>PRD · 服务商索赔管理</title>
+<style>
+:root{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--cm:#6b7a90;--kw:#7aa2ff;--str:#e0a458;
+  --th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;
+  --ok:#1f9d55;--ok-soft:#e6f6ec;--warn:#b7791f;--warn-soft:#fdf3e2;--crit:#d64545;--crit-soft:#fbeaea;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}}
+:root[data-theme="dark"]{
+  --bg:#0a0d12;--surface:#12171f;--surface-2:#0f141b;--ink:#e7edf5;--muted:#94a1b2;--faint:#66707d;
+  --line:#212a37;--line-soft:#1a222d;--accent:#5b8bff;--accent-ink:#8fb0ff;--accent-soft:#152036;
+  --code-bg:#0c111a;--code-ink:#c9d4e5;--code-line:#1a2333;--th-bg:#1b2431;--th-ink:#e7edf5;--zebra:#0f141b;
+  --ok:#3fb950;--ok-soft:#122019;--warn:#d9a441;--warn-soft:#241d10;--crit:#f07a7a;--crit-soft:#241414;}
+:root[data-theme="light"]{
+  --bg:#f5f7fa;--surface:#fff;--surface-2:#fbfcfe;--ink:#12161c;--muted:#5b6673;--faint:#8a95a3;
+  --line:#e3e8ef;--line-soft:#eef1f6;--accent:#2f6bff;--accent-ink:#1d4fd0;--accent-soft:#eaf0ff;
+  --code-bg:#0f1420;--code-ink:#c9d4e5;--code-line:#1e2738;--th-bg:#101722;--th-ink:#e8eef7;--zebra:#f7f9fc;}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-size:15px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{font-weight:680;color:var(--ink)}
+.topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1080px;margin:0 auto;padding:13px 26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 9px}
+.topbar .nm{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.topbar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar a.tl{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px 9px;border:1px solid var(--line);border-radius:6px}
+.topbar a.tl:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.themebtn{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+.themebtn:hover{border-color:var(--accent);color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px 120px}
+h1{font-size:30px;font-weight:760;margin:30px 0 8px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:21px;font-weight:710;margin:40px 0 12px;padding-top:18px;border-top:1px solid var(--line);letter-spacing:-.005em}
+h3{font-size:16.5px;font-weight:680;margin:26px 0 9px}
+h4{font-size:13.5px;font-weight:680;margin:18px 0 7px;color:var(--muted);font-family:var(--mono)}
+p{margin:11px 0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:26px 0 12px}
+code{font-family:var(--mono);font-size:.85em;background:var(--accent-soft);color:var(--accent-ink);padding:1.5px 6px;border-radius:5px}
+blockquote{margin:15px 0;padding:11px 16px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;color:var(--muted);font-size:14px}
+blockquote p{margin:5px 0}blockquote strong{color:var(--ink)}
+ul,ol{margin:11px 0;padding-left:23px}li{margin:4px 0}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th{background:var(--th-bg);color:var(--th-ink);font-weight:600;text-align:left;padding:9px 13px;white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.02em;position:sticky;top:0}
+td{padding:8px 13px;border-top:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
+.note b{color:var(--ink)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+/* code walkthrough */
+.filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
+.filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.filecard .fh .tag{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px}
+.filecard .fh .tag.be{background:#8957e5}.filecard .fh .tag.fe{background:#1f9d55}.filecard .fh .tag.cfg{background:#b7791f}
+.filecard .fh .pth{font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+.filecard .role{padding:9px 15px;font-size:13px;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line-soft)}
+.filecard .role b{color:var(--accent-ink)}
+.codebox{background:var(--code-bg);overflow-x:auto;max-height:640px;overflow-y:auto}
+pre{margin:0;padding:14px 0}
+pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--code-ink);background:none;padding:0}
+.cl{display:block;counter-increment:l;padding:0 16px 0 0;white-space:pre}
+.cl::before{content:counter(l);display:inline-block;width:38px;padding-right:14px;margin-right:12px;text-align:right;color:#46536b;border-right:1px solid var(--code-line);user-select:none}
+.cl.cm{color:var(--cm)}
+/* tabs (xlsx sheets) */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 4px}
+.tab{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 13px;cursor:pointer}
+.tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sheet{display:none}.sheet.on{display:block}
+.sheet .meta{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:10px 0}
+.toc{display:flex;flex-direction:column;gap:2px;margin:12px 0 20px;font-family:var(--mono);font-size:12.5px}
+.toc a{color:var(--muted);padding:3px 0}.toc a:hover{color:var(--accent)}
+.doc-note{font-family:var(--mono);font-size:11px;color:var(--faint);margin:38px 0 0;padding-top:16px;border-top:1px dashed var(--line)}
+.p>*:first-child{margin-top:0}
+/* dashboard */
+.hero{padding:40px 0 8px}
+.hero .eb{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.hero h1{font-size:34px;margin:0 0 10px}
+.hero p{font-size:16px;color:var(--muted);max-width:60ch;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:26px 0}
+.stat{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:14px 16px}
+.stat .n{font-size:22px;font-weight:740;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .n.ok{color:var(--ok)}.stat .n.ac{color:var(--accent)}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px;margin:14px 0}
+.card{display:block;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 17px;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px)}
+.card .ct{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:5px;padding:2px 8px;display:inline-block}
+.card .ct.be{background:#8957e5}.card .ct.fe{background:#1f9d55}.card .ct.ui{background:#0e8a9c}.card .ct.doc{background:#b7791f}
+.card h3{margin:11px 0 5px;font-size:16px;color:var(--ink)}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.grouplabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:30px 0 4px}
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;background:var(--surface)}
+.shot .cap{display:flex;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.shot .cap .t{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#0e8a9c;border-radius:5px;padding:2px 8px}
+.shot .cap b{font-size:14px}.shot .cap span{font-size:12.5px;color:var(--muted)}
+.shot img{display:block;width:100%;height:auto}
+.protolist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin:12px 0}
+.protolist a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface)}
+.protolist a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+</style></head><body><div class="topbar"><div class="in">
+<span class="badge">服务商索赔管理</span><span class="nm">设计文档 / PRD · 服务商索赔管理</span>
+<div class="sp"><a class="tl" href="../../SDD-V8-使用手册.html" style="color:var(--accent);border-color:var(--accent)">← 使用手册</a><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
+</div></div><main class="wrap"><h1>PRD · 服务商索赔管理</h1><div class="p"><h1>服务商索赔管理模块 · PRD</h1>
+<blockquote><p>版本：V1.0（阶段 C 定稿 · 待 feature-signoff 冻结统一版本号）</p>
+<p>来源：外部 PRD V1.0（吴娟 2026-04-05）+ 业务流程图，经 A0 稳定审读（门禁 PASS）与 40 条决策逐条确认后派生。</p>
+<p>权威决策源：<code>docs/decisions/待确认决策表.xlsx</code>（已确认）/ <code>.sdd/decision-registry.json</code>。文末「决策落地登记」逐条映射。</p>
+<p>技术栈：后端 JDK17 / Spring Boot 3 / MyBatis-Plus / MySQL8；前端 React+TS+Vite / Ant Design（桌面 Web 后台）。</p></blockquote>
+<hr>
+<h2>1. 背景与目标</h2>
+<p>规范售后服务系统中<strong>服务商保内维修索赔</strong>全流程：索赔申请 → 多级审核 → 责任判定 → 服务商结算 → 向上游欣旺达索赔与结算 → 付款申请。解决线下流程不透明、权责不清、结算效率低、超范围索赔等问题，实现全链路数字化、合规可追溯。</p>
+<p><strong>业务目标</strong>：合规管控（仅保内工单可索赔、杜绝超范围/超权限）、数据可溯（全流程留痕）、权责清晰（按备件来源拆分处理）、上下游协同（打通向欣旺达索赔链路）。</p>
+<p><strong>依赖既有模块</strong>：维修工单管理（工单基础/状态/维修项目/工时/备件/主责件/系数）、用户与权限管理（RBAC）、服务商管理（服务商基础/区域）。<strong>外部对接</strong>见 S11 与 <code>docs/external-interfaces/待料清单.md</code>。</p>
+<hr>
+<h2>2. 角色与权限模型（RBAC）</h2>
+<div class="tablewrap"><table><thead><tr><th>角色</th><th>职责</th><th>数据范围</th></tr></thead><tbody><tr><td>服务商售后专员</td><td>发起/编辑/提交/查看本店索赔单、结算对账、开票、上传发票</td><td>仅本服务商数据</td></tr><tr><td>区域负责人</td><td>所辖区域索赔单区域初审、录入索赔对象/项目编码</td><td>仅所辖区域</td></tr><tr><td>闪欣动力索赔专员</td><td>业务审核、生成/提交向欣旺达索赔单、结算确认、付款申请</td><td>全国全量</td></tr><tr><td>质量部责任判定专员</td><td>外采件责任判定</td><td>仅【待责任判定】外采件</td></tr><tr><td>欣旺达索赔专员</td><td>闪欣索赔单审批、闪欣结算确认/付款</td><td>全量闪欣索赔单（本期在本系统内建角色操作，见 EXT-02）</td></tr><tr><td>财务人员（闪欣）</td><td>付款审批链节点、质保金扣减、录付款凭证</td><td>按审批节点</td></tr><tr><td>索赔业务管理员</td><td>结算基础配置（周期/开票权限/审批流/索赔系数/付款金额档位）</td><td>全局配置</td></tr></tbody></table></div>
+<p>权限管控三层：前端按角色渲染菜单/按钮；后端接口鉴权（401/403）+ 数据行级权限过滤；数据权限按角色+所属机构/区域过滤。</p>
+<hr>
+<h2>3. 页面清单与跳转</h2>
+<div class="tablewrap"><table><thead><tr><th>编号</th><th>页面</th><th>类型</th><th>可见角色</th><th>入口</th></tr></thead><tbody><tr><td>P01</td><td>服务商索赔单列表页</td><td>列表</td><td>服务商/区域/索赔专员/质量部</td><td>菜单</td></tr><tr><td>P02</td><td>服务商索赔单 新建/编辑/详情页</td><td>表单/详情</td><td>同上（按状态与角色）</td><td>P01</td></tr><tr><td>P03</td><td>闪欣向欣旺达索赔单 列表页</td><td>列表</td><td>索赔专员/欣旺达</td><td>菜单</td></tr><tr><td>P04</td><td>闪欣索赔单 新建/编辑/详情页</td><td>表单/详情</td><td>索赔专员/欣旺达</td><td>P03</td></tr><tr><td>P05</td><td>服务商索赔结算单 列表页</td><td>列表</td><td>服务商/索赔专员</td><td>菜单</td></tr><tr><td>P06</td><td>服务商索赔结算单 详情页</td><td>详情</td><td>服务商/索赔专员</td><td>P05</td></tr><tr><td>P07</td><td>闪欣索赔结算单 列表页</td><td>列表</td><td>索赔专员/欣旺达</td><td>菜单</td></tr><tr><td>P08</td><td>闪欣索赔结算单 详情页</td><td>详情</td><td>索赔专员/欣旺达</td><td>P07</td></tr><tr><td>P09</td><td>付款申请单 列表页</td><td>列表</td><td>索赔专员/审批人</td><td>菜单</td></tr><tr><td>P10</td><td>付款申请单 新建/编辑/详情页</td><td>表单/详情</td><td>索赔专员/审批人</td><td>P09、P06 申请付款</td></tr><tr><td>P11</td><td>结算基础配置页</td><td>配置</td><td>索赔业务管理员</td><td>菜单</td></tr><tr><td>—</td><td>审核弹窗 / 审批弹窗 / 导出弹窗 / 判责录入弹窗 / 发票上传弹窗</td><td>弹窗</td><td>按操作</td><td>各列表/详情</td></tr></tbody></table></div>
+<p><strong>关键跳转</strong>：列表→详情（点编号/查看）；列表→新建/编辑（按状态+角色）；结算详情「申请付款」→付款单新建；付款/结算详情「返回」→对应列表。</p>
+<hr>
+<h2>4. 功能定义（按模块）</h2>
+<blockquote><p>每条功能标注「用户可感知完成标准」。功能编号 <code>F-&lt;模块&gt;-&lt;序&gt;</code>。决策已落地。</p></blockquote>
+<h3>4.1 服务商索赔单管理（P01/P02）</h3>
+<div class="tablewrap"><table><thead><tr><th>编号</th><th>功能</th><th>说明（含决策落地）</th><th>完成标准</th></tr></thead><tbody><tr><td>F-CLAIM-01</td><td>新建索赔</td><td>仅关联状态【已完工】且维修方案已过技术审核的<strong>保内</strong>维修工单【A-8】；自动带出工单基础信息、维修项目、工时标准、备件明细（备件索赔金额=0、备件管理费）、其它费用、维修类型/SN/条码（只读带入）【A-10】、主责件；索赔类型由工单业务类型带出只读【A-9】；可暂存草稿</td><td>保存后生成草稿单、带出费用明细</td></tr><tr><td>F-CLAIM-02</td><td>提交索赔</td><td>提交时<strong>维修凭证附件必填</strong>（原始 PRD S4.1.1，硬校验）、旧件资料附件选填；校验备件是否需回运，需回运的必须先发起回运（在途即可提交）【A-11】；提交进入区域初审</td><td>状态→待区域初审</td></tr><tr><td>F-CLAIM-03</td><td>编辑</td><td>仅草稿/已驳回可编辑；工时费、备件管理费不可改，<strong>其它费用明细（物流费等）可人工编辑</strong>，合计随明细计算【A-7】</td><td>保存生效、可重新提交</td></tr><tr><td>F-CLAIM-04</td><td>作废</td><td>仅草稿可作废</td><td>状态→已作废</td></tr><tr><td>F-CLAIM-05</td><td>查看</td><td>全状态可查看；含全流程审核记录、附件、操作日志、责任判定</td><td>—</td></tr><tr><td>F-CLAIM-06</td><td>区域初审</td><td>区域负责人核查工单真实性/资料完整性；录入索赔对象（是否欣旺达）、欣旺达时必填项目编码；含 SN 自动预判责任（可覆盖，非终判）【A-26】；汽车电子自由填报工时在此把关可驳回【A-14】</td><td>通过→待总部审核</td></tr><tr><td>F-CLAIM-07</td><td>业务审核</td><td>索赔专员复核；通过后按<strong>主责件归属唯一决定流向</strong>【A-6】分支：欣旺达件→逐单自动生成向欣旺达索赔单【A-36】+进待结算；外采件→进【待责任判定】【A-12】</td><td>通过→待责任判定/待结算</td></tr><tr><td>F-CLAIM-08</td><td>责任判定</td><td>质量部对外采件判定；结果三项：供应商责任/服务商责任/内部责任【A-27】，录责任说明+承担比例；服务商责任→自动生成索赔抵扣单；供应商责任→触发供应商索赔流程；内部责任→记录比例/费用内部转嫁</td><td>判责完成→待结算</td></tr><tr><td>F-CLAIM-09</td><td>搜索/导出</td><td>多维筛选（编号/工单/类型/服务商/区域/时间/状态）；按筛选导出</td><td>—</td></tr><tr><td>F-CLAIM-10</td><td>批量审核</td><td>区域/索赔专员勾选批量审核（部分成功部分失败）</td><td>返回成功/失败明细</td></tr></tbody></table></div>
+<h3>4.2 闪欣向欣旺达索赔单管理（P03/P04）</h3>
+<div class="tablewrap"><table><thead><tr><th>编号</th><th>功能</th><th>说明</th><th>完成标准</th></tr></thead><tbody><tr><td>F-XW-01</td><td>生成</td><td>服务商索赔业务审核通过（欣旺达件）后<strong>逐单自动生成</strong>（非汇总），明细同服务商索赔单；专员补附件后提交【A-36】；金额=服务商对应金额，不再乘系数【A-37】</td><td>生成草稿单</td></tr><tr><td>F-XW-02</td><td>提交/审批</td><td>提交触发欣旺达审批（通过/驳回/拒绝/部分通过）；<strong>部分通过</strong>→进待结算并按核准金额调整、记录核减明细【A-40】</td><td>通过/部分通过→待结算</td></tr><tr><td>F-XW-03</td><td>查看/导出</td><td>全量明细、关联服务商索赔单、状态流转、审批记录；批量导出</td><td>—</td></tr></tbody></table></div>
+<h3>4.3 结算管理（服务商结算 P05/P06 + 闪欣结算 P07/P08）</h3>
+<div class="tablewrap"><table><thead><tr><th>编号</th><th>功能</th><th>说明</th><th>完成标准</th></tr></thead><tbody><tr><td>F-SET-01</td><td>自动生成结算单</td><td>定时（默认每月1日0点）按服务商维度汇总审核通过未结算索赔单，生成唯一结算单；支持手动提前结算；结算归属以<strong>闪欣内部审批通过时间</strong>为准；<strong>应付=0 不生成，索赔单直接 0 元核销置已结算</strong>【A-34】</td><td>生成待确认结算单</td></tr><tr><td>F-SET-02</td><td>结算确认/对账</td><td>索赔专员核对可增删索赔单据→确认结算推送对账；收款方对账确认</td><td>待确认→待对账→(对账)→分支</td></tr><tr><td>F-SET-03</td><td>正数结算-开票</td><td>对账后校验<strong>开票权限（白名单）</strong>【A-32】；有权限→待开票→服务商开票上传发票→待核验；无权限→停留待开票+标记挂起</td><td>发票上传→待核验</td></tr><tr><td>F-SET-04</td><td>发票核验/申请付款</td><td>闪欣发票确认→<strong>（闪欣侧）人工申请付款</strong>生成付款单进审批【A-28】</td><td>已核验→（付款）已结算</td></tr><tr><td>F-SET-05</td><td>负数结算-强制结算</td><td>负数对账后<strong>关闭开票权限</strong>、进【待强制结算】中间态【A-33】；索赔专员发起强制结算→财务扣质保金</td><td>待强制结算→已结算</td></tr><tr><td>F-SET-06</td><td>闪欣结算（欣旺达→闪欣）</td><td>统一生成一张结算单不拆分开票，内部分账交财务共享/OA【A-35】；欣旺达确认结算自动发起付款推财务共享（本期 Mock）【A-18】</td><td>已结算</td></tr><tr><td>F-SET-07</td><td>查询/导出</td><td>多维筛选、明细导出</td><td>—</td></tr></tbody></table></div>
+<h3>4.4 付款申请单管理（P09/P10）</h3>
+<div class="tablewrap"><table><thead><tr><th>编号</th><th>功能</th><th>说明</th><th>完成标准</th></tr></thead><tbody><tr><td>F-PAY-01</td><td>生成/新建</td><td>系统按结算单自动生成付款申请草稿（带出收款信息），人工补充/确认后提交【A-23】；基础信息由结算单带出只读</td><td>生成待提交单</td></tr><tr><td>F-PAY-02</td><td>提交/分级审批</td><td>提交按金额自动匹配审批链：&lt;5万 / 5万≤x&lt;20万 / ≥20万 三档【A-24】，档位与链路可在配置中维护；闪欣侧为<strong>本系统内建审批流</strong>【A-17】</td><td>待提交→审批中→审批通过</td></tr><tr><td>F-PAY-03</td><td>审批/驳回</td><td>审批人逐节点处理；任意节点驳回→退回待提交，修改后重提</td><td>—</td></tr><tr><td>F-PAY-04</td><td>付款/作废</td><td>审批通过后线下付款、录凭证→已付款；待提交可作废（<strong>已作废</strong>为终态）【A-25】</td><td>已付款/已作废</td></tr><tr><td>F-PAY-05</td><td>查询/导出/批量审核</td><td>多维筛选、导出、批量审核</td><td>—</td></tr></tbody></table></div>
+<h3>4.5 结算基础配置（P11）</h3>
+<div class="tablewrap"><table><thead><tr><th>编号</th><th>功能</th><th>说明</th></tr></thead><tbody><tr><td>F-CFG-01</td><td>结算周期配置</td><td>变更仅对下一周期/新单生效，进行中与历史不回溯【A-16】</td></tr><tr><td>F-CFG-02</td><td>服务商开票权限（白名单）配置</td><td>白名单=开票权限；中途取消对在开票中的处理按 A-16 不回溯【A-32】</td></tr><tr><td>F-CFG-03</td><td>付款审批流配置</td><td>维护三档金额线与各档审批链【A-24】</td></tr><tr><td>F-CFG-04</td><td>服务商索赔系数配置</td><td>按服务商维度配置；新建索赔取发起时点值快照存单，不影响历史【A-2】</td></tr></tbody></table></div>
+<hr>
+<h2>5. 版本规划（Mission / Persona / MVP）</h2>
+<p><strong>Mission</strong>：让服务商保内索赔从线下走向全链路线上化、合规可溯、上下游协同结算。</p>
+<p><strong>Persona</strong>：服务商售后专员（高频发起）、闪欣索赔专员（枢纽审核+结算）、质量部/财务（判责+付款）。</p>
+<p><strong>V1 / MVP</strong>（本期）：服务商索赔单全流程（新建→区域初审→业务审核→责任判定）、向欣旺达索赔（内建欣旺达角色）、服务商正/负数结算、闪欣结算、付款申请（内建审批流）、结算基础配置。外部系统 QMS/财务共享/OA 走 <strong>Mock/内建/待挂载</strong>。</p>
+<p><strong>V2+</strong>：QMS 判责真实对接（EXT-01）、财务共享系统付款对接（EXT-03）、OA 三级组织同步与自动分账（EXT-04）、里程地图自动计算与限次规则、美元/汇率支持（本期禁用）【A-29】、供应商索赔子流程完整化（PRD 标注「9月」项）。</p>
+<hr>
+<h2>6. 核心业务流程（决策落地版）</h2>
+<h3>6.1 服务商保内维修索赔全流程</h3>
+<p><code>工单已完工 → 新建索赔(带费用) → [需回运则先发起回运] → 提交 → 区域初审(录索赔对象/项目编码/SN预判) → 业务审核 →</code></p>
+<ul>
+<li><strong>主责件=欣旺达件</strong>：逐单自动生成向欣旺达索赔单 + 进服务商结算【A-6/A-36】</li>
+<li><strong>主责件=外采件</strong>：进【待责任判定】→ 质量判责(供应商/服务商/内部) → 进服务商结算</li>
+<li>驳回：一律退回服务商（已驳回），重提从区域初审从头【A-13】；拒绝：终止（已拒绝）</li>
+</ul>
+<h3>6.2 向欣旺达索赔触发流程</h3>
+<p><code>业务审核通过(欣旺达件) → 逐单自动生成闪欣索赔单 → 专员补附件提交 → 欣旺达审批 → [部分通过按核准金额调整] → 待结算</code>【A-36/A-40】。QMS 判责本期 Mock【A-20】。</p>
+<h3>6.3 正数结算流程</h3>
+<p><code>定时/手动生成结算单 → 索赔专员确认结算 → 服务商对账确认 → [校验白名单] → 待开票 → 服务商开票上传发票 → 待核验 → 闪欣发票确认 → 闪欣侧人工申请付款 → 付款单分级审批 → 线下付款录凭证 → 已结算</code>【A-28/A-32】。</p>
+<h3>6.4 负数结算流程</h3>
+<p><code>生成负数结算单 → 确认→对账确认 → [关闭开票权限] → 待强制结算 → 索赔专员发起强制结算 → 财务从质保金账户扣减|金额|(不足扣全部+差额挂账结转) → 录扣减凭证 → 已结算</code>【A-31/A-33】。</p>
+<h3>6.5 欣旺达→闪欣结算流程</h3>
+<p><code>自动汇总生成一张结算单(不拆分开票) → 欣旺达确认→推闪欣对账 → 闪欣对账确认待开票 → 闪欣开票上传发票 → 欣旺达发票确认 → 自动发起付款推财务共享(本期Mock) → 回传更新已结算</code>；内部费用归属交财务共享/OA 自动分账【A-35/A-18/A-19】。</p>
+<hr>
+<h2>7. 状态机（权威，决策落地）</h2>
+<p><strong>服务商索赔单</strong>：<code>草稿 → 待区域初审 → 待总部审核 →（外采件）待责任判定 → 待结算 → 已结算</code>；旁支 <code>已驳回</code>（可编辑重提回待区域初审）、<code>已拒绝</code>(终)、<code>已作废</code>(终，仅草稿)。【新增 待责任判定 · A-12】</p>
+<p><strong>闪欣索赔单</strong>：<code>草稿 → 待审核 →（部分通过按核准金额）待结算 → 已结算</code>；<code>已驳回</code>(可重提)、<code>已拒绝</code>(终)、<code>已作废</code>(终)。</p>
+<p><strong>结算单</strong>：<code>待确认 → 待对账 →</code> 正数<code>待开票 → 待核验 → 已核验 → 已结算</code>｜负数<code>待强制结算 → 已结算</code>；<code>已作废</code>(终，仅待确认)。【新增 待强制结算 · A-33；"账单挂起"=待开票下的挂起标记，非独立状态 · A-32】</p>
+<p><strong>付款申请单</strong>：<code>待提交 → 审批中 → 审批通过 → 已付款</code>；<code>审批驳回</code>(退回待提交重提)、<code>已作废</code>(终，仅待提交)。【补 已作废 · A-25】</p>
+<blockquote><p>术语归一：「已关闭」=「已拒绝」【A-15】；「待审批」泛指待区域初审+待总部审核，「审核驳回」=已驳回【A-4】；「白名单」=开票权限配置【A-32】。</p></blockquote>
+<hr>
+<h2>8. 关键业务规则</h2>
+<ol>
+<li><strong>索赔准入</strong>：仅【已完工】保内维修工单可索赔【A-8】；同一工单仅允许 1 张状态非【已拒绝/已作废】的索赔单，已拒绝/已作废后可重新发起【A-15】。</li>
+<li><strong>费用</strong>：索赔单显示工时费/备件管理费/其它费用，不显示备件费；备件管理费=备件销售价×服务商索赔系数（系数按服务商配置、取发起时点快照）【A-2】；工时费&gt;0 必有，其它费用≥0 可编辑物流费明细【A-1/A-7】；备件索赔金额=0。</li>
+<li><strong>备件来源分支</strong>：按主责件归属唯一决定整单流向【A-6】。欣旺达件→无需判责、纳入向欣旺达索赔；外采件→必经质量判责，仅工时费+其它费用纳入向欣旺达，备件费走供应商索赔【A-37】。</li>
+<li><strong>责任判定</strong>：三项（供应商/服务商/内部）【A-27】；SN 自动预判可覆盖、非终判【A-26】；QMS 判责本期 Mock【A-20】。</li>
+<li><strong>旧件回运</strong>：目的地按备件属性默认+服务商可改；售后仓点确认+回运单附件即视为已发起（在途即可提交、签收不卡结算），闪欣仓支持扫码【A-11】。</li>
+<li><strong>工单/维修分类</strong>：一级=乘用车/商用车/储能/汽车电子/其他【A-38】；三电二级=电池包/电机/电控；条件必填：电池包 SN24 位、汽车电子旧件条码（Excel 批量）、整车 VIN17 位（内部场景豁免）【A-39】；汽车电子无标准工时自由填报、区域初审把关【A-14】。</li>
+<li><strong>结算生成</strong>：定时按服务商维度生成唯一结算单，归属以闪欣审批通过时间为准；应付=符合条件索赔应付−责任抵扣金额；<strong>抵扣金额=服务商责任对应索赔金额×责任承担比例</strong>，按闪欣审批通过时间归入同周期【A-30】；应付=0 不生成、索赔单 0 元核销【A-34】。</li>
+<li><strong>正负结算差异</strong>：&gt;0 走开票付款；&lt;0 关闭开票权限、走待强制结算+质保金扣减【A-33】；强制结算仅负数可用。</li>
+<li><strong>质保金账户</strong>：本模块新建服务商质保金账户实体（余额/流水/归属），扣减在本系统完成留痕；余额不足扣全部+差额挂账结转【A-31】。</li>
+<li><strong>欣旺达结算拆分</strong>：统一一张不拆分开票，内部分账交财务共享/OA【A-35】。</li>
+<li><strong>付款审批分级</strong>：三档金额线正式采用、可配【A-24】；闪欣侧内建审批流【A-17】。</li>
+<li><strong>配置生效</strong>：配置变更仅对下一周期/新单生效，不回溯【A-16】。</li>
+</ol>
+<hr>
+<h2>9. 金额计算逻辑</h2>
+<ul>
+<li>服务商索赔单：<code>申请总金额 = 工时费合计 + 其它费用合计 + 备件管理费</code>；工时费合计=维修项目工时费累加；备件管理费=Σ(备件销售价×服务商索赔系数)。</li>
+<li>闪欣索赔单：<code>= 欣旺达备件索赔金额合计(=对应服务商索赔单总额，不再乘系数) + 外采备件合规索赔金额合计(=工时费+其它费用)</code>【A-37】。</li>
+<li>结算单：<code>应付总金额 = 审核通过索赔单应付 − 责任抵扣金额</code>；抵扣金额=服务商责任索赔金额×承担比例【A-30】；&gt;0 正数、&lt;0 负数、=0 不生成【A-34】。</li>
+<li>币种：本期仅人民币，美元禁用【A-29】。</li>
+</ul>
+<hr>
+<h2>10. 数据契约（A5-1 业务数据）</h2>
+<blockquote><p>字段以原 S4/S5 为底，按决策统一。完整字段表见 S4 与阶段 D 详细设计/表结构文档。此处锁枚举与关键契约。</p></blockquote>
+<p><strong>统一枚举</strong>：</p>
+<ul>
+<li>索赔单状态：草稿/待区域初审/待总部审核/<strong>待责任判定</strong>/待结算/已驳回/已拒绝/已结算/已作废</li>
+<li>索赔类型：保内维修/服务活动/内部服务/特殊工单【A-3】（由工单业务类型带出只读，映射字典待工单模块契约【A-9/A-21】）</li>
+<li>责任判定结果：供应商责任/服务商责任/内部责任【A-27】</li>
+<li>闪欣索赔单状态：草稿/待审核/待结算/已驳回/已拒绝/已结算/已作废；审核结果含 部分通过【A-40】</li>
+<li>结算单状态：待确认/待对账/待开票/待核验/已核验/<strong>待强制结算</strong>/已结算/已作废</li>
+<li>付款申请单状态：待提交/审批中/审批通过/审批驳回/已付款/<strong>已作废</strong>【A-25】</li>
+<li>结算类型：服务商结算/闪欣动力结算；费用归属：欣旺达/闪欣动力/内部部门；币种：人民币（美元禁用）</li>
+</ul>
+<p><strong>编码规则</strong>：服务商索赔单 SPCO-8位年月日-4位流水；闪欣索赔单 SXCO-…；结算单 SPJS-…；付款申请单 JSFK-…；均全局唯一。</p>
+<p><strong>新增实体</strong>（阶段 D 落表）：服务商质保金账户（余额/流水/归属）【A-31】、索赔抵扣单、工单业务类型→索赔类型映射字典、服务商索赔系数配置。</p>
+<h3>A5-2 接口响应格式契约</h3>
+<p>统一 <code>Result&lt;T&gt;</code>：<code>{success, code, message, data, traceId}</code>；分页 <code>PageResult</code>：<code>{list,total,pageNo,pageSize,totalPages}</code>；HTTP 统一 200，业务码区分；仅 400/401/403/429/500 用真实 HTTP 码。（权威源 <code>dev-standards/java/接口设计与文档规范指南.md</code>）</p>
+<hr>
+<h2>11. 外部依赖与配置草稿（A5-3，待用户确认）</h2>
+<div class="tablewrap"><table><thead><tr><th>依赖</th><th>用途</th><th>本期策略</th><th>状态</th></tr></thead><tbody><tr><td>QMS 判责系统</td><td>推送索赔单/回传判责结果</td><td>Mock（人工录）+索取契约</td><td>待挂载【A-20】</td></tr><tr><td>欣旺达售后系统</td><td>索赔推送/审批/对账</td><td>本系统内建欣旺达角色</td><td>内建【A-22】</td></tr><tr><td>财务共享系统（欣旺达侧）</td><td>付款/回传/分账</td><td>Mock（人工回填）</td><td>待挂载【A-18】</td></tr><tr><td>OA 系统</td><td>内部转嫁/三级组织分账</td><td>仅本系统记录</td><td>待挂载【A-19】</td></tr><tr><td>闪欣财务系统</td><td>付款审批</td><td>本系统内建审批流</td><td>内建【A-17】</td></tr><tr><td>维修工单管理模块</td><td>取数（状态/工时/备件/主责件/系数…）</td><td>登记取数字段契约清单</td><td>待挂载【A-21】</td></tr><tr><td>附件存储</td><td>维修凭证/旧件照片/发票/回运单上传</td><td><strong>本期本地磁盘/服务器存储</strong>（存储路径配置化，后续可迁 OSS/S3）</td><td>已定（本地）</td></tr></tbody></table></div>
+<p>详见 <code>docs/external-interfaces/待料清单.md</code>。附件存储本期本地化：文件落服务器磁盘、DB 存相对路径，抽象存储层便于 V2 迁对象存储。</p>
+<hr>
+<h2>12. 异常处理与容错（承接原 S10）</h2>
+<p>前端：网络异常保留表单可重试；表单预校验聚焦错误项；并发操作提示刷新；无权限拦截。</p>
+<p>后端：token 鉴权 401/403；核心单据乐观锁（版本号）+分布式锁；核心操作事务回滚；业务规则二次校验；异常日志留痕不泄敏。</p>
+<p>批量/文件：大数据异步导出+进度；附件校验格式大小、大文件分片续传；批量操作部分成功部分失败返回明细。</p>
+<hr>
+<h2>13. 决策落地登记（40 条 → PRD 章节）</h2>
+<div class="tablewrap"><table><thead><tr><th>决策</th><th>落地章节</th><th>决策</th><th>落地章节</th></tr></thead><tbody><tr><td>A-1 其它费用≥0</td><td>S8.2/S9</td><td>A-21 工单取数契约</td><td>S11/EXT-06</td></tr><tr><td>A-2 索赔系数按服务商快照</td><td>S4.5/S8.2</td><td>A-22 欣旺达内建角色</td><td>S2/S11</td></tr><tr><td>A-3 索赔类型统一</td><td>S10</td><td>A-23 付款单自动生成</td><td>S4.4 F-PAY-01</td></tr><tr><td>A-4 待审批/审核驳回术语</td><td>S7</td><td>A-24 付款分级三档</td><td>S4.4/S8.11</td></tr><tr><td>A-5 里程不限次+截图</td><td>S5(V2补)</td><td>A-25 付款已作废态</td><td>S7/S10</td></tr><tr><td>A-6 主责件唯一决定流向</td><td>S6.1/S8.3</td><td>A-26 SN 预判可覆盖</td><td>S4.1 F-CLAIM-06</td></tr><tr><td>A-7 其它费用可编辑物流费</td><td>S4.1 F-CLAIM-03</td><td>A-27 责任判定三项</td><td>S10/S8.4</td></tr><tr><td>A-8 准入=已完工</td><td>S8.1</td><td>A-28 发票确认后人工申请付款</td><td>S6.3</td></tr><tr><td>A-9 索赔类型工单带出</td><td>S4.1/S10</td><td>A-29 仅人民币</td><td>S9</td></tr><tr><td>A-10 维修/SN 只读带入</td><td>S4.1 F-CLAIM-01</td><td>A-30 抵扣=金额×比例</td><td>S9</td></tr><tr><td>A-11 回运目的地/确认</td><td>S8.5</td><td>A-31 质保金账户实体</td><td>S8.9/S10</td></tr><tr><td>A-12 新增待责任判定态</td><td>S7</td><td>A-32 白名单=开票权限</td><td>S8/S4.5</td></tr><tr><td>A-13 驳回退回服务商</td><td>S6.1</td><td>A-33 待强制结算态</td><td>S7/S6.4</td></tr><tr><td>A-14 汽车电子并入区域初审</td><td>S4.1 F-CLAIM-06</td><td>A-34 应付=0 零元核销</td><td>S8.7</td></tr><tr><td>A-15 已关闭=已拒绝</td><td>S7/S8.1</td><td>A-35 欣旺达结算一张不拆</td><td>S6.5/S8.10</td></tr><tr><td>A-16 配置不回溯</td><td>S4.5/S8.12</td><td>A-36 向欣旺达逐单自动</td><td>S4.2/S6.2</td></tr><tr><td>A-17 闪欣付款内建审批</td><td>S4.4/S11</td><td>A-37 闪欣金额不再乘系数</td><td>S9</td></tr><tr><td>A-18 财务共享 Mock</td><td>S11/EXT-03</td><td>A-38 一级分类五类</td><td>S8.6</td></tr><tr><td>A-19 OA 待挂载</td><td>S11/EXT-04</td><td>A-39 整车 VIN 条件必填</td><td>S8.6</td></tr><tr><td>A-20 QMS Mock</td><td>S11/EXT-01</td><td>A-40 部分通过核准金额</td><td>S4.2/S6.2</td></tr></tbody></table></div>
+<hr>
+<h2>14. 路线图（终版）</h2>
+<div class="tablewrap"><table><thead><tr><th>版本</th><th>范围</th><th>说明</th></tr></thead><tbody><tr><td><strong>V1 / MVP（本期）</strong></td><td>服务商索赔单全流程（新建→区域初审→业务审核→责任判定）、向欣旺达索赔（内建欣旺达角色）、服务商正/负数结算、闪欣结算、付款申请（内建分级审批流）、结算基础配置、质保金账户、附件本地存储</td><td>外部系统 QMS/财务共享/OA 走 Mock/内建/待挂载；仅人民币</td></tr><tr><td><strong>V1.1</strong></td><td>QMS 判责真实对接（EXT-01）、工单模块取数契约固化（EXT-06）</td><td>判责自动化</td></tr><tr><td><strong>V1.2</strong></td><td>财务共享系统付款对接（EXT-03）、OA 三级组织同步与自动分账（EXT-04）</td><td>跨系统付款/分账</td></tr><tr><td><strong>V2+</strong></td><td>里程地图自动计算与限次、美元/汇率、供应商索赔子流程完整化（PRD「9月」项）、欣旺达售后系统间实时对接（替代内建角色）</td><td>—</td></tr></tbody></table></div>
+<h2>15. 技术架构蓝图</h2>
+<p><strong>技术选型</strong>：后端 JDK 17 + Spring Boot 3 + MyBatis-Plus + Maven；数据库 MySQL 8；前端 React + TypeScript + Vite + Ant Design（桌面 Web 后台）；鉴权 RBAC（用户-角色-权限三级）；附件本地磁盘存储（抽象存储层，路径配置化，DB 存相对路径，V2 可迁 OSS/S3）。</p>
+<p><strong>分层</strong>：<code>Controller（REST，统一 Result/PageResult，接口鉴权+数据范围过滤）→ Service（业务编排、状态机流转、金额计算、事务）→ Mapper（MyBatis-Plus）→ MySQL</code>。核心单据（索赔单/结算单/付款单）用乐观锁（version 版本号）+ 核心操作分布式锁；提交/审核/结算/付款等走数据库事务，异常回滚。</p>
+<p><strong>部署</strong>：单体应用（前后端分离部署）；MySQL 8 主库；定时任务（结算单自动生成，默认每月 1 日 0 点）用 Spring 调度/XXL-Job 之一（研发侧定）。</p>
+<p><strong>与外部系统边界（本期）</strong>：QMS/财务共享=Mock 适配层（人工录入/回填，接口就位后替换实现，不改上层）；欣旺达售后=本系统内建角色（不走跨系统接口）；OA=仅本系统记录转嫁单；工单模块=取数依赖（读既有库/接口，契约见 external-interfaces）。</p>
+<h2>16. 原型说明</h2>
+<p>原型形态：HTML（SDD 模式 A），位于 <code>docs/prototypes/</code>，<code>index.html</code> 为总览。界面对应：</p>
+<div class="tablewrap"><table><thead><tr><th>PRD 页面</th><th>原型文件</th></tr></thead><tbody><tr><td>P01 服务商索赔单列表</td><td><code>pages/01-服务商索赔单列表.html</code></td></tr><tr><td>P02 服务商索赔单详情/表单（+判责弹窗）</td><td><code>pages/02-服务商索赔单详情.html</code></td></tr><tr><td>P03 向欣旺达索赔单列表</td><td><code>pages/03-向欣旺达索赔单列表.html</code></td></tr><tr><td>P04 闪欣索赔单详情（+审核/部分通过弹窗）</td><td><code>pages/04-闪欣索赔单详情.html</code></td></tr><tr><td>P05 服务商结算单列表</td><td><code>pages/05-服务商结算单列表.html</code></td></tr><tr><td>P06 服务商结算单详情</td><td><code>pages/06-服务商结算单详情.html</code></td></tr><tr><td>P07 闪欣结算单列表</td><td><code>pages/07-闪欣结算单列表.html</code></td></tr><tr><td>P08 闪欣结算单详情</td><td><code>pages/08-闪欣结算单详情.html</code></td></tr><tr><td>P09 付款申请单列表</td><td><code>pages/09-付款申请单列表.html</code></td></tr><tr><td>P10 付款申请单详情（审批时间线）</td><td><code>pages/10-付款申请单详情.html</code></td></tr><tr><td>P10 付款申请单新建/编辑</td><td><code>pages/11-付款申请单新建.html</code></td></tr><tr><td>P11 结算基础配置</td><td><code>pages/12-结算基础配置.html</code></td></tr></tbody></table></div>
+<p>设计系统 token 见 <code>docs/prototypes/design-system/DESIGN.md</code> 与 <code>assets/style.css</code>。原型仅设计验证，字段/状态真相以本 PRD S7/S10 为准。</p>
+<h2>17. 核心流程图</h2>
+<h3>17.1 服务商索赔全流程（状态机）</h3>
+<div class="codebox"><pre><code><span class="cl">flowchart TD</span><span class="cl">  ST([新建]) --&gt; A[草稿]</span><span class="cl">  A --&gt;|提交·已回运| B[待区域初审]</span><span class="cl">  A --&gt;|作废| Z1([已作废])</span><span class="cl">  B --&gt;|初审通过| C[待总部审核]</span><span class="cl">  B --&gt;|驳回| R[已驳回]</span><span class="cl">  B --&gt;|拒绝| Z2([已拒绝])</span><span class="cl">  C --&gt;|审核通过·欣旺达件| D[待结算]</span><span class="cl">  C --&gt;|审核通过·外采件| E[待责任判定]</span><span class="cl">  C --&gt;|驳回| R</span><span class="cl">  C --&gt;|拒绝| Z2</span><span class="cl">  E --&gt;|判责完成| D</span><span class="cl">  R --&gt;|编辑重提·从头| B</span><span class="cl">  D --&gt;|结算完成| F([已结算])</span><span class="cl">  C -.欣旺达件.-&gt; G[[逐单自动生成向欣旺达索赔单]]</span><span class="cl">  E -.服务商责任.-&gt; H[[自动生成索赔抵扣单]]</span><span class="cl">  E -.供应商责任.-&gt; I[[触发供应商索赔流程]]</span></code></pre></div>
+<h3>17.2 正数结算 + 付款（时序）</h3>
+<div class="codebox"><pre><code><span class="cl">sequenceDiagram</span><span class="cl">  participant SYS as 系统(定时)</span><span class="cl">  participant SX as 闪欣索赔员</span><span class="cl">  participant SP as 服务商</span><span class="cl">  participant FIN as 财务/审批链</span><span class="cl">  SYS-&gt;&gt;SYS: 每月1日按服务商汇总审核通过未结算索赔单→生成结算单(应付=索赔应付-抵扣)</span><span class="cl">  SX-&gt;&gt;SP: 确认结算→推送对账</span><span class="cl">  SP-&gt;&gt;SP: 对账确认</span><span class="cl">  Note over SYS,SP: 校验开票权限(白名单)+正数</span><span class="cl">  SP-&gt;&gt;SX: 开票并上传发票→待核验</span><span class="cl">  SX-&gt;&gt;SX: 发票确认→人工申请付款(自动生成付款单草稿)</span><span class="cl">  SX-&gt;&gt;FIN: 提交付款申请(按金额分级审批链)</span><span class="cl">  FIN-&gt;&gt;FIN: 全链审批通过→线下付款→录凭证</span><span class="cl">  FIN--&gt;&gt;SYS: 结算单/索赔单置已结算</span></code></pre></div>
+<h3>17.3 负数结算（强制结算 + 质保金扣减）</h3>
+<div class="codebox"><pre><code><span class="cl">flowchart LR</span><span class="cl">  N[生成负数结算单] --&gt; C1[待确认] --&gt; C2[待对账]</span><span class="cl">  C2 --&gt;|对账确认·关闭开票权限| C3[待强制结算]</span><span class="cl">  C3 --&gt;|索赔员发起强制结算| FIN[财务扣减质保金]</span><span class="cl">  FIN --&gt;|扣=金额绝对值·不足扣全部+差额挂账结转| DONE([已结算])</span></code></pre></div>
+<h2>18. 组件交互说明</h2>
+<ul>
+<li><strong>影响/依赖既有模块</strong>：维修工单管理（取数：工单状态/保内标识/维修项目/工时标准/备件明细/主责件/系数）、用户与权限管理（RBAC 角色与数据范围）、服务商管理（服务商基础/区域）。</li>
+<li><strong>本模块拟新增实体/服务</strong>：索赔单、向欣旺达索赔单、结算单（服务商/闪欣）、结算明细、付款申请单、索赔抵扣单、<strong>质保金账户（余额/流水/归属）</strong>、结算基础配置（周期/白名单/审批流/索赔系数）、工单业务类型→索赔类型映射字典。</li>
+<li><strong>调用关系</strong>：索赔单业务审核通过 → 按主责件归属分流（欣旺达件→生成向欣旺达索赔单；外采件→责任判定）；结算单生成 ← 定时汇总审核通过索赔单 − 抵扣单；付款单 ← 结算单（已核验）自动生成草稿；外部适配层（QMS/财务共享/OA Mock）由 Service 经接口隔离调用。</li>
+</ul>
+<h2>19. 技术选型与风险</h2>
+<div class="tablewrap"><table><thead><tr><th>风险</th><th>影响</th><th>缓解</th></tr></thead><tbody><tr><td>外部系统契约未定（QMS/财务共享/OA/工单模块）</td><td>判责自动化、跨系统付款/分账、取数口径悬空</td><td>本期 Mock/内建/待挂载 + <code>external-interfaces/待料清单</code>；接口隔离层，契约就位替换实现不改上层</td></tr><tr><td>多状态机 + 多表事务（索赔/结算/付款链）</td><td>状态错乱、金额不一致</td><td>显式状态机（S7）+ 事务 + 乐观锁 + 分布式锁；阶段 D 详细设计逐链落 LLD</td></tr><tr><td>金额/抵扣/质保金计算</td><td>结算错误、资金风险</td><td>金额公式与取值时点（系数快照）明确（S9）；质保金账户流水留痕；单元测试覆盖正/负/零边界</td></tr><tr><td>结算单定时生成幂等</td><td>重复生成</td><td>唯一性约束（周期×主体一张）+ 幂等键；应付=0 不生成</td></tr><tr><td>单据编码并发流水</td><td>编号重复</td><td>编码规则 + 唯一索引 + 号段/序列并发控制（阶段 D 落地）</td></tr><tr><td>附件本地存储</td><td>V2 迁移成本</td><td>抽象存储层、路径配置化、DB 存相对路径</td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>阶段 C 定稿完成</strong>。下一步：阶段 D 触发判定（本项目重度命中触发条件）。</p></blockquote></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.0 · 本页由产物渲染生成</p></main><script>(function(){var b=document.getElementById('tb');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();</script></body></html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>详细设计（LLD）：经销商新能源订单管理（增补订单）</title>
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+    --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+    --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+    --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0e13; --surface:#12171f; --ink:#e7edf5; --muted:#94a1b2;
+  --line:#222b38; --accent:#5b8bff; --accent-soft:#161f30;
+  --code-bg:#161d28; --code-ink:#7aa2ff; --quote-bg:#121a26; --quote-bar:#5b8bff;
+  --th-bg:#1b2431; --th-ink:#e7edf5; --zebra:#0f1319;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#12161c; --muted:#5b6673;
+  --line:#e3e8ef; --accent:#2f6bff; --accent-soft:#eaf0ff;
+  --code-bg:#f0f3f8; --code-ink:#1f6feb; --quote-bg:#f0f4fb; --quote-bar:#2f6bff;
+  --th-bg:#101722; --th-ink:#e8eef7; --zebra:#f7f9fc;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.7; font-size:15px;
+  letter-spacing:.01em;
+}
+.wrap{max-width:900px; margin:0 auto; padding:0 24px 120px}
+.topbar{
+  position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line); margin-bottom:40px;
+}
+.topbar .inner{max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:14px}
+.badge{
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent); border-radius:5px;
+  padding:3px 9px; white-space:nowrap;
+}
+.topbar .name{font-size:13px; color:var(--muted); font-family:var(--mono)}
+.back{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent); text-decoration:none}
+.back:hover{text-decoration:underline}
+h1{font-size:29px; line-height:1.25; font-weight:750; margin:28px 0 8px; text-wrap:balance; letter-spacing:-.01em}
+h2{font-size:21px; font-weight:700; margin:44px 0 12px; padding-top:16px; border-top:1px solid var(--line); letter-spacing:-.005em}
+h3{font-size:17px; font-weight:680; margin:30px 0 10px; color:var(--ink)}
+h4{font-size:14.5px; font-weight:680; margin:22px 0 8px; color:var(--muted); font-family:var(--mono)}
+p{margin:12px 0}
+a{color:var(--accent)}
+strong{font-weight:680; color:var(--ink)}
+code{font-family:var(--mono); font-size:.86em; background:var(--code-bg); color:var(--code-ink); padding:1.5px 6px; border-radius:5px}
+pre{background:var(--code-bg); border:1px solid var(--line); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:16px 0}
+pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.6}
+blockquote{
+  margin:16px 0; padding:12px 18px; background:var(--quote-bg);
+  border-left:3px solid var(--quote-bar); border-radius:0 8px 8px 0; color:var(--muted); font-size:14px;
+}
+blockquote p{margin:6px 0}
+blockquote strong{color:var(--ink)}
+ul,ol{margin:12px 0; padding-left:24px}
+li{margin:5px 0}
+ul ul,ol ol,ul ol,ol ul{margin:4px 0}
+hr{border:none; border-top:1px solid var(--line); margin:36px 0}
+.tablewrap{overflow-x:auto; margin:18px 0; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums}
+th{background:var(--th-bg); color:var(--th-ink); font-weight:640; text-align:left; padding:9px 13px; white-space:nowrap; font-family:var(--mono); font-size:12px; letter-spacing:.02em}
+td{padding:9px 13px; border-top:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:var(--zebra)}
+.doc-note{
+  font-family:var(--mono); font-size:11px; color:var(--muted);
+  margin:34px 0 0; padding-top:16px; border-top:1px dashed var(--line);
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+  <span class="badge">SDD V8 · 生成产物</span>
+  <span class="name">detail-design-示例-经销商新能源订单管理.md</span>
+  <a class="back" href="../SDD-V8-使用手册.html">← 返回使用手册</a>
+</div></div>
+<main class="wrap">
+<h1>详细设计（LLD）：经销商新能源订单管理（增补订单）</h1>
+<blockquote><p><strong>参考样例（目标产出长什么样）</strong>。这份来源本身已是成品级详细设计，用它对照 <code>templates/detail-design.md</code>，说明"一份合格的阶段 D 产出应达到的颗粒度"——字段级映射、三分支五表事务、双状态机、逆向回滚。</p>
+<p>注意：这<strong>不是</strong>从 PRD 真跑的压测（那份见 <code>detail-design-整车市场活动管理-压测.md</code>）；此文是"标杆"，不是"待测输入"。</p>
+<p>语料来源：用户提供的《经销商新能源订单管理》功能说明。</p></blockquote>
+<h2>0. 元信息</h2>
+<ul>
+<li>功能编码：F-DCS-增补订单</li>
+<li>节点目录：DCS - 新能源业务 - 整车资源管理 - 订单管理 - 经销商新能源订单管理</li>
+<li>开发类型：新增节点</li>
+<li>Schema 模式：基于既有库扩展</li>
+<li>涉及表：</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>表名</th><th>用途</th><th>本功能可写字段</th><th>只读字段</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER</td><td>经销商采购订单主表</td><td>STATE, SUBMIT_TIME, 修改人/时间, ACCOUNT_SUM_USE_PRICE…</td><td>ORDER_CODE(生成)</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_NUM_D</td><td>采购订单明细(按 AIC)</td><td>全字段(新增/编辑)</td><td>—</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>采购订单单车明细(按 VIN)</td><td>DLR_ORDER_D_STATUS, VIN, APPROVE_VIN, APPROVE_SON, 是否分车, 分车时间, 审批单号/子单号…</td><td>—</td></tr><tr><td>T_M_Z_BD_CAR</td><td>车辆主数据</td><td>CAR_STATE, DLR_CODE, SPLIT_DATE, STOCK_LOCK_STATE, LOCK_BILL_NO, LOCK_BILL_ID</td><td>VIN, AIC, OFFLINE_DATE…</td></tr><tr><td>T_M_Z_BD_CAR_CHANGE_HIS</td><td>车辆异动历史</td><td>全字段(INSERT)</td><td>—</td></tr><tr><td>T_V_Z_BU_PRODUCT_PLAN</td><td>生产计划实绩</td><td>ASSIGN_FLAG, ASSIGN_TYPE, DLR_CODE, ONECAR_FLAG, CUS_ORDER, 业务单据号/ID…</td><td>SON</td></tr><tr><td>T_V_Z_BU_CAR_APPROVE</td><td>审批单</td><td>全字段(INSERT)</td><td>—</td></tr><tr><td>T_V_Z_BU_CAR_APPROVE_HIS</td><td>审批历史</td><td>全字段(INSERT)</td><td>—</td></tr><tr><td>VLS_T_WH_VIN</td><td>仓库 VIN</td><td>—</td><td>ISDISTRIBUTION, VLS_STATE, CAR_QUALITY_STATUS…</td></tr><tr><td>VLS_T_IF_D2L_CARSPLIT_RESULT</td><td>分车结果信息表</td><td>全字段(INSERT)</td><td>—</td></tr><tr><td>T_M_Z_BD_DLR</td><td>经销商主数据</td><td>—</td><td>DLR_CODE, DLR_NAME, REGION_CODE, NEV交付中心</td></tr><tr><td>T_M_Z_BD_REGION</td><td>区域表</td><td>—</td><td>REGION_CODE, REGION_NAME</td></tr><tr><td>T_M_Z_BD_PRODUCT</td><td>产品主数据</td><td>—</td><td>AIC, AIC_DESC, EXCOLOR_CODE, IS_FUEL, BATCH_PRICE, ABC分类</td></tr><tr><td>T_M_Z_PRODUCT_SERIES_LIMIT</td><td>产品查询车系限制</td><td>—</td><td>DLR_CODE, SERIES_CODE</td></tr><tr><td>T_V_Z_BD_WEEK_CALENDAR</td><td>周度工作日历</td><td>—</td><td>订单年/月/周, 订单周开始/结束时间</td></tr><tr><td>T_M_Z_BD_EXCOLOR</td><td>外饰色配置</td><td>—</td><td>EXCOLOR_CODE, EXCOLOR_NAME</td></tr></tbody></table></div>
+<h2>1. 查询规格</h2>
+<h3>1.1 查询条件</h3>
+<div class="tablewrap"><table><thead><tr><th>字段</th><th>控件</th><th>默认值</th><th>数据来源（表.字段 / 关联路径）</th><th>必填</th></tr></thead><tbody><tr><td>订单类型</td><td>下拉</td><td>增补订单</td><td>固定 ORDER_TYPE=8</td><td>否</td></tr><tr><td>区域</td><td>下拉</td><td>—</td><td>T_M_Z_BD_REGION</td><td>否</td></tr><tr><td>交付中心代码</td><td>文本(模糊)</td><td>—</td><td>T_V_Z_BU_DLR_ORDER.DLR_CODE</td><td>否</td></tr><tr><td>交付中心名称</td><td>文本(模糊)</td><td>—</td><td>经 DLR_CODE→T_M_Z_BD_DLR.DLR_NAME</td><td>否</td></tr><tr><td>计划年 / 计划月</td><td>年/月选择</td><td>—</td><td>T_V_Z_BU_DLR_ORDER.计划年/月</td><td>否</td></tr><tr><td>计划周</td><td>文本</td><td>—</td><td>T_V_Z_BU_DLR_ORDER.计划周</td><td>否</td></tr><tr><td>订单状态</td><td>下拉</td><td>—</td><td>新建/部分待审批/待审批/部分完成/完成/拒绝/作废</td><td>否</td></tr><tr><td>预计发运时间起/止</td><td>日期</td><td>—</td><td>T_V_Z_BU_DLR_ORDER_D.预计发运时间</td><td>否</td></tr><tr><td>是否订单车 / 是否紧急</td><td>下拉</td><td>—</td><td>T_V_Z_BU_DLR_ORDER_D 对应字段</td><td>否</td></tr><tr><td>零售合同号 / 采购订单号</td><td>文本(模糊)</td><td>—</td><td>对应字段</td><td>否</td></tr></tbody></table></div>
+<h3>1.2 查询结果</h3>
+<div class="tablewrap"><table><thead><tr><th>列</th><th>来源（表.字段）</th><th>关联/JOIN 逻辑</th><th>显示转换</th></tr></thead><tbody><tr><td>采购订单号</td><td>T_V_Z_BU_DLR_ORDER.ORDER_CODE</td><td>—</td><td>超链接→查看明细</td></tr><tr><td>区域</td><td>T_M_Z_BD_REGION.REGION_NAME</td><td>ORDER.DLR_CODE→T_M_Z_BD_DLR.REGION_CODE→T_M_Z_BD_REGION</td><td>显示名称</td></tr><tr><td>交付中心代码</td><td>T_V_Z_BU_DLR_ORDER.DLR_CODE</td><td>—</td><td>—</td></tr><tr><td>交付中心名称</td><td>T_M_Z_BD_DLR.DLR_NAME</td><td>ORDER.DLR_CODE→T_M_Z_BD_DLR</td><td>—</td></tr><tr><td>计划年/月/周、提交时间、订单状态、车辆总数量、车辆总价、备注、创建/修改人时间</td><td>T_V_Z_BU_DLR_ORDER 对应字段</td><td>—</td><td>状态枚举→文案</td></tr><tr><td>收货交付中心</td><td>T_V_Z_BU_DLR_ORDER.S_DLR_CODE</td><td>—</td><td>—</td></tr></tbody></table></div>
+<h3>1.3 数据范围过滤</h3>
+<ul>
+<li>硬过滤：<code>T_V_Z_BU_DLR_ORDER.ORDER_TYPE = 8</code></li>
+<li>数据权限：操作人组织机构（沿用 经销商订单管理 节点的区域/交付中心权限口径）</li>
+</ul>
+<h2>2. 表单与明细字段规格</h2>
+<h3>2.1 主表单字段（代新增 / 代修改）</h3>
+<div class="tablewrap"><table><thead><tr><th>字段</th><th>控件</th><th>必填</th><th>新增可改</th><th>编辑可改</th><th>只读</th><th>默认值/自动带出（来源）</th><th>校验/联动规则</th></tr></thead><tbody><tr><td>采购订单号</td><td>文本</td><td>—</td><td>否</td><td>否</td><td>是</td><td>系统自动生成</td><td>编辑时只读</td></tr><tr><td>订单类型</td><td>文本</td><td>—</td><td>否</td><td>否</td><td>是</td><td>增补订单</td><td>—</td></tr><tr><td>交付中心代码</td><td>放大镜选框</td><td>是</td><td>是</td><td>是</td><td>—</td><td>—</td><td>仅可选 T_M_Z_BD_DLR.NEV交付中心='是'；不可手工填</td></tr><tr><td>交付中心名称</td><td>文本</td><td>—</td><td>否</td><td>否</td><td>是</td><td>由交付中心代码带出(T_M_Z_BD_DLR.DLR_NAME)</td><td>随代码联动</td></tr><tr><td>收货交付中心</td><td>文本</td><td>—</td><td>否</td><td>否</td><td>是</td><td>默认=所选交付中心代码</td><td>—</td></tr><tr><td>车辆总数量</td><td>数值</td><td>—</td><td>否</td><td>否</td><td>是</td><td>Σ订单明细.采购数量</td><td>派生</td></tr><tr><td>车辆总价</td><td>数值</td><td>—</td><td>否</td><td>否</td><td>是</td><td>Σ订单明细.批售价格</td><td>派生</td></tr><tr><td>计划年/月/周</td><td>文本</td><td>—</td><td>否</td><td>否</td><td>是</td><td>T_V_Z_BD_WEEK_CALENDAR（订单周开始&lt;当前&lt;订单周结束 命中行的 订单年/月/周）</td><td>只读带出</td></tr><tr><td>备注</td><td>文本</td><td>否</td><td>是</td><td>是</td><td>—</td><td>—</td><td>—</td></tr></tbody></table></div>
+<h3>2.2 子明细网格：订单明细（按 AIC）</h3>
+<div class="tablewrap"><table><thead><tr><th>字段</th><th>控件/来源</th><th>可编辑</th><th>联动/派生规则</th></tr></thead><tbody><tr><td>AIC / 产品名称 / 外饰色 / ABC分类</td><td>由"添加"选择的产品信息填充(T_M_Z_BD_PRODUCT)</td><td>只读</td><td>—</td></tr><tr><td>采购数量</td><td>数值</td><td>可编辑，默认 1</td><td>驱动主表单车辆总数量与单车明细拆行</td></tr><tr><td>批售价格</td><td>计算</td><td>只读</td><td>= 采购价格 × 采购数量</td></tr></tbody></table></div>
+<h3>2.3 子明细网格：单车明细（按 VIN，拆行）</h3>
+<div class="tablewrap"><table><thead><tr><th>字段</th><th>控件/来源</th><th>可编辑</th><th>联动/派生规则</th></tr></thead><tbody><tr><td>AIC / 产品名称 / 外饰色 / 批售价格</td><td>由产品信息带出</td><td>只读</td><td><strong>按订单明细采购数量拆行</strong>：AIC 采购数量=2 → 生成 2 行相同数据</td></tr><tr><td>SON / 零售合同号 / 客户姓名/电话 / 仓库 / 周计划预计到店日 / 实际分配时间</td><td>空</td><td>只读</td><td>新建时为空，分车后回填</td></tr><tr><td>是否订单车</td><td>—</td><td>只读</td><td>默认 否</td></tr><tr><td>订单行状态</td><td>—</td><td>只读</td><td>默认 新建</td></tr><tr><td>是否紧急</td><td>下拉(是/否)</td><td>必填</td><td>—</td></tr><tr><td>期望到店时间</td><td>日期时间</td><td>是否紧急=是则必填</td><td>默认空，VIN 关联后更新</td></tr><tr><td>紧急原因</td><td>下拉(1车展备车/2大客户订单/3缺少展车/4订单车/5享受地补/6其他)</td><td>是否紧急=是则必填</td><td>—</td></tr><tr><td>其他原因</td><td>文本(≤200)</td><td>紧急原因=其他则必填</td><td>—</td></tr><tr><td>是否满足交期</td><td>派生</td><td>只读</td><td>紧急=否→是；紧急=是→分车预计到店日≤期望到店时间为是，否则否</td></tr></tbody></table></div>
+<h2>3. 状态机</h2>
+<h3>3.1 订单状态（T_V_Z_BU_DLR_ORDER.STATE）</h3>
+<ul>
+<li>状态全集：新建 / 待审批 / 部分待审批 / 部分完成 / 完成 / 拒绝 / 作废</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>当前态</th><th>事件</th><th>目标态</th><th>前置条件</th><th>触发副作用</th></tr></thead><tbody><tr><td>—</td><td>代新增保存</td><td>新建</td><td>—</td><td>4.2</td></tr><tr><td>新建</td><td>代作废</td><td>作废</td><td>仅新建可作废</td><td>4.4</td></tr><tr><td>新建</td><td>代提报(全匹配)</td><td>待审批</td><td>全部单车匹配到资源</td><td>4.5-A</td></tr><tr><td>新建</td><td>代提报(部分匹配)</td><td>部分待审批</td><td>部分匹配</td><td>4.5-B</td></tr><tr><td>新建</td><td>代提报(无匹配)</td><td>新建(不变)</td><td>无资源</td><td>4.5-C</td></tr><tr><td>待审批</td><td>审批(全通过)</td><td>完成</td><td>全行待审批且无拒绝行</td><td>4.6-A</td></tr><tr><td>待审批/部分待审批/部分完成</td><td>审批(部分通过)</td><td>部分完成</td><td>部分行通过</td><td>4.6-B</td></tr><tr><td>待审批/部分待审批</td><td>拒绝(全部)</td><td>拒绝</td><td>勾选全部待审批行</td><td>4.7-A</td></tr><tr><td>待审批/部分待审批/部分完成</td><td>拒绝(部分)</td><td>存在完成行→部分完成；否则部分待审批</td><td>勾选部分待审批行</td><td>4.7-B</td></tr></tbody></table></div>
+<ul>
+<li>非法迁移拦截：非"新建"不可代修改/代作废/代提报；勾选含 拒绝/完成 行时 审核/拒绝 按钮置灰。</li>
+</ul>
+<h3>3.2 订单行状态（T_V_Z_BU_DLR_ORDER_D.DLR_ORDER_D_STATUS）</h3>
+<ul>
+<li>状态全集：新建 / 待审批 / 完成 / 拒绝 / 作废</li>
+<li>主/行联动：全部行完成→单据完成；部分行完成+存在拒绝行→部分完成；全部行拒绝→单据拒绝。</li>
+</ul>
+<h2>4. 操作清单</h2>
+<h3>4.2 操作：保存（代新增/代修改）</h3>
+<ul>
+<li>可用条件：新增/编辑模式</li>
+<li>副作用（单分支，写 3 表）：</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>操作</th><th>作用行范围</th><th>字段</th><th>写入值</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER</td><td>INSERT/UPDATE</td><td>主单</td><td>ORDER_TYPE / STATE / DLR_CODE / S_DLR_CODE / MADE_TYPE / ACCOUNT_SUM_USE_PRICE</td><td>8 / '1'(新建) / 交付中心代码 / 收货交付中心 / 总部 / 0</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_NUM_D</td><td>INSERT/UPDATE</td><td>各 AIC 明细</td><td>对应字段</td><td>表单值</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>INSERT/UPDATE</td><td>各 VIN 单车明细</td><td>DLR_ORDER_D_STATUS</td><td>'1'(新建)</td></tr></tbody></table></div>
+<ul>
+<li>代修改差异：ORDER_CODE/订单类型/计划年月周只读；交付中心代码可改；保存后 STATE 仍=新建，行状态=新建。</li>
+</ul>
+<h3>4.4 操作：代作废</h3>
+<ul>
+<li>可用条件：仅 新建；二次确认「您确认要作废选择的数据吗？」</li>
+<li>副作用（确认=是）：</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>操作</th><th>作用行范围</th><th>字段</th><th>写入值</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER</td><td>UPDATE</td><td>主单</td><td>STATE / 最后修改时间 / 最后修改人</td><td>作废 / 当前时间 / 当前操作人</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>UPDATE</td><td>全部行</td><td>DLR_ORDER_D_STATUS / 最后修改时间/人</td><td>作废 / 当前时间 / 当前操作人</td></tr></tbody></table></div>
+<h3>4.5 操作：代提报 ★（三分支五表——模板核心压测点）</h3>
+<ul>
+<li>可用条件：仅 新建；二次确认「您确认要提报选择的数据吗？」</li>
+<li>匹配逻辑（只匹配现车）：中心库 <code>T_M_Z_BD_CAR</code>（CAR_STATE∈{2,12} &amp;&amp; ONECAR_FLAG(No/null) &amp;&amp; WAREHOUSE_CODE='A' &amp;&amp; EXPECT_SUB_WAREHOUSE=null &amp;&amp; LOGISTICS_CAR_FLAG=Yes &amp;&amp; IS_SALE_CLOSED=Yes &amp;&amp; 整车共享经销商=null &amp;&amp; OFFLINE_DATE≠null）JOIN <code>VLS_T_WH_VIN</code>（ISDISTRIBUTION=未分车 &amp;&amp; VLS_STATE=已入库 &amp;&amp; CAR_QUALITY_STATUS=正常 &amp;&amp; IS_LOGISTICS_SEPARABLE=否 &amp;&amp; ISMODEL=否 &amp;&amp; ZEBRASTATE=否 &amp;&amp; ISLEND∈{空,归还} &amp;&amp; INV_FROZEN=否），按 OFFLINE_DATE 升序占用。</li>
+</ul>
+<h4>分支 A：全部匹配成功 → 订单=待审批</h4>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>操作</th><th>作用行范围</th><th>字段</th><th>写入值</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER</td><td>UPDATE</td><td>主单</td><td>STATE / SUBMIT_TIME / 修改时间/人</td><td>待审批 / 当前时间 / 当前时间/操作人</td></tr><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>UPDATE</td><td>全部行</td><td>行状态 / 是否分车 / 分车时间 / VIN / APPROVE_VIN / APPROVE_SON / 修改时间/人</td><td>待审批 / Yes / 当前时间 / 匹配VIN / 匹配VIN / (APPROVE_VIN→T_V_Z_BU_PRODUCT_PLAN.SON) / 当前时间/操作人</td></tr><tr><td>T_M_Z_BD_CAR_CHANGE_HIS</td><td>INSERT</td><td>每个匹配VIN</td><td>异动类型/原状态/新状态/单据编码/描述/时间</td><td>增补订单分配 / 原CAR_STATE / 4 / 采购订单号 / 增补订单分配 / 当前时间</td></tr><tr><td>T_M_Z_BD_CAR</td><td>UPDATE</td><td>每个匹配VIN</td><td>SPLIT_DATE / CAR_STATE / DLR_CODE / STOCK_LOCK_STATE / LOCK_BILL_NO / LOCK_BILL_ID / 修改时间/人</td><td>当前时间 / 4 / 订单经销商 / Yes / 采购订单号 / 采购订单明细ID / 当前时间/操作人</td></tr><tr><td>T_V_Z_BU_PRODUCT_PLAN</td><td>UPDATE</td><td>每个匹配VIN</td><td>ASSIGN_FLAG / ASSIGN_TYPE / DLR_CODE / ONECAR_FLAG / CUS_ORDER / 是否冻结 / 业务单据号/ID / 修改时间/人</td><td>Yes / 12 / 订单经销商 / 明细ONECAR / 明细CUS_ORDER / No / 采购订单号 / 明细ID / 当前时间/操作人</td></tr></tbody></table></div>
+<h4>分支 B：部分匹配 → 订单=部分待审批</h4>
+<ul>
+<li>主单 STATE=部分待审批（其余同上）；<strong>已匹配行</strong>按分支 A 的 4 张表写入；<strong>未匹配行</strong>：<code>T_V_Z_BU_DLR_ORDER_D</code> UPDATE 行状态=拒绝、修改时间/人。</li>
+</ul>
+<h4>分支 C：无匹配</h4>
+<ul>
+<li>不更新任何数据，提示「系统可用资源不足！」</li>
+</ul>
+<ul>
+<li>事务边界：一次代提报的全部表写入必须在单一事务内；任一表失败整单回滚，车辆资源不得半占用。</li>
+<li>结果反馈：成功返回主界面并刷新状态。</li>
+</ul>
+<h3>4.6 操作：审批（要点，勾选相关分支）</h3>
+<ul>
+<li>可用条件：待审批 / 部分待审批 / 部分完成；勾选含 拒绝/完成 行时审核置灰。</li>
+<li>分支 A（勾选全部待审批行且无拒绝行）：INSERT <code>T_V_Z_BU_CAR_APPROVE</code>(APPROVE_CODE=交付中心编码+EO+YYYYMMDD+四位流水，审批状态=有效)、INSERT <code>T_V_Z_BU_CAR_APPROVE_HIS</code>(类型=审批通过，子单号=审批单号+三位流水)、UPDATE <code>T_M_Z_BD_CAR</code>(分车时间=审批时间)、INSERT <code>VLS_T_IF_D2L_CARSPLIT_RESULT</code>、UPDATE <code>T_V_Z_BU_DLR_ORDER_D</code>(行状态=完成+回填审批单号/子单号/行状态/创建修改人时间+分车时间)、UPDATE 主单 STATE=完成。</li>
+<li>分支 B（勾选部分待审批行，或全选但含拒绝行）：同上但只作用待审批行；主单 STATE=部分完成。</li>
+</ul>
+<h3>4.7 操作：拒绝 ★（逆向回滚——见第 6 节）</h3>
+<ul>
+<li>可用条件：仅可勾选 待审批 行（含 拒绝/完成 则置灰）。</li>
+<li>分支 A（勾选全部待审批行）→ 主单 STATE=拒绝；分支 B（部分）→ 存在完成行则 部分完成，否则 部分待审批。副作用见第 6 节逆向表。</li>
+</ul>
+<h2>5. 编码生成规则</h2>
+<div class="tablewrap"><table><thead><tr><th>单据</th><th>规则</th><th>示例</th><th>流水位数</th><th>重置周期</th></tr></thead><tbody><tr><td>审批单号 APPROVE_CODE</td><td>交付中心编码 + EO + YYYYMMDD + 四位流水</td><td>A17997EO202408010003</td><td>4</td><td>按日</td></tr><tr><td>审批单子单号</td><td>审批单号 + 三位流水</td><td>A17997EO202408010003001</td><td>3</td><td>每审批单</td></tr><tr><td>采购订单号 ORDER_CODE</td><td>（沿用 经销商订单管理 编码规则，考古项 → 第 7 节）</td><td>A17997OR202408010002</td><td>—</td><td>—</td></tr></tbody></table></div>
+<h2>6. 并发 / 幂等 / 回滚</h2>
+<ul>
+<li>并发校验：代提报/审批抢占同一 VIN——以 <code>T_M_Z_BD_CAR.STOCK_LOCK_STATE</code> + 匹配时对候选车行加锁，避免两单锁同一车（原文多处标"并发校验"）。</li>
+<li>幂等：非"新建"不可再代提报；非"待审批"行不可再审批/拒绝。</li>
+<li><strong>逆向操作（拒绝，逐表逐字段释放已占资源）</strong>：</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>表</th><th>操作</th><th>作用行范围</th><th>字段</th><th>写入值</th></tr></thead><tbody><tr><td>T_V_Z_BU_DLR_ORDER_D</td><td>UPDATE</td><td>被拒且曾匹配的行</td><td>行状态 / 是否分车 / 分车时间 / VIN / APPROVE_VIN / APPROVE_SON / 修改时间/人</td><td>拒绝 / No / NULL / NULL / NULL / NULL / 当前时间/操作人</td></tr><tr><td>T_M_Z_BD_CAR</td><td>UPDATE</td><td>被拒VIN</td><td>SPLIT_DATE / CAR_STATE / DLR_CODE / STOCK_LOCK_STATE / LOCK_BILL_NO / LOCK_BILL_ID / 修改时间/人</td><td>NULL / 车辆异动历史最新一条的原车辆状态 / NULL / No / NULL / NULL / 当前时间/操作人</td></tr><tr><td>T_V_Z_BU_PRODUCT_PLAN</td><td>UPDATE</td><td>被拒VIN</td><td>ASSIGN_FLAG / ASSIGN_TYPE / 业务单据号/ID / DLR_CODE / ONECAR_FLAG / CUS_ORDER / 修改时间/人</td><td>No / NULL / NULL / NULL / No / No / 当前时间/操作人</td></tr><tr><td>T_M_Z_BD_CAR_CHANGE_HIS</td><td>INSERT</td><td>被拒VIN</td><td>异动类型/原状态/新状态/单据编码/描述/时间</td><td>增补订单分配拒绝 / 4 / 异动历史最新一条原状态 / 采购订单号 / 增补订单分配拒绝 / 当前时间</td></tr></tbody></table></div>
+<h2>7. 依赖既有逻辑（考古项）</h2>
+<ul>
+<li>采购订单号编码规则："参考 经销商订单管理 节点"——<strong>待考古</strong>：需从旧节点取准确编码规则（前缀 OR/位数/重置周期）。</li>
+<li>审批字段回填："更新字段逻辑可以参考 DCS-订单管理-审批单审批-审批"——<strong>待考古</strong>：旧审批节点还更新哪些字段需一并对齐。</li>
+<li><code>VLS_T_IF_D2L_CARSPLIT_RESULT</code> "其他字段看原逻辑赋值"——<strong>待考古</strong>：分车结果表非枚举字段的赋值来源。</li>
+</ul>
+<h2>8. 自检结论（模板压测）</h2>
+<ul>
+<li>[x] 三分支五表事务（代提报）：模板第 4 节分支表<strong>完整装下</strong>，每表每字段可落值</li>
+<li>[x] 逆向回滚（拒绝）：第 6 节逆向表<strong>完整装下</strong></li>
+<li>[x] 双状态机 + 主/行联动：第 3 节装下</li>
+<li>[x] 嵌套编码（子单号）：第 5 节装下</li>
+<li>[x] 双子明细网格 + 拆行/联动：第 2 节（<strong>本次为模板新增章节</strong>）装下</li>
+<li>[ ] 三处"参考原逻辑"：模板第 7 节<strong>正确暴露为待考古项</strong>（不是模板缺陷，是需求本身的外部依赖）</li>
+</ul>
+<p><strong>结论：模板补上「第 2 节 表单与明细字段规格」后，可无损承接该企业级规格。唯一真实外部依赖是三处"参考原逻辑"，模板已强制把它显性化为考古项。</strong></p>
+<p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/detail-design-示例-经销商新能源订单管理.md · 内容为真实生成产物样例</p>
+</main>
+</body>
+</html>
