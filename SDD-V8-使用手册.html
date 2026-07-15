@@ -137,6 +137,11 @@ td code{white-space:nowrap}
 .realart:hover .lead, .realart:hover .arw{color:#fff}
 .realart .lead{font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); background:var(--surface); border:1px solid var(--accent); border-radius:5px; padding:2px 7px; font-weight:600; flex:none}
 .realart .arw{margin-left:auto; color:var(--accent)}
+.realart.sample{color:var(--muted); background:var(--surface-2); border-color:var(--line)}
+.realart.sample .lead{color:var(--muted); background:var(--surface); border-color:var(--line)}
+.realart.sample .arw{color:var(--faint)}
+.realart.sample:hover{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.realart.sample:hover .lead,.realart.sample:hover .arw{color:var(--bg)}
 .casebar{display:flex; align-items:center; gap:16px; border:1px solid var(--accent); background:var(--accent-soft); border-radius:14px; padding:16px 20px; margin:22px 0 4px; flex-wrap:wrap}
 .casebar .ic{width:38px; height:38px; border-radius:9px; background:var(--accent); flex:none; position:relative}
 .casebar .ic::before{content:"⌘"; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:18px}
@@ -360,12 +365,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
     <div class="body">
       <p>把用户的大段想法整理成清晰的业务目标、范围、场景、验收口径；调研竞品；沉淀视觉证据。</p>
       <div class="kv"><span class="t">产出</span><span>需求澄清结论（一般合并进 PRD，不单独建文件）；大功能落 <code>docs/澄清文档/&lt;feature&gt;/01-alignment.md</code></span></div>
-      <div class="deliv">
-        <div class="lbl">可预览产物样例</div>
-        <div class="files">
-          <div class="file"><span class="path">整车市场活动管理-产品补充需求清单.md</span><a class="prev" href="samples/整车市场活动管理-产品补充需求清单.html">预览</a></div>
-        </div>
-      </div>
+      <a class="realart sample" href="samples/整车市场活动管理-产品补充需求清单.html"><span class="lead">样例产物</span>跨项目样例 · 整车市场活动管理-产品补充需求清单<span class="arw">→</span></a>
     </div>
   </div>
 

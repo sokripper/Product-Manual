@@ -46,15 +46,16 @@ body{
   background:color-mix(in srgb, var(--bg) 82%, transparent);
   border-bottom:1px solid var(--line); margin-bottom:40px;
 }
-.topbar .inner{max-width:900px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:14px}
-.badge{
-  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--accent); border:1px solid var(--accent); border-radius:5px;
-  padding:3px 9px; white-space:nowrap;
-}
-.topbar .name{font-size:13px; color:var(--muted); font-family:var(--mono)}
-.back{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent); text-decoration:none}
-.back:hover{text-decoration:underline}
+.topbar .inner{max-width:900px; margin:0 auto; padding:11px 24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.up{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:640; color:#fff; background:var(--accent); border-radius:8px; padding:8px 14px; white-space:nowrap; flex:none; text-decoration:none}
+.up:hover{filter:brightness(1.09); text-decoration:none}
+.crumb{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); flex-wrap:wrap; min-width:0}
+.crumb a{color:var(--muted); text-decoration:none}.crumb a:hover{color:var(--accent)}
+.crumb .sep{color:var(--faint)}
+.crumb .dim{color:var(--faint)}
+.crumb .cur{color:var(--ink); font-weight:640}
+.themebtn{margin-left:auto; font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer}
+.themebtn:hover{border-color:var(--accent); color:var(--accent)}
 h1{font-size:29px; line-height:1.25; font-weight:750; margin:28px 0 8px; text-wrap:balance; letter-spacing:-.01em}
 h2{font-size:21px; font-weight:700; margin:44px 0 12px; padding-top:16px; border-top:1px solid var(--line); letter-spacing:-.005em}
 h3{font-size:17px; font-weight:680; margin:30px 0 10px; color:var(--ink)}
@@ -88,9 +89,9 @@ tbody tr:nth-child(even){background:var(--zebra)}
 </head>
 <body>
 <div class="topbar"><div class="inner">
-  <span class="badge">SDD V8 · 生成产物</span>
-  <span class="name">阶段D-清单法演示-薄PRD到详细设计.md</span>
-  <a class="back" href="../SDD-V8-使用手册.html">← 返回使用手册</a>
+  <a class="up" href="../SDD-V8-使用手册.html" data-back>← 返回</a>
+  <nav class="crumb"><a href="../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><span class="dim">样例</span><span class="sep">›</span><span class="cur">阶段D-清单法演示-薄PRD到详细设计.md</span></nav>
+  <button class="themebtn" id="tb" type="button">◐ 深浅色</button>
 </div></div>
 <main class="wrap">
 <h1>阶段 D 清单法演示：从薄 PRD → 完善详细设计（经销商新能源订单管理）</h1>
@@ -131,5 +132,9 @@ tbody tr:nth-child(even){background:var(--zebra)}
 <p><strong>给齐前两项，我就能把这份薄 PRD 产出成和样例同精度的详细设计；给不齐，我产出的是"格子全、来源标清、待填项明确"的清单——不编造表名。</strong></p>
 <p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/阶段D-清单法演示-薄PRD到详细设计.md · 内容为真实生成产物样例</p>
 </main>
+<script>
+(function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();
+(function(){document.querySelectorAll('a[data-back]').forEach(function(a){a.addEventListener('click',function(e){try{if(history.length>1&&document.referrer&&new URL(document.referrer).origin===location.origin){e.preventDefault();history.back();}}catch(err){}});});})();
+</script>
 </body>
 </html>
