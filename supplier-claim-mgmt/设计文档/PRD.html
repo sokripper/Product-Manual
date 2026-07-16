@@ -64,6 +64,21 @@ tbody tr:nth-child(even){background:var(--zebra)}
 .note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
 .note b{color:var(--ink)}
 .note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+.dl{display:flex;align-items:center;gap:13px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:11px;padding:12px 16px;margin:0 0 22px;flex-wrap:wrap}
+.dl .ic{width:34px;height:34px;border-radius:8px;background:var(--accent);flex:none;position:relative}
+.dl .ic::before{content:"↓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:17px;font-weight:700}
+.dl .tx{flex:1;min-width:180px}
+.dl .tx b{font-size:14px;color:var(--ink)}
+.dl .tx span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.dl a.go{font-family:var(--mono);font-size:12px;color:#fff;background:var(--accent);border-radius:8px;padding:9px 15px;white-space:nowrap}
+.dl a.go:hover{filter:brightness(1.09);text-decoration:none}
+.dlgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px;margin:14px 0}
+.dlcard{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 14px}
+.dlcard:hover{border-color:var(--accent);text-decoration:none}
+.dlcard .ex{font-family:var(--mono);font-size:9.5px;font-weight:700;color:#fff;border-radius:5px;padding:3px 7px;flex:none}
+.dlcard .ex.xlsx{background:#1f9d55}.dlcard .ex.md{background:#8957e5}.dlcard .ex.sql{background:#b7791f}
+.dlcard .nm{font-size:13px;color:var(--ink);min-width:0;word-break:break-all}
+.dlcard .nm span{display:block;font-size:11px;color:var(--muted)}
 /* code walkthrough */
 .filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
 .filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
@@ -118,7 +133,7 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <a class="up" href="../index.html" data-back>← 返回</a>
 <nav class="crumb"><a href="../../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><a href="../index.html">产物站总览</a><span class="sep">›</span><span class="cur">PRD · 服务商索赔管理</span></nav>
 <div class="sp"><span class="lbl">本站</span><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
-</div></div><main class="wrap"><h1>PRD · 服务商索赔管理</h1><div class="p"><h1>服务商索赔管理模块 · PRD</h1>
+</div></div><main class="wrap"><h1>PRD · 服务商索赔管理</h1><div class="dl"><div class="ic"></div><div class="tx"><b>真实原始文件 · PRD.md</b><span>产品需求文档原件（Markdown）</span></div><a class="go" href="../原始文件/PRD.md" download>下载原件 ↓</a></div><div class="p"><h1>服务商索赔管理模块 · PRD</h1>
 <blockquote><p>版本：V1.0（阶段 C 定稿 · 待 feature-signoff 冻结统一版本号）</p>
 <p>来源：外部 PRD V1.0（吴娟 2026-04-05）+ 业务流程图，经 A0 稳定审读（门禁 PASS）与 40 条决策逐条确认后派生。</p>
 <p>权威决策源：<code>docs/decisions/待确认决策表.xlsx</code>（已确认）/ <code>.sdd/decision-registry.json</code>。文末「决策落地登记」逐条映射。</p>

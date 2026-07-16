@@ -142,6 +142,11 @@ td code{white-space:nowrap}
 .realart.sample .arw{color:var(--faint)}
 .realart.sample:hover{background:var(--ink); color:var(--bg); border-color:var(--ink)}
 .realart.sample:hover .lead,.realart.sample:hover .arw{color:var(--bg)}
+.realart.dl{color:var(--ok); background:var(--ok-soft); border-color:var(--ok)}
+.realart.dl .lead{color:var(--ok); background:var(--surface); border-color:var(--ok)}
+.realart.dl .arw{color:var(--ok)}
+.realart.dl:hover{background:var(--ok); color:#fff}
+.realart.dl:hover .lead,.realart.dl:hover .arw{color:#fff}
 .casebar{display:flex; align-items:center; gap:16px; border:1px solid var(--accent); background:var(--accent-soft); border-radius:14px; padding:16px 20px; margin:22px 0 4px; flex-wrap:wrap}
 .casebar .ic{width:38px; height:38px; border-radius:9px; background:var(--accent); flex:none; position:relative}
 .casebar .ic::before{content:"⌘"; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:18px}
@@ -350,7 +355,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <!-- ===================== 产品侧节点 ===================== -->
 <section id="nodes">
   <h2><span class="idx">05</span>节点逐个讲 · 跟着真实项目走</h2>
-  <p class="sub">下面每个阶段都标清：谁做、产出什么文件、文件长什么样。每个节点都挂了一枚 <span style="color:var(--accent-ink);font-weight:600">🔗 真实产物</span> 链接，点开就是真实项目《服务商索赔管理模块》在该节点<b>实际生成的产物</b>——把手册的抽象说明代入具体产物，理解更快。</p>
+  <p class="sub">下面每个阶段都标清：谁做、产出什么文件、文件长什么样。每个节点都挂了一枚 <span style="color:var(--accent-ink);font-weight:600">真实产物</span> 链接，点开就是真实项目《服务商索赔管理模块》在该节点<b>实际生成的产物</b>。产物页顶部还可<b>下载原始文件</b>（<span style="color:var(--ok);font-weight:600">下载原件</span>）——尤其两个 Excel（测试用例 / 决策表）供各阶段人员直接取用；完整原件也在产物站「原始文件下载」区。</p>
 
   <div class="casebar">
     <div class="ic"></div>
@@ -431,6 +436,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
       <div class="audit-tag">D3.5 独立审计 · 喂 PRD+LLD+schema+矩阵，逐条抓幻觉与遗漏，PASS 才往下</div>
       <a class="realart" href="supplier-claim-mgmt/设计文档/详细设计-服务商索赔单.html"><span class="lead">真实产物</span>服务商索赔管理 · 详细设计-服务商索赔单（字段级映射 / 状态机 / 费用计算）<span class="arw">→</span></a>
       <a class="realart" href="supplier-claim-mgmt/设计文档/表结构文档.html"><span class="lead">真实产物</span>服务商索赔管理 · 表结构文档（既有库纳管登记）<span class="arw">→</span></a>
+      <a class="realart dl" href="supplier-claim-mgmt/原始文件/decisions/待确认决策表.xlsx" download><span class="lead">下载原件</span>待确认决策表.xlsx · 产品逐条签字用（73 项已决）<span class="arw">↓</span></a>
       <div class="deliv">
         <div class="lbl">跨项目标杆/压测样例（对照 LLD 颗粒度）</div>
         <div class="files">
@@ -495,6 +501,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
       <div class="note warn" style="margin:10px 0">两条硬规则：① 每条用例必须映射到功能编号，无孤儿用例（防幻觉）；② <b>「测试数据」列一律留空</b>（设计阶段不预置具体数据值）。</div>
       <div class="audit-tag">G-audit 独立审计 · 查可溯功能点、无编造字段/文案、测试数据列为空、无漏测</div>
       <a class="realart" href="supplier-claim-mgmt/测试用例.html"><span class="lead">真实产物</span>服务商索赔管理 · 188 条测试用例（6 模块分栏，测试数据列留空）<span class="arw">→</span></a>
+      <a class="realart dl" href="supplier-claim-mgmt/原始文件/test-cases/测试用例.xlsx" download><span class="lead">下载原件</span>测试用例.xlsx · 测试同学下载后直接填测试数据与执行结果<span class="arw">↓</span></a>
       <div class="deliv">
         <div class="lbl">测试用例示例 · 14 列节选</div>
         <div class="tablewrap" style="margin:0"><table>

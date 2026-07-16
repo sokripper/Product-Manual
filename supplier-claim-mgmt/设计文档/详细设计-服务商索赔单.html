@@ -64,6 +64,21 @@ tbody tr:nth-child(even){background:var(--zebra)}
 .note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;color:var(--muted)}
 .note b{color:var(--ink)}
 .note.warn{border-color:var(--warn);background:var(--warn-soft)}.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+.dl{display:flex;align-items:center;gap:13px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:11px;padding:12px 16px;margin:0 0 22px;flex-wrap:wrap}
+.dl .ic{width:34px;height:34px;border-radius:8px;background:var(--accent);flex:none;position:relative}
+.dl .ic::before{content:"↓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:17px;font-weight:700}
+.dl .tx{flex:1;min-width:180px}
+.dl .tx b{font-size:14px;color:var(--ink)}
+.dl .tx span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.dl a.go{font-family:var(--mono);font-size:12px;color:#fff;background:var(--accent);border-radius:8px;padding:9px 15px;white-space:nowrap}
+.dl a.go:hover{filter:brightness(1.09);text-decoration:none}
+.dlgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px;margin:14px 0}
+.dlcard{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 14px}
+.dlcard:hover{border-color:var(--accent);text-decoration:none}
+.dlcard .ex{font-family:var(--mono);font-size:9.5px;font-weight:700;color:#fff;border-radius:5px;padding:3px 7px;flex:none}
+.dlcard .ex.xlsx{background:#1f9d55}.dlcard .ex.md{background:#8957e5}.dlcard .ex.sql{background:#b7791f}
+.dlcard .nm{font-size:13px;color:var(--ink);min-width:0;word-break:break-all}
+.dlcard .nm span{display:block;font-size:11px;color:var(--muted)}
 /* code walkthrough */
 .filecard{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden;background:var(--surface)}
 .filecard .fh{display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
@@ -118,7 +133,7 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <a class="up" href="../index.html" data-back>← 返回</a>
 <nav class="crumb"><a href="../../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><a href="../index.html">产物站总览</a><span class="sep">›</span><span class="cur">详细设计 · 服务商索赔单</span></nav>
 <div class="sp"><span class="lbl">本站</span><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
-</div></div><main class="wrap"><h1>详细设计 · 服务商索赔单</h1><div class="p"><blockquote><p>版本：v1.0 ｜ 冻结版本 v1.0 ｜ 冻结 commit 88ed0f850780</p></blockquote>
+</div></div><main class="wrap"><h1>详细设计 · 服务商索赔单</h1><div class="dl"><div class="ic"></div><div class="tx"><b>真实原始文件 · 详细设计-服务商索赔单.md</b><span>后端详细设计 LLD 原件（Markdown）</span></div><a class="go" href="../原始文件/detail-design/详细设计-服务商索赔单.md" download>下载原件 ↓</a></div><div class="p"><blockquote><p>版本：v1.0 ｜ 冻结版本 v1.0 ｜ 冻结 commit 88ed0f850780</p></blockquote>
 <h1>详细设计 · 服务商索赔单链（后端 LLD）</h1>
 <p>本文覆盖服务商索赔单从新建到结算入口的完整后端行为，字段级、可开发。范围表：<code>claim_order</code>（主单）、<code>claim_fee_labor</code>（工时费明细）、<code>claim_fee_part</code>（备件明细）、<code>claim_fee_other</code>（其它费用明细）、<code>claim_audit_record</code>（审核记录）、<code>claim_deduct_order</code>（索赔抵扣单）、<code>attachment</code>（附件）。工单库取数一律 Mock、标「待挂载」；向欣旺达索赔单、结算单、质保金账户、供应商索赔、OA 转嫁属于相邻链，本文只写触发点，不写其内部字段。</p>
 <p>技术底座：Spring Boot 3 + MyBatis-Plus + MySQL8；主单更新一律带乐观锁（<code>WHERE id=? AND status=? AND version=? AND deleted_at IS NULL</code>，命中 0 行即判为并发冲突/状态已变，抛业务码并整事务回滚）；一个操作涉及的多张表在同一数据库事务内提交，任一步失败全部回滚；所有查询附 <code>deleted_at IS NULL</code>。</p>
