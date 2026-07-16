@@ -280,7 +280,7 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 </ul>
 <h3>编码规则：</h3>
 <ul>
-<li><code>claim_no</code> = <code>SPCO-yyyyMMdd-4位日内流水</code>，例 <code>SPCO-20260712-0007</code>（依据：PRD S10 编码规则；D-编码-D1/D2 已确认，序列表 DDL 待 D-编码-B1）。同事务行锁取号、INSERT 成功才占号、回滚退号，<code>uk_claim_no</code> 兜底。</li>
+<li><code>claim_no</code> = <code>SPCO-yyyyMMdd-4位日内流水</code>，例 <code>SPCO-20260712-0007</code>（依据：PRD S10 编码规则；D-编码-D1/D2 已确认，序列表 DDL 待 D-编码-B1）。取号走序列表 <code>doc_no_sequence(prefix, seq_date, current_seq)</code>：以「前缀+日期」同事务行锁自增（详见 conventions S7）、INSERT 成功才占号、回滚退号，<code>uk_claim_no</code> 兜底。</li>
 </ul>
 <h3>外部接口：</h3>
 <ul>
