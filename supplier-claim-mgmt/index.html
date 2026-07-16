@@ -136,17 +136,17 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 </div></div><main class="wrap"><div class="hero">
 <div class="eb">SDD V8 · 生成产物展示</div>
 <h1>服务商索赔管理模块</h1>
-<p>设计已冻结 <b>v1.1</b>（A0~G 全阶段 PASS · 返工修订）。本页汇总最新生成的产物：测试用例、前后端代码逻辑、真实界面与设计文档，供评审查阅。</p>
+<p>设计已冻结 <b>v1.2</b>（A0~G 全阶段 PASS · 索赔单聚焦）。本页汇总最新生成的产物：测试用例、前后端代码逻辑、真实界面与设计文档，供评审查阅。</p>
 </div>
 <div class="note"><b>这是《SDD V8 使用手册》的贯穿案例。</b>手册讲清每个节点该产出什么，本站是同一套流程在真实项目上的落地产物——建议从 <a href="../SDD-V8-使用手册.html">使用手册</a> 进入，跟着节点点开这里对应的真实产物对照理解。</div>
 <div class="stats">
 <div class="stat"><div class="n ok">10/10</div><div class="l">阶段 PASS A0~G</div></div>
-<div class="stat"><div class="n ac">30</div><div class="l">功能点冻结</div></div>
+<div class="stat"><div class="n ac">10</div><div class="l">功能点冻结</div></div>
 <div class="stat"><div class="n ac">188</div><div class="l">测试用例 G-audit</div></div>
-<div class="stat"><div class="n ac">82</div><div class="l">决策登记</div></div>
-<div class="stat"><div class="n">21</div><div class="l">DDL 建表</div></div>
+<div class="stat"><div class="n ac">54</div><div class="l">决策登记</div></div>
+<div class="stat"><div class="n">10</div><div class="l">DDL 建表</div></div>
 </div>
-<div class="note warn"><b>本轮为最小场景验证：</b>研发侧仅开发 <code>F-CLAIM-05</code>（服务商索赔单「查看」= 分页列表 + 只读详情），走通「前端 Mock → 后端骨架 → 真实 API 闭环」全链路；其余 29 个功能点本轮登记为 <b>pass（不开发）</b>，保留可溯性。运行时：JDK17 + Maven3.9 + MySQL8（docker）。冻结 commit <code>d7f0755</code>（v1.1）。<br><b style="color:var(--warn)">注：v1.1 为返工修订态</b>——补齐 ~30 处 PRD↔LLD↔schema 缺口、新增结算基础配置详设与 F-CFG-02~04；其中 8 条裁决为跑流程用的 <b>mock 确认</b>、3 条 HIGH 裁决尚未正式化、返工新增内容测试未重生成，<b>非生产就绪</b>。</div>
+<div class="note warn"><b>本期聚焦服务商索赔单：</b>本期只保留 <code>服务商索赔单</code> 模块（F-CLAIM-01~10，共 10 功能点），其他 5 模块（向欣旺达 / 结算 / 付款 / 配置 / 编码）本期已删除。研发侧仅开发 <code>F-CLAIM-05</code>（查看 = 分页列表 + 只读详情），走通「前端 Mock → 后端骨架 → 真实 API 闭环」全链路；其余 9 个功能点登记为 <b>pass（不开发）</b>。运行时：JDK17 + Maven3.9 + MySQL8（docker）。冻结 <b>v1.2（索赔单聚焦·返工修订）</b>，commit <code>b1fbc94</code>。<br><b style="color:var(--warn)">注：跑流程态、非生产就绪</b>——B9/B10/B11 加列裁决为 mock 默认值、待产品复核；开发代码停在"减法收尾"前，未追平 B9/B11 新列与 A-39 硬校验。</div>
 
 <div class="grouplabel">产物速览</div>
 <div class="cards">
@@ -170,8 +170,8 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <div class="grouplabel">原始文件下载 · 各阶段人员可取用真实原件</div>
 <div class="note">上方各页是<b>在线预览</b>；下方是<b>真实原件</b>（Excel 点击即下载，md/sql 为原始文本）。完整原件在仓库 <code>原始文件/</code> 目录。</div>
 <div class="dlgrid">
-<a class="dlcard" href="原始文件/test-cases/测试用例.xlsx" download><span class="ex xlsx">XLSX</span><span class="nm">测试用例.xlsx<span>188 条 · 测试同学填数据/结果</span></span></a>
-<a class="dlcard" href="原始文件/decisions/待确认决策表.xlsx" download><span class="ex xlsx">XLSX</span><span class="nm">待确认决策表.xlsx<span>产品逐条签字（73 项已决）</span></span></a>
+<a class="dlcard" href="原始文件/test-cases/测试用例.xlsx" download><span class="ex xlsx">XLSX</span><span class="nm">测试用例.xlsx<span>78 条 · 测试同学填数据/结果</span></span></a>
+<a class="dlcard" href="原始文件/decisions/待确认决策表.xlsx" download><span class="ex xlsx">XLSX</span><span class="nm">待确认决策表.xlsx<span>54 项 · 产品逐条签字</span></span></a>
 <a class="dlcard" href="原始文件/PRD.md" download><span class="ex md">MD</span><span class="nm">PRD.md<span>产品需求文档</span></span></a>
 <a class="dlcard" href="原始文件/detail-design/详细设计-服务商索赔单.md" download><span class="ex md">MD</span><span class="nm">详细设计-服务商索赔单.md<span>后端 LLD</span></span></a>
 <a class="dlcard" href="原始文件/api-contracts/接口文档-服务商索赔单.md" download><span class="ex md">MD</span><span class="nm">接口文档-服务商索赔单.md<span>接口契约</span></span></a>
@@ -181,7 +181,7 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <a class="dlcard" href="原始文件/Plan.md" download><span class="ex md">MD</span><span class="nm">Plan.md<span>开发计划</span></span></a>
 <a class="dlcard" href="原始文件/tasks.md" download><span class="ex md">MD</span><span class="nm">tasks.md<span>研发任务清单</span></span></a>
 </div>
-<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.1 · 本页由产物渲染生成</p></main><script>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.2 · 本页由产物渲染生成</p></main><script>
 (function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();
 (function(){document.querySelectorAll('a[data-back]').forEach(function(a){a.addEventListener('click',function(e){try{if(history.length>1&&document.referrer&&new URL(document.referrer).origin===location.origin){e.preventDefault();history.back();}}catch(err){}});});})();
 (function(){if('scrollRestoration' in history)history.scrollRestoration='manual';var key='sdd-scroll:'+location.pathname;if(!location.hash){try{var y=sessionStorage.getItem(key);if(y!==null){var r=document.documentElement,p=r.style.scrollBehavior;r.style.scrollBehavior='auto';window.scrollTo(0,parseInt(y,10)||0);r.style.scrollBehavior=p;}}catch(e){}}var t=null;window.addEventListener('scroll',function(){if(t)return;t=setTimeout(function(){t=null;try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}},150);},{passive:true});window.addEventListener('beforeunload',function(){try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}});})();

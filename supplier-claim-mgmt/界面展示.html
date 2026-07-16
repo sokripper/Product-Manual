@@ -134,17 +134,17 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <nav class="crumb"><a href="../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><a href="index.html">产物站总览</a><span class="sep">›</span><span class="cur">界面展示</span></nav>
 <div class="sp"><span class="lbl">本站</span><a class="tl" href="index.html">总览</a><a class="tl" href="测试用例.html">测试用例</a><a class="tl" href="代码-前端.html">前端代码</a><a class="tl" href="代码-后端.html">后端代码</a><a class="tl on" href="界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
 </div></div><main class="wrap"><h1>界面展示</h1>
-<div class="note"><b>两部分：</b>①「真实实现」= 本轮开发的 React 前端实际渲染（F-CLAIM-05 查看功能，Mock 数据脱离后端运行的真实截图）；②「设计原型」= 阶段 B2 已确认的可交互 HTML 原型（30 功能点全量，前端实现的文案/样式依据）。</div>
+<div class="note"><b>两部分：</b>①「真实实现」= 本轮开发的 React 前端实际渲染（F-CLAIM-05 查看功能，Mock 数据脱离后端运行的真实截图）；②「设计原型」= 阶段 B2 已确认的可交互 HTML 原型（服务商索赔单 · 列表+详情，本期聚焦；其他模块原型已删）。</div>
 
 <h2>① 真实实现 · React 前端（本轮开发 F-CLAIM-05）</h2>
 <p style="color:var(--muted);font-size:14px">下方为实际构建的前端页面真实截图（React + TypeScript + Ant Design，VITE_USE_MOCK 模式独立运行）。</p>
 <div class="shot"><div class="cap"><span class="t">实现</span><b>服务商索赔单列表</b><span>/claims · 查询条件 + 分页表格 + 状态标签</span></div><img src="shots/list.png" alt="索赔单列表页真实截图" loading="lazy"></div>
 <div class="shot"><div class="cap"><span class="t">实现</span><b>服务商索赔单详情</b><span>/claims/:id · 基础信息 + 费用明细 + 附件 + 审核时间线（只读）</span></div><img src="shots/detail.png" alt="索赔单详情页真实截图" loading="lazy"></div>
 
-<h2>② 设计原型 · 可交互 HTML（阶段 B2 冻结，30 功能点全量）</h2>
+<h2>② 设计原型 · 可交互 HTML（阶段 B2 冻结，服务商索赔单 列表+详情）</h2>
 <p style="color:var(--muted);font-size:14px">点击直接打开可交互原型页（Stitch 生成 + 整理）。<a href="原型/index.html">打开原型索引首页 →</a></p>
-<div class="protolist"><a href="原型/pages/01-服务商索赔单列表.html">服务商索赔单列表</a><a href="原型/pages/02-服务商索赔单详情.html">服务商索赔单详情</a><a href="原型/pages/03-向欣旺达索赔单列表.html">向欣旺达索赔单列表</a><a href="原型/pages/04-闪欣索赔单详情.html">闪欣索赔单详情</a><a href="原型/pages/05-服务商结算单列表.html">服务商结算单列表</a><a href="原型/pages/06-服务商结算单详情.html">服务商结算单详情</a><a href="原型/pages/07-闪欣结算单列表.html">闪欣结算单列表</a><a href="原型/pages/08-闪欣结算单详情.html">闪欣结算单详情</a><a href="原型/pages/09-付款申请单列表.html">付款申请单列表</a><a href="原型/pages/10-付款申请单详情.html">付款申请单详情</a><a href="原型/pages/11-付款申请单新建.html">付款申请单新建</a><a href="原型/pages/12-结算基础配置.html">结算基础配置</a></div>
-<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.1 · 本页由产物渲染生成</p></main><script>
+<div class="protolist"><a href="原型/pages/01-服务商索赔单列表.html">服务商索赔单列表</a><a href="原型/pages/02-服务商索赔单详情.html">服务商索赔单详情</a></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.2 · 本页由产物渲染生成</p></main><script>
 (function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();
 (function(){document.querySelectorAll('a[data-back]').forEach(function(a){a.addEventListener('click',function(e){try{if(history.length>1&&document.referrer&&new URL(document.referrer).origin===location.origin){e.preventDefault();history.back();}}catch(err){}});});})();
 (function(){if('scrollRestoration' in history)history.scrollRestoration='manual';var key='sdd-scroll:'+location.pathname;if(!location.hash){try{var y=sessionStorage.getItem(key);if(y!==null){var r=document.documentElement,p=r.style.scrollBehavior;r.style.scrollBehavior='auto';window.scrollTo(0,parseInt(y,10)||0);r.style.scrollBehavior=p;}}catch(e){}}var t=null;window.addEventListener('scroll',function(){if(t)return;t=setTimeout(function(){t=null;try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}},150);},{passive:true});window.addEventListener('beforeunload',function(){try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}});})();

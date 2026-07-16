@@ -133,218 +133,788 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <a class="up" href="../index.html" data-back>← 返回</a>
 <nav class="crumb"><a href="../../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><a href="../index.html">产物站总览</a><span class="sep">›</span><span class="cur">详细设计 · 服务商索赔单</span></nav>
 <div class="sp"><span class="lbl">本站</span><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
-</div></div><main class="wrap"><h1>详细设计 · 服务商索赔单</h1><div class="dl"><div class="ic"></div><div class="tx"><b>真实原始文件 · 详细设计-服务商索赔单.md</b><span>后端详细设计 LLD 原件（Markdown）</span></div><a class="go" href="../原始文件/detail-design/详细设计-服务商索赔单.md" download>下载原件 ↓</a></div><div class="p"><blockquote><p>版本：v1.0 ｜ 冻结版本 v1.1 ｜ 冻结 commit d7f07555cb73</p></blockquote>
-<h1>详细设计 · 服务商索赔单链（后端 LLD）</h1>
-<p>本文覆盖服务商索赔单从新建到结算入口的完整后端行为，字段级、可开发。范围表：<code>claim_order</code>（主单）、<code>claim_fee_labor</code>（工时费明细）、<code>claim_fee_part</code>（备件明细）、<code>claim_fee_other</code>（其它费用明细）、<code>claim_audit_record</code>（审核记录）、<code>claim_deduct_order</code>（索赔抵扣单）、<code>attachment</code>（附件）。工单库取数一律 Mock、标「待挂载」；向欣旺达索赔单、结算单、质保金账户、供应商索赔、OA 转嫁属于相邻链，本文只写触发点，不写其内部字段。</p>
-<p>技术底座：Spring Boot 3 + MyBatis-Plus + MySQL8；主单更新一律带乐观锁（<code>WHERE id=? AND status=? AND version=? AND deleted_at IS NULL</code>，命中 0 行即判为并发冲突/状态已变，抛业务码并整事务回滚）；一个操作涉及的多张表在同一数据库事务内提交，任一步失败全部回滚；所有查询附 <code>deleted_at IS NULL</code>。</p>
+</div></div><main class="wrap"><h1>详细设计 · 服务商索赔单</h1><div class="dl"><div class="ic"></div><div class="tx"><b>真实原始文件 · 详细设计-服务商索赔单.md</b><span>后端详细设计 LLD 原件（Markdown）</span></div><a class="go" href="../原始文件/detail-design/详细设计-服务商索赔单.md" download>下载原件 ↓</a></div><div class="p"><blockquote><p>版本：v1.2 ｜ 冻结版本 v1.2 ｜ 冻结 commit b1fbc94db4cef46bd8a4bd920ce5aadc06a4c494</p></blockquote>
+<h1>服务商索赔单 详细设计</h1>
+<p>本文覆盖服务商索赔单从新建到结算入口的完整后端行为，字段级、可开发。按 PRD 功能定义清单 F-CLAIM-01~10 一一对应，一个功能点一节。范围表：<code>claim_order</code>（主单）、<code>claim_fee_labor</code>（工时费明细）、<code>claim_fee_part</code>（备件明细）、<code>claim_fee_other</code>（其它费用明细）、<code>claim_audit_record</code>（审核记录）、<code>claim_deduct_order</code>（索赔抵扣单）、<code>attachment</code>（附件）。工单库取数一律 Mock、标「待挂载」；向欣旺达索赔单、结算单、质保金账户、供应商索赔、OA 转嫁属于相邻链，本文只写触发点，不写其内部字段。</p>
+<p>技术底座：Spring Boot 3 + MyBatis-Plus + MySQL8。主单每次更新都带乐观锁：<code>WHERE id=? AND status=? AND version=? AND deleted_at IS NULL</code>，命中 0 行即判为并发冲突或状态已变，抛业务码并整事务回滚。一个操作涉及的多张表在同一数据库事务内提交，任一步失败全部回滚。所有查询附 <code>deleted_at IS NULL</code>。</p>
 <hr>
-<h2>一、先约定：这条链里反复用到的东西</h2>
+<h2>通用约定</h2>
+<p>这条链里反复用到、各功能点共享的约定集中放这里，各功能点正文不再重复。</p>
+<h3>谁在操作（RBAC + 数据范围）</h3>
 <ul>
-<li><strong>谁在操作</strong>：接口进来先做 RBAC 鉴权（未登录 401，越权 403）+ 数据范围过滤。服务商售后专员只看/只动本服务商单；区域负责人只动本区域单；索赔专员全国；质量部只动【待责任判定】的自采件单。数据范围过滤在 SQL 里拼 <code>provider_id</code> / <code>region</code> 条件，不靠前端。</li>
-<li><strong>状态取值</strong>：<code>claim_order.status</code> 只允许 <code>CLAIM_STATUS</code> 九个码值：<code>DRAFT / PENDING_REGION / PENDING_HQ / PENDING_LIABILITY / PENDING_SETTLE / REJECTED / DECLINED / SETTLED / VOIDED</code>。任何写状态的地方都先判「当前状态是否为该操作允许的前置状态」，不是就拦下（见第九节非法迁移）。</li>
-<li><strong>单号怎么来</strong>：<code>claim_no = SPCO-yyyyMMdd-4位日内流水</code>。落库前按已确认的 D-编码-D1/D2 方案，从 <code>doc_no_sequence</code> 以「前缀+日期」同事务行锁取号，业务 INSERT 成功才占号、回滚退号；<code>uk_claim_no</code> 唯一索引兜底。抵扣单号 <code>deduct_no = DKD-yyyyMMdd-4位流水</code>，同机制。序列表 DDL 仍待研发组长审定（D-编码-B1）。</li>
-<li><strong>金额恒等式</strong>（落单即算、只读）：<code>apply_total_amount = labor_fee_total + part_mgmt_fee + other_fee_total</code>。其中 <code>labor_fee_total = Σ claim_fee_labor.amount</code>，<code>part_mgmt_fee = Σ claim_fee_part.mgmt_fee</code>，<code>other_fee_total = Σ claim_fee_other.amount</code>。备件索赔金额 <code>claim_fee_part.claim_amount</code> 恒为 0。</li>
-<li><strong>系数快照</strong>：新建时把「发起时点的服务商索赔系数」写进 <code>claim_order.coefficient_snapshot</code>，之后系数配置变了也不动历史单（A-2）。备件管理费 <code>mgmt_fee = 备件销售价 × coefficient_snapshot</code>。</li>
-<li><strong>审计列</strong>：每次写主单都要带 <code>update_by / updated_at(NOW()) / version=version+1</code>；新建带 <code>create_by / created_at</code>。</li>
-<li><strong>附件挂哪</strong>：都进 <code>attachment</code> 表，用 <code>biz_type + biz_id</code> 定位。索赔单主体附件 <code>biz_type=CLAIM, biz_id=claim_order.id</code>；判责录入附件 <code>biz_type=LIABILITY, biz_id=claim_order.id</code>。回运单附件按 A-11 也落 <code>attachment</code>（判定见「提交」一节，B-3）。</li>
+<li>接口进来先做 RBAC 鉴权（未登录 401，越权 403）+ 数据范围过滤。</li>
+<li>数据范围：服务商售后专员只看/只动本服务商单；区域负责人只动本区域单；闪欣索赔专员全国；质量部只动【待责任判定】的自采件单。</li>
+<li>数据范围过滤在 SQL 里拼 <code>provider_id</code> / <code>region</code> 条件，不靠前端。</li>
 </ul>
+<h3>状态取值（九个码值）</h3>
+<ul>
+<li><code>claim_order.status</code> 只允许 <code>CLAIM_STATUS</code> 九个码值：<code>DRAFT / PENDING_REGION / PENDING_HQ / PENDING_LIABILITY / PENDING_SETTLE / REJECTED / DECLINED / SETTLED / VOIDED</code>。</li>
+<li>任何写状态的地方都先判「当前状态是否为该操作允许的前置状态」，不是就拦下（见文末迁移总表下方的非法迁移拦截）。</li>
+<li>术语归一（来自 PRD S7）：「已关闭」=「已拒绝」<code>DECLINED</code>（A-15）；「审核驳回」=「已驳回」<code>REJECTED</code>（A-4）。</li>
+</ul>
+<h3>单号怎么来</h3>
+<ul>
+<li><code>claim_no = SPCO-yyyyMMdd-4位日内流水</code>（PRD S10 编码规则：SPCO-8位年月日-4位流水，全局唯一）。落库前按已确认的 D-编码-D1/D2 方案，从 <code>doc_no_sequence</code> 以「前缀+日期」同事务行锁取号，业务 INSERT 成功才占号、回滚退号；<code>uk_claim_no</code> 唯一索引兜底。</li>
+<li>抵扣单号 <code>deduct_no = DKD-yyyyMMdd-4位流水</code>，同机制。</li>
+<li>序列表 DDL 仍待研发组长审定（D-编码-B1）。</li>
+</ul>
+<h3>金额恒等式（落单即算、只读）</h3>
+<ul>
+<li><code>apply_total_amount = labor_fee_total + part_mgmt_fee + other_fee_total</code>。</li>
+<li><code>labor_fee_total = Σ claim_fee_labor.amount</code>；<code>part_mgmt_fee = Σ claim_fee_part.mgmt_fee</code>；<code>other_fee_total = Σ claim_fee_other.amount</code>。</li>
+<li>备件索赔金额 <code>claim_fee_part.claim_amount</code> 恒为 0（PRD S8.2）。</li>
+</ul>
+<h3>系数快照</h3>
+<ul>
+<li>新建时把「发起时点的服务商索赔系数」写进 <code>claim_order.coefficient_snapshot</code>，之后系数配置变了也不动历史单（A-2）。</li>
+<li>备件管理费 <code>mgmt_fee = claim_fee_part.sale_price（备件销售价，落库）× coefficient_snapshot</code>（裁决 D-索赔-B11：销售价落库 <code>sale_price</code> 使 mgmt_fee 可追溯）。</li>
+</ul>
+<h3>审计列</h3>
+<ul>
+<li>每次写主单都要带 <code>update_by / updated_at(NOW()) / version=version+1</code>；新建带 <code>create_by / created_at</code>。</li>
+</ul>
+<h3>附件挂哪</h3>
+<ul>
+<li>都进 <code>attachment</code> 表，用 <code>biz_type + biz_id</code> 定位。</li>
+<li>索赔单主体附件 <code>biz_type=CLAIM, biz_id=claim_order.id</code>；判责录入附件 <code>biz_type=LIABILITY, biz_id=claim_order.id</code>。</li>
+<li>回运单附件按 A-11 也落 <code>attachment</code>（判定见 F-CLAIM-02 提交一节，B-3）。</li>
+</ul>
+<h3>全链状态流转总表（谁触发 + 条件 + 写哪些字段 + 拦截）</h3>
+<p>各功能点「业务流转说明」是本表对应行的展开，本表作为全链一览保留。</p>
+<div class="tablewrap"><table><thead><tr><th>起态</th><th>事件（谁）</th><th>终态</th><th>迁移条件</th><th>迁移时写的关键字段</th></tr></thead><tbody><tr><td>—（新建）</td><td>新建（服务商专员）</td><td><code>DRAFT</code></td><td>工单已完工+技术审核已过+保内+条件唯一+工时费&gt;0</td><td>建 claim_order(status=DRAFT)+三明细+系数快照</td></tr><tr><td><code>DRAFT</code></td><td>提交（服务商专员）</td><td><code>PENDING_REGION</code></td><td>需回运件已发起回运+维修凭证附件在+硬校验</td><td>claim_order.status=PENDING_REGION</td></tr><tr><td><code>DRAFT</code></td><td>编辑（服务商专员）</td><td><code>DRAFT</code></td><td>仅改其它费用</td><td>claim_fee_other + 重算 other_fee_total/apply_total_amount</td></tr><tr><td><code>DRAFT</code></td><td>作废（服务商专员）</td><td><code>VOIDED</code></td><td>仅草稿</td><td>status=VOIDED；主单/明细/附件保留供全状态查看</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审通过（区域负责人）</td><td><code>PENDING_HQ</code></td><td>核查通过+录 claim_target（XW 必录 project_code）</td><td>status=PENDING_HQ、claim_target、project_code、audit_record(区域初审/通过)</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审驳回</td><td><code>REJECTED</code></td><td>资料不实/汽车电子工时不合理等</td><td>status=REJECTED、audit_record(区域初审/驳回+原因)</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审拒绝</td><td><code>DECLINED</code></td><td>判定不予受理</td><td>status=DECLINED、audit_record(区域初审/拒绝+原因)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核通过·XW（索赔专员）</td><td><code>PENDING_SETTLE</code></td><td>claim_target=XW</td><td>status=PENDING_SETTLE、audit_record(业务审核/通过)、<strong>生成向欣旺达单</strong></td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核通过·SELF（索赔专员）</td><td><code>PENDING_LIABILITY</code></td><td>claim_target=SELF</td><td>status=PENDING_LIABILITY、audit_record(业务审核/通过)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核驳回</td><td><code>REJECTED</code></td><td>复核不通过</td><td>status=REJECTED、audit_record(业务审核/驳回+原因)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核拒绝</td><td><code>DECLINED</code></td><td>终止</td><td>status=DECLINED、audit_record(业务审核/拒绝+原因)</td></tr><tr><td><code>PENDING_LIABILITY</code></td><td>判责录入（质量部）</td><td><code>PENDING_SETTLE</code></td><td>三结果之一+说明</td><td>liability_result/desc/ratio/by/time、status=PENDING_SETTLE、audit_record(audit_stage='LIABILITY' 责任判定/判责结果，裁决 D-索赔-B10)；PROVIDER 建抵扣单+provider_deduct_started=1；SUPPLIER 置 supplier_claim_started=1；INTERNAL 仅记录</td></tr><tr><td><code>REJECTED</code></td><td>编辑（服务商专员）</td><td><code>REJECTED</code></td><td>仅改其它费用</td><td>claim_fee_other + 重算金额（状态不变）</td></tr><tr><td><code>REJECTED</code></td><td>重新提交（服务商专员）</td><td><code>PENDING_REGION</code></td><td>同提交校验（从头，A-13）</td><td>status=PENDING_REGION</td></tr><tr><td><code>PENDING_SETTLE</code></td><td>结算完成（结算链，非本链动作）</td><td><code>SETTLED</code></td><td>由结算链驱动</td><td>status=SETTLED（字段属结算链）</td></tr></tbody></table></div>
+<p><strong>非法迁移拦截（统一策略）</strong>：每个写状态的操作，先用乐观锁 SQL 限定「前置状态白名单」——<code>UPDATE ... WHERE id=? AND status IN (&lt;该操作允许的前置态&gt;) AND version=? AND deleted_at IS NULL</code>。命中 0 行有两种原因：并发导致 version 变了、或状态已不在白名单（如对已结算单点作废、对草稿单点判责、对已拒绝/已作废终态做任何流转）。一律回滚并返回业务码「当前状态不允许该操作，请刷新」（HTTP 200，<code>Result.success=false</code>，PRD S12 乐观锁+二次校验）。终态 <code>DECLINED / VOIDED / SETTLED</code> 不作为任何流转事件的前置态。<code>SETTLED</code> 由结算链负责，本链不主动写。</p>
 <hr>
-<h2>二、新建暂存草稿（对应 F-CLAIM-01）</h2>
-<p><strong>谁能点 + 前置</strong>：服务商售后专员，在「新建索赔单」入口。无前置单据状态（是新建）。</p>
-<p><strong>校验（新建阶段从宽，只拦硬错）</strong>：</p>
+<h2>F-CLAIM-01 新建索赔</h2>
+<h3>功能说明：</h3>
+<ul>
+<li>服务商售后专员关联一张【已完工 + 维修方案已过技术审核 + 保内】的维修工单，自动带出工单基础信息、维修项目、工时标准、备件明细（备件索赔金额=0、备件管理费）、其它费用、维修类型/SN/条码（只读带入，A-10）、主责件；索赔类型由工单业务类型带出只读（A-9）。</li>
+<li>保存后生成草稿单并带出费用明细（PRD 完成标准）。</li>
+<li>关键限制：仅保内且已过技术审核的已完工工单可发起（A-8，技术审核前置来源 PRD F-CLAIM-01）；同一工单同时只能有一张有效单（A-15）；工时费合计必须 &gt; 0（A-1）。</li>
+</ul>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 新建索赔单（P02 表单）。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>服务商售后专员在「新建索赔单」入口发起，无前置单据状态（是新建）。系统先取工单维度互斥锁、再在事务内校验工单准入与唯一性，通过后同一事务内建主单 <code>claim_order</code>（status=DRAFT）+ 三张费用明细 + 系数快照 +（可选）附件 + 一条新建操作留痕，任一步失败整体回滚，不留半张单。落地终态为 <code>DRAFT</code>（草稿），不触发任何下游。</li>
+</ul>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：写入主单全部字段（单号/状态/工单带出信息/系数快照/金额汇总/审计列）—— 表结构与状态字典见 <code>docs/db-schema/</code>。</li>
+<li><code>claim_fee_labor</code>（工时费明细）：按工单维修项目逐行写入。</li>
+<li><code>claim_fee_part</code>（备件明细）：按工单备件逐行写入。</li>
+<li><code>claim_fee_other</code>（其它费用明细）：写入工单带出的其它费用行。</li>
+<li><code>attachment</code>（附件）：新建时可传可不传，若传按 <code>biz_type=CLAIM</code> 逐个写入。</li>
+<li><code>claim_audit_record</code>（审核记录）：写入一条新建操作事件。</li>
+<li>工单库相关取数表：<strong>只读、待挂载/Mock</strong>，物理列未登记，禁止自造。</li>
+<li><code>claim_type_mapping</code>（工单业务类型→索赔类型映射字典）：只读，用于带出 <code>claim_type</code>。</li>
+<li><code>claim_coefficient</code>（服务商索赔系数配置）：只读，用于取系数快照回退值。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>新建</strong>（表单，逐字段写规则）：</li>
+<ul>
+<li>校验（新建阶段从宽，只拦硬错）：</li>
 <ol>
-<li>关联工单必须是「本服务商 + 状态=已完工 + <strong>维修方案已过技术审核</strong> + 保内」的维修工单（A-8；技术审核前置来源 PRD F-CLAIM-01）。工单状态/保内标识/服务商归属/<strong>维修方案技术审核结果</strong>都从工单库取——<strong>待挂载/Mock</strong>，本期用 Mock 数据源判断（技术审核结果本期由工单侧 Mock 保证，真库接上后回填判据）。</li>
-<li>同一工单已存在一张状态非 <code>DECLINED/VOIDED</code> 的索赔单则拦下（A-15：只有已拒绝/已作废才允许重新发起；<code>REJECTED</code> 仍是可编辑重提的同一张有效单，不能另建）。为避免“先查后插”并发穿透，新建必须使用同一 DB 连接先取工单维度互斥锁 <code>SELECT GET_LOCK(CONCAT('claim-wo-',MD5(?)),5)</code>；取锁失败/超时直接返回“该工单正在发起索赔，请稍后重试”。取锁后在事务内再查 <code>claim_order WHERE work_order_id=? AND status NOT IN (DECLINED,VOIDED) AND deleted_at IS NULL</code>，通过后才插入；提交/回滚后在 <code>finally</code> 中用同连接 <code>RELEASE_LOCK</code>。该锁是连接级而非事务级，不得在取锁与放锁之间归还连接池。</li>
+<li>关联工单必须是「本服务商 + 状态=已完工 + 维修方案已过技术审核 + 保内」的维修工单（A-8；技术审核前置来源 PRD F-CLAIM-01）。工单状态/保内标识/服务商归属/维修方案技术审核结果都从工单库取——<strong>待挂载/Mock</strong>，本期用 Mock 数据源判断（技术审核结果本期由工单侧 Mock 保证，真库接上后回填判据）。</li>
+<li>同一工单已存在一张状态非 <code>DECLINED/VOIDED</code> 的索赔单则拦下（A-15：只有已拒绝/已作废才允许重新发起；<code>REJECTED</code> 仍是可编辑重提的同一张有效单，不能另建）。为避免「先查后插」并发穿透，新建必须使用同一 DB 连接先取工单维度互斥锁 <code>SELECT GET_LOCK(CONCAT('claim-wo-',MD5(?)),5)</code>；取锁失败/超时直接返回「该工单正在发起索赔，请稍后重试」。取锁后在事务内再查 <code>claim_order WHERE work_order_id=? AND status NOT IN (DECLINED,VOIDED) AND deleted_at IS NULL</code>，通过后才插入；提交/回滚后在 <code>finally</code> 中用同连接 <code>RELEASE_LOCK</code>。该锁是连接级而非事务级，不得在取锁与放锁之间归还连接池。</li>
 <li>工时费合计必须 &gt; 0（A-1，S8.2「工时费&gt;0 必有」）；其它费用合计 ≥ 0。</li>
 <li>草稿阶段允许必填项暂缺（附件、claim_target 等留白），提交时再严格校验。</li>
 </ol>
-<p><strong>写哪些表哪些字段 = 什么值</strong>（同一事务）：</p>
+<li>操作按钮：</li>
 <ul>
-<li><code>claim_order</code> 插一行：</li>
+<li>保存：写入以下数据（同一事务）：</li>
 <ul>
-<li><code>id</code>=雪花；<code>claim_no</code>=生成的 SPCO 号；<code>status</code>='DRAFT'；<code>currency</code>='CNY'。</li>
-<li><code>work_order_id / work_order_no / work_order_biz_type / provider_id / provider_code / provider_name / region</code>=工单库带出（<strong>待挂载/Mock</strong>）。</li>
-<li><code>claim_type</code>=按 <code>work_order_biz_type</code> 查 <code>claim_type_mapping</code> 映射得到，只读带入（A-9）；映射查不到时留空并报「工单业务类型未配置映射」拦截（不可静默）。</li>
-<li><code>coefficient_snapshot</code>=发起时点服务商系数：优先取工单库系数（待挂载），无则查本模块 <code>claim_coefficient</code> 当前生效值。「当前生效值」选取谓词：<code>enabled=1 AND deleted_at IS NULL AND COALESCE(effective_from,'1000-01-01') &lt;= 发起日</code>，先按 <code>provider_id=:providerId</code> 命中、无命中行时回退 <code>provider_id IS NULL</code>（全局默认行）；同一命中范围内多行时按 <code>effective_from DESC, created_at DESC</code> 取最新一行（与白名单 effective_from 同口径）。</li>
-<li><code>labor_fee_total / part_mgmt_fee / other_fee_total</code>=由三张明细汇总回填；<code>apply_total_amount</code>=三者之和。</li>
-<li><code>main_part_id / main_part_name</code>=工单主责件带出（<strong>待挂载/Mock</strong>），可为空（区域初审前允许）。</li>
-<li><code>claim_target</code>=NULL、<code>project_code</code>=NULL（区域初审才录）；<code>liability_*</code>=NULL；<code>supplier_claim_started</code>=0、<code>provider_deduct_started</code>=0。</li>
-<li>审计列：<code>create_by</code>=当前用户、<code>created_at</code>=NOW()、<code>version</code>=0。</li>
+<li>写入 <code>claim_order</code>（插一行）：</li>
+<ul>
+<li><code>id</code> = 雪花</li>
+<li><code>claim_no</code> = 生成的 SPCO 号（见「编码规则」）</li>
+<li><code>status</code> = 'DRAFT'</li>
+<li><code>currency</code> = 'CNY'</li>
+<li><code>work_order_id / work_order_no / work_order_biz_type / provider_id / provider_code / provider_name / region</code> = 工单库带出（<strong>待挂载/Mock</strong>）</li>
+<li><code>claim_type</code> = 按 <code>work_order_biz_type</code> 查 <code>claim_type_mapping</code> 映射得到，只读带入（A-9）；映射查不到时留空并报「工单业务类型未配置映射」拦截（不可静默）</li>
+<li><code>coefficient_snapshot</code> = 发起时点服务商系数：优先取工单库系数（待挂载），无则查本模块 <code>claim_coefficient</code> 当前生效值。「当前生效值」选取谓词：<code>enabled=1 AND deleted_at IS NULL AND COALESCE(effective_from,'1000-01-01') &lt;= 发起日</code>，先按 <code>provider_id=:providerId</code> 命中、无命中行时回退 <code>provider_id IS NULL</code>（全局默认行）；同一命中范围内多行时按 <code>effective_from DESC, created_at DESC</code> 取最新一行（与白名单 effective_from 同口径）</li>
+<li><code>labor_fee_total / part_mgmt_fee / other_fee_total</code> = 由三张明细汇总回填</li>
+<li><code>apply_total_amount</code> = 三者之和</li>
+<li><code>main_part_id / main_part_name</code> = 工单主责件带出（<strong>待挂载/Mock</strong>），可为空（区域初审前允许）</li>
+<li><code>repair_type / sub_repair_type / serial_no / vin / province_city</code> = 工单库带出的维修类型/二级类型/序列号/整车 VIN/所属省市（只读带入 A-10，<strong>待挂载/Mock</strong>；裁决 D-索赔-B9 已加列，支撑 A-14 汽车电子把关与 A-39 场景条件必填的分类判据），无值可空</li>
+<li><code>claim_target</code> = NULL、<code>project_code</code> = NULL（区域初审才录）</li>
+<li><code>liability_*</code> = NULL</li>
+<li><code>supplier_claim_started</code> = 0、<code>provider_deduct_started</code> = 0</li>
+<li><code>create_by</code> = 当前用户、<code>created_at</code> = NOW()、<code>version</code> = 0</li>
 </ul>
-<li><code>claim_fee_labor</code> 按工单维修项目逐行插：<code>claim_id</code>=主单 id、<code>project_name / labor_hours / labor_price</code>=工单带出（待挂载）、<code>amount</code>=<code>labor_hours × labor_price</code>。</li>
-<li><code>claim_fee_part</code> 按工单备件逐行插：<code>claim_id</code>、<code>part_name / part_attr / battery_sn / old_part_code</code>=工单带出（待挂载）、<code>claim_amount</code>=0.00（恒 0）、<code>mgmt_fee</code>=<code>销售价 × coefficient_snapshot</code>。</li>
-<li><code>claim_fee_other</code> 插工单带出的其它费用行：<code>claim_id</code>、<code>fee_type / amount / remark</code>；<code>editable</code>=物流费等可人工改的置 1，其余置 0（A-7）。</li>
-<li>附件此刻可传可不传；若传，<code>attachment</code> 逐个插（<code>biz_type=CLAIM</code>）。</li>
-<li><code>claim_audit_record</code> 插入新建操作事件：<code>biz_type='CLAIM'</code>、<code>biz_id</code>=新单 id、<code>audit_stage='OPERATION'</code>、<code>audit_result='CREATE'</code>、<code>auditor/audit_time</code>=操作人/时间，<code>remark='新建草稿'</code>。</li>
+<li>写入 <code>claim_fee_labor</code>（按工单维修项目逐行插）：</li>
+<ul>
+<li><code>claim_id</code> = 主单 id</li>
+<li><code>project_name / labor_hours / labor_price</code> = 工单带出（待挂载）</li>
+<li><code>amount</code> = <code>labor_hours × labor_price</code></li>
 </ul>
-<p><strong>状态变成</strong>：<code>DRAFT</code>（草稿）。</p>
-<p><strong>触发下游</strong>：无。</p>
-<p><strong>事务/回滚</strong>：主单+三张明细+附件同一事务；任一插入失败整体回滚，不留半张单。</p>
+<li>写入 <code>claim_fee_part</code>（按工单备件逐行插）：</li>
+<ul>
+<li><code>claim_id</code> = 主单 id</li>
+<li><code>part_name / part_attr / battery_sn / old_part_code</code> = 工单带出（待挂载）</li>
+<li><code>sale_price</code> = 工单备件销售价（<strong>待挂载/Mock 带出</strong>，裁决 D-索赔-B11 已加列落库，保金额可追溯）</li>
+<li><code>claim_amount</code> = 0.00（恒 0）</li>
+<li><code>mgmt_fee</code> = <code>sale_price × coefficient_snapshot</code>（销售价落库于 <code>sale_price</code>，派生可复核，裁决 D-索赔-B11）</li>
+</ul>
+<li>写入 <code>claim_fee_other</code>（插工单带出的其它费用行）：</li>
+<ul>
+<li><code>claim_id</code> = 主单 id</li>
+<li><code>fee_type / amount / remark</code> = 工单带出</li>
+<li><code>editable</code> = 物流费等可人工改的置 1，其余置 0（A-7）</li>
+</ul>
+<li>写入 <code>attachment</code>（此刻可传可不传；若传逐个插）：<code>biz_type=CLAIM</code>、<code>biz_id</code>=新单 id</li>
+<li>写入 <code>claim_audit_record</code>（新建操作事件）：<code>biz_type='CLAIM'</code>、<code>biz_id</code>=新单 id、<code>audit_stage='OPERATION'</code>、<code>audit_result='CREATE'</code>、<code>auditor/audit_time</code>=操作人/时间、<code>remark='新建草稿'</code></li>
+</ul>
+<li>取消：不保存，返回上一页。</li>
+</ul>
+</ul>
+</ul>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li><code>claim_no</code> = <code>SPCO-yyyyMMdd-4位日内流水</code>，例 <code>SPCO-20260712-0007</code>（依据：PRD S10 编码规则；D-编码-D1/D2 已确认，序列表 DDL 待 D-编码-B1）。同事务行锁取号、INSERT 成功才占号、回滚退号，<code>uk_claim_no</code> 兜底。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>工单库取数：对接系统为维修工单管理模块；触发时机为进入新建表单带出工单基础信息/维修项目/工时/备件/主责件/系数/技术审核结果/VIN·SN·条码。本期 <strong>Mock/待挂载</strong>，物理列未登记，真库到位走变更登记回填（A-21，见「留白与取数边界」）。失败处理：Mock 源缺关键判据（技术审核结果等）时按校验规则拦截，不静默放行。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无（新建单条表单录入；批量导入场景见 F-CLAIM-09 涉及的汽车电子旧件条码 Excel，属相邻能力，不在本节）。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>工单维度互斥锁 <code>GET_LOCK('claim-wo-'+MD5(work_order_id))</code> 连接级串行化，防「先查后插」并发穿透造成一工单两张有效单；取锁失败即返回重试。</li>
+<li>主单+三张明细+附件+操作事件同一事务，任一插入失败整体回滚。</li>
+<li><code>uk_claim_no</code> 唯一索引兜底单号并发重复。</li>
+</ul>
 <hr>
-<h2>三、提交（对应 F-CLAIM-02，也用于「已驳回」重新提交）</h2>
-<p><strong>谁能点 + 前置</strong>：服务商售后专员；前置状态 <code>DRAFT</code> 或 <code>REJECTED</code>（已驳回可编辑后重提，A-13）。</p>
-<p><strong>校验</strong>：</p>
+<h2>F-CLAIM-02 提交索赔</h2>
+<h3>功能说明：</h3>
+<ul>
+<li>服务商售后专员把草稿或已驳回单提交，进入区域初审（PRD 完成标准：状态→待区域初审）。</li>
+<li>提交时维修凭证附件必填（原始 PRD S4.1.1，硬校验），旧件资料附件选填；校验备件是否需回运，需回运的必须先发起回运（在途即可提交，A-11）。</li>
+<li>也用于「已驳回」单编辑后重新提交（A-13，从头走区域初审）。</li>
+</ul>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 详情/编辑页（P02）- 提交。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>服务商售后专员对 <code>DRAFT</code> 或 <code>REJECTED</code>（已驳回可编辑后重提，A-13）单点提交。系统重走一遍新建硬校验并叠加回运/维修凭证/条件必填校验，通过后单表更新 <code>claim_order.status='PENDING_REGION'</code> 并写一条提交操作留痕，同一事务、走乐观锁。从 <code>REJECTED</code> 重提同样回到 <code>PENDING_REGION</code>（从头走）。落地终态 <code>PENDING_REGION</code>（待区域初审），不触发下游（等区域初审）。</li>
+</ul>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：更新 <code>status</code> 与审计列，其余业务字段不动；<code>repair_type/sub_repair_type</code>（场景触发）、<code>vin</code>（整车条件必填）只读用于 A-39 硬校验（裁决 D-索赔-B9）。</li>
+<li><code>claim_audit_record</code>（审核记录）：写一条提交操作事件。</li>
+<li><code>claim_fee_part</code>（备件明细）：只读，用于回运与条件必填校验（<code>battery_sn</code>/<code>old_part_code</code>）。</li>
+<li><code>attachment</code>（附件）：只读，用于维修凭证必填与回运单附件判定。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>提交</strong>（只有 <code>DRAFT</code> 或 <code>REJECTED</code> 状态的可以提交）：</li>
+<ul>
+<li>前置校验：</li>
 <ol>
-<li>走一遍新建的硬校验（工单仍为已完工、<strong>维修方案已过技术审核</strong>、保内、本服务商、条件唯一、工时费&gt;0；技术审核前置来源 PRD F-CLAIM-01，本期由工单侧 Mock 保证）。</li>
-<li><strong>旧件回运</strong>（A-11）：逐条看 <code>claim_fee_part</code> 是否「需回运」；需回运的必须「已发起回运」才放行，否则拦「存在需回运备件未发起回运，不能提交」。</li>
+<li>走一遍新建的硬校验（工单仍为已完工、维修方案已过技术审核、保内、本服务商、条件唯一、工时费&gt;0；技术审核前置来源 PRD F-CLAIM-01，本期由工单侧 Mock 保证）。</li>
+<li><strong>旧件回运</strong>（A-11）：逐条看 <code>claim_fee_part</code> 是否「需回运」；需回运的必须「已发起回运」才放行，否则拦【存在需回运备件未发起回运，不能提交】。</li>
 <ul>
 <li>「是否需回运」判定：读 <code>claim_fee_part.part_attr</code> 是否含「需回运」标识（<strong>B-2</strong>：当前无结构化布尔位，暂按属性文本判定，建议工单取数补布尔字段）。</li>
 <li>「已发起回运」判定：本模块未登记回运单实体/回运状态；按 A-11「售后仓点确认+回运单附件即视为已发起」，暂以「该单存在回运单附件」作为已发起证据（<strong>B-3</strong>：回运单实体/在途状态待挂载，附件判定为临时口径）。</li>
 </ul>
 <li><strong>维修凭证附件必填（有据·硬校验）</strong>：提交时必须至少 1 张维修凭证类附件（维修照片/检测报告等），无维修凭证不可提交（原始 PRD S4.1.1 服务商索赔单字段表明文「维修凭证附件…提交时必填」）。旧件资料附件仍为选填（原始 S4.1.1 标非必填），不随此项一起强制。</li>
-<li><strong>A-39 条件必填 + 位长校验</strong>（来源 PRD S8.6/A-39）：</li>
+<li><strong>A-39 条件必填 + 位长校验（硬校验，裁决 D-索赔-B9）</strong>（来源 PRD S8.6/A-39）：分类列 <code>claim_order.repair_type/sub_repair_type</code> 已按 B9 落库、场景触发有数据支撑，本期即做<strong>硬校验</strong>（内部场景豁免）：</li>
 <ul>
-<li><code>claim_fee_part.battery_sn</code>（电池包 SN）：<strong>电池包维修场景</strong>必填、须为 <strong>24 位</strong>。</li>
-<li><code>claim_fee_part.old_part_code</code>（汽车电子旧件条码，Excel 批量场景）：<strong>汽车电子场景</strong>必填。</li>
-<li>整车 VIN 17 位：VIN 列落在相邻链 <code>xw_claim_order</code>（本链 <code>claim_order</code>/明细无 VIN 列），本链<strong>豁免</strong>，不在本链校验（内部场景本就豁免，A-39）。</li>
-<li><strong>触发口径本期边界</strong>：条件必填的「场景触发」（是否电池包/汽车电子）取决于维修一级/二级分类，而本链 <code>claim_order</code> 无 <code>repair_type/sub_repair_type</code> 列承接分类（<strong>schema 缺口，见 G4 待确认；同步影响第六节 A-14 汽车电子把关</strong>），故本期分类判定依赖工单侧 Mock 源；与向欣旺达链 D-向欣-B3 同口径——<strong>本期 Mock 已带出值时做位长校验（如 SN 须 24 位），场景条件必填因分类字段未落库暂由工单 Mock 保证/不硬卡，真库接上后改硬校验</strong>。</li>
+<li><code>claim_fee_part.battery_sn</code>（电池包 SN）：<strong>电池包维修场景</strong>必填、须为 <strong>24 位</strong>，不满足 → 拦。</li>
+<li><code>claim_fee_part.old_part_code</code>（汽车电子旧件条码，Excel 批量场景）：<strong>汽车电子场景</strong>必填，缺失 → 拦。</li>
+<li><code>claim_order.vin</code>（整车 VIN）：<strong>整车场景</strong>必填、须为 <strong>17 位</strong>（VIN 列已按 B9 补入本链 <code>claim_order</code>，不再豁免本链校验；内部场景仍豁免，A-39）。</li>
+<li><strong>场景触发口径</strong>：是否电池包/汽车电子/整车由 <code>claim_order.repair_type/sub_repair_type</code>（B9 已落库，工单库 Mock/待挂载带出值）判定；分类命中对应场景即按上述硬校验拦截，缺失/位长不符统一拦【条件必填/位长校验不通过】。</li>
 </ul>
 </ol>
-<p><strong>写哪些表哪些字段</strong>（同一事务，乐观锁）：</p>
+<li>若选择「是」，则更新以下数据（同一事务，乐观锁）：</li>
 <ul>
-<li><code>claim_order</code>：<code>status</code>='PENDING_REGION'；审计列刷新。其余业务字段不动。</li>
-<li>提交动作在 <code>claim_audit_record</code> 写一条操作事件：<code>biz_type='CLAIM'</code>、<code>audit_stage='OPERATION'</code>、<code>audit_result='SUBMIT'</code>（已驳回重提为 <code>RESUBMIT</code>）、<code>auditor/audit_time</code>=操作人/时间，<code>remark</code>=操作摘要。</li>
+<li><code>claim_order</code>：<code>status</code> = 'PENDING_REGION'；审计列刷新；其余业务字段不动</li>
+<li><code>claim_audit_record</code>（插一条操作事件）：<code>biz_type='CLAIM'</code>、<code>audit_stage='OPERATION'</code>、<code>audit_result='SUBMIT'</code>（已驳回重提为 <code>RESUBMIT</code>）、<code>auditor/audit_time</code>=操作人/时间、<code>remark</code>=操作摘要</li>
 </ul>
-<p><strong>状态变成</strong>：<code>PENDING_REGION</code>（待区域初审）。从 <code>REJECTED</code> 重提同样回到 <code>PENDING_REGION</code>（从头走，A-13）。</p>
-<p><strong>触发下游</strong>：无（等区域初审）。</p>
-<p><strong>回滚</strong>：单表更新，乐观锁未命中（并发/状态已变）即回滚报冲突。</p>
+<li>若选择「否」，则返回，不做处理。</li>
+</ul>
+</ul>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无新增（沿用 F-CLAIM-01 的 <code>claim_no</code>）。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>无（回运单实体/在途状态待挂载，本期以回运单附件为临时判定口径，B-3；不对接外部）。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>单表更新，乐观锁未命中（并发/状态已变）即回滚报冲突。</li>
+<li>前置状态白名单 <code>status IN (DRAFT, REJECTED)</code>，防重复点击/并发双提交。</li>
+</ul>
 <hr>
-<h2>四、编辑（对应 F-CLAIM-03）</h2>
-<p><strong>谁能点 + 前置</strong>：服务商售后专员；前置状态 <code>DRAFT</code> 或 <code>REJECTED</code>。其它状态一律不可编辑。</p>
-<p><strong>能改什么</strong>：只能动「其它费用明细」（物流费等，A-7）。工时费明细、备件明细、备件管理费一律<strong>不可改</strong>（工时费/备件管理费按 S8.2 固定，来源工单+系数）。</p>
+<h2>F-CLAIM-03 编辑</h2>
+<h3>功能说明：</h3>
 <ul>
-<li>允许对 <code>claim_fee_other</code> 中 <code>editable=1</code> 的行做改金额/备注/增行/删行；<code>editable=0</code> 的行禁止改删（D-索赔-B8 已确认）。</li>
+<li>仅草稿/已驳回可编辑；工时费、备件管理费不可改，其它费用明细（物流费等）可人工编辑，合计随明细计算（A-7）。</li>
+<li>保存生效、可重新提交（PRD 完成标准）。</li>
 </ul>
-<p><strong>写哪些表哪些字段</strong>（同一事务）：</p>
+<h3>开发类型：</h3>
 <ul>
-<li><code>claim_fee_other</code>：按编辑结果 upsert/删除对应行。</li>
-<li><code>claim_order</code>：重算 <code>other_fee_total</code>=<code>Σ claim_fee_other.amount</code>，随后 <code>apply_total_amount</code>=<code>labor_fee_total + part_mgmt_fee + other_fee_total</code>（labor 和 part 两项不变）；审计列刷新。<code>status</code> 不变（草稿仍草稿、已驳回仍已驳回）。</li>
-<li><code>claim_audit_record</code>：插入 <code>audit_stage='OPERATION'</code>、<code>audit_result='EDIT'</code>，<code>auditor/audit_time</code>=操作人/时间，<code>remark</code> 记录本次其它费用增删改摘要。</li>
+<li>新增节点。</li>
 </ul>
-<p><strong>状态变成</strong>：不变（编辑不改状态；改完可再走「提交」）。</p>
-<p><strong>触发下游</strong>：无。</p>
-<p><strong>回滚</strong>：明细与主单汇总在同一事务，金额必须一致回写，失败全回滚。</p>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 详情/编辑页（P02）- 编辑。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>服务商售后专员对 <code>DRAFT</code> 或 <code>REJECTED</code> 单编辑，只动其它费用明细。系统同一事务内 upsert/删除 <code>claim_fee_other</code> 对应行，重算主单 <code>other_fee_total</code> 与 <code>apply_total_amount</code> 回写，并写一条编辑操作留痕。状态不变（草稿仍草稿、已驳回仍已驳回），改完可再走提交。不触发下游。</li>
+</ul>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_fee_other</code>（其它费用明细）：按编辑结果 upsert/删除对应行。</li>
+<li><code>claim_order</code>（索赔主单）：重算金额汇总 + 审计列，<code>status</code> 不变。</li>
+<li><code>claim_audit_record</code>（审核记录）：写一条编辑操作事件。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>编辑保存</strong>（只有 <code>DRAFT</code> 或 <code>REJECTED</code> 状态可编辑，其它状态一律不可编辑）：</li>
+<ul>
+<li>能改什么：只能动「其它费用明细」（物流费等，A-7）。工时费明细、备件明细、备件管理费一律<strong>不可改</strong>（工时费/备件管理费按 S8.2 固定，来源工单+系数）。允许对 <code>claim_fee_other</code> 中 <code>editable=1</code> 的行做改金额/备注/增行/删行；<code>editable=0</code> 的行禁止改删（D-索赔-B8 已确认）。</li>
+<li>保存，则更新以下数据（同一事务）：</li>
+<ul>
+<li><code>claim_fee_other</code>：按编辑结果 upsert/删除对应行</li>
+<li><code>claim_order</code>：重算 <code>other_fee_total</code> = <code>Σ claim_fee_other.amount</code>，随后 <code>apply_total_amount</code> = <code>labor_fee_total + part_mgmt_fee + other_fee_total</code>（labor 和 part 两项不变）；审计列刷新；<code>status</code> 不变</li>
+<li><code>claim_audit_record</code>（插一条）：<code>audit_stage='OPERATION'</code>、<code>audit_result='EDIT'</code>、<code>auditor/audit_time</code>=操作人/时间、<code>remark</code>=记录本次其它费用增删改摘要</li>
+</ul>
+<li>取消：不保存，返回。</li>
+</ul>
+</ul>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>明细与主单汇总在同一事务，金额必须一致回写，失败全回滚。</li>
+<li>主单更新走乐观锁；前置状态白名单 <code>status IN (DRAFT, REJECTED)</code>。</li>
+</ul>
 <hr>
-<h2>五、作废（对应 F-CLAIM-04）</h2>
-<p><strong>谁能点 + 前置</strong>：服务商售后专员；前置状态<strong>仅</strong> <code>DRAFT</code>。非草稿点作废一律拦下。</p>
-<p><strong>写哪些表哪些字段</strong>：</p>
+<h2>F-CLAIM-04 作废</h2>
+<h3>功能说明：</h3>
 <ul>
-<li><code>claim_order</code>：<code>status</code>='VOIDED'；<code>deleted_at</code> 保持 NULL，审计列刷新。已作废是可查看的业务终态，不以技术软删除隐藏。</li>
-<li>明细行 <code>claim_fee_*</code> 与附件保留不删，确保 F-CLAIM-05 的全状态查看、附件和操作留痕仍可访问。同一工单重新发起由条件唯一规则排除 <code>VOIDED</code> 实现，不依赖软删除。</li>
+<li>仅草稿可作废（PRD F-CLAIM-04）；作废后状态→已作废（终态）。</li>
+<li>已作废是可查看的业务终态，不以技术软删除隐藏；作废后该工单可重新发起新单（A-15）。</li>
 </ul>
-<p><strong>状态变成</strong>：<code>VOIDED</code>（已作废，终态）。</p>
-<p><strong>触发下游</strong>：无。作废后该工单可重新发起新单（条件唯一放行，A-15）。</p>
-<p><strong>操作留痕</strong>：与头表状态更新同事务写 <code>claim_audit_record</code>：<code>audit_stage='OPERATION'</code>、<code>audit_result='VOID'</code>、<code>auditor/audit_time</code>=操作人/时间，<code>remark</code>=作废原因或“作废”。</p>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 作废。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>服务商售后专员对<strong>仅</strong> <code>DRAFT</code> 单点作废，非草稿点作废一律拦下。系统同一事务把主单 <code>status='VOIDED'</code>（<code>deleted_at</code> 保持 NULL）、刷新审计列，并写一条作废操作留痕；明细行与附件保留不删。落地终态 <code>VOIDED</code>，不触发下游。同一工单重新发起由条件唯一规则排除 <code>VOIDED</code> 实现，不依赖软删除。</li>
+</ul>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：更新 <code>status='VOIDED'</code> + 审计列，<code>deleted_at</code> 保持 NULL。</li>
+<li><code>claim_fee_*</code>（三张明细）、<code>attachment</code>（附件）：保留不删，确保 F-CLAIM-05 全状态查看、附件和操作留痕仍可访问。</li>
+<li><code>claim_audit_record</code>（审核记录）：写一条作废操作事件。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>作废</strong>（前置状态<strong>仅</strong> <code>DRAFT</code>，非草稿一律拦下）：</li>
+<ul>
+<li>点击后弹出确认框，确认作废原因。</li>
+<li>若选择「是」，则更新以下数据（同一事务）：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code> = 'VOIDED'；<code>deleted_at</code> 保持 NULL；审计列刷新</li>
+<li>明细行 <code>claim_fee_*</code> 与附件保留不删</li>
+<li><code>claim_audit_record</code>（与头表状态更新同事务写）：<code>audit_stage='OPERATION'</code>、<code>audit_result='VOID'</code>、<code>auditor/audit_time</code>=操作人/时间、<code>remark</code>=作废原因或「作废」</li>
+</ul>
+<li>若选择「否」，则返回，不做处理。</li>
+</ul>
+</ul>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>主单更新走乐观锁；前置状态白名单<strong>仅</strong> <code>DRAFT</code>，对非草稿/已作废终态点作废命中 0 行即回滚报「当前状态不允许该操作」。</li>
+</ul>
 <hr>
-<h2>六、区域初审（对应 F-CLAIM-06）</h2>
-<p><strong>谁能点 + 前置</strong>：区域负责人（只限本区域）；前置状态 <code>PENDING_REGION</code>。</p>
-<p><strong>要核查/要录的</strong>：</p>
+<h2>F-CLAIM-05 查看</h2>
+<h3>功能说明：</h3>
+<ul>
+<li>全状态可查看（PRD F-CLAIM-05）；含全流程审核记录、附件、操作日志、责任判定。</li>
+<li>只读，不写库；操作日志不再用「最后修改人/时间」代替历史，新建、编辑、提交、重提、作废、判责均一次动作一条事件。</li>
+</ul>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 详情页（P02）- 查看。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>全部相关角色（按数据范围）对任意状态单点查看。系统只读聚合主单 + 三张费用明细 + 审核记录（含操作事件） + 附件（按 biz_type 分组） + 责任判定字段 + 抵扣单（如有），无状态变更、不写库。</li>
+</ul>
+<h3>涉及数据表（均只读）：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：主单字段。</li>
+<li><code>claim_fee_labor / claim_fee_part / claim_fee_other</code>（三张费用明细）。</li>
+<li><code>claim_audit_record</code>（审核记录）：审核记录与 <code>audit_stage='OPERATION'</code> 的操作事件，按 <code>audit_time,id</code> 升序。</li>
+<li><code>attachment</code>（附件）：按 biz_type 分组（维修凭证/旧件/回运单/判责）。</li>
+<li><code>claim_deduct_order</code>（索赔抵扣单）：如有则展示。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>查询结果</strong>（详情只读聚合）：</li>
+<ul>
+<li><strong>查询数据范围：按当前角色数据范围过滤（服务商本店/区域本区/索赔专员全国/质量部本人待责任判定件）+ <code>deleted_at IS NULL</code>（主单软删过滤，作废单不软删仍可见）</strong></li>
+<li>主单信息：取 <code>claim_order</code> 全部业务字段（单号/状态/工单信息/金额/系数/主责件/分类信息 repair_type/sub_repair_type/serial_no/vin/province_city（裁决 D-索赔-B9）/claim_target/project_code/责任判定字段）</li>
+<li>工时费明细：取 <code>claim_fee_labor</code>（project_name/labor_hours/labor_price/amount）</li>
+<li>备件明细：取 <code>claim_fee_part</code>（part_name/part_attr/sale_price（裁决 D-索赔-B11）/battery_sn/old_part_code/claim_amount=0/mgmt_fee）</li>
+<li>其它费用明细：取 <code>claim_fee_other</code>（fee_type/amount/remark/editable）</li>
+<li>审核/操作日志：取 <code>claim_audit_record</code>（审核记录与操作事件，按 <code>audit_time,id</code> 升序），一动作一条事件</li>
+<li>附件：取 <code>attachment</code>，按 biz_type 分组（维修凭证/旧件/回运单/判责）</li>
+<li>责任判定：取 <code>claim_order.liability_result/liability_desc/liability_ratio/liability_by/liability_time</code></li>
+<li>抵扣单（如有）：取 <code>claim_deduct_order</code></li>
+</ul>
+<li><strong>操作按钮</strong>：返回列表（无写库动作）。</li>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>只读，无并发写；数据范围过滤在 SQL，不靠前端。</li>
+</ul>
+<hr>
+<h2>F-CLAIM-06 区域初审</h2>
+<h3>功能说明：</h3>
+<ul>
+<li>区域负责人核查工单真实性/资料完整性；录入索赔对象（是否欣旺达）、欣旺达时必填项目编码；含 SN 自动预判责任（可覆盖，非终判，A-26）；汽车电子自由填报工时在此把关可驳回（A-14）。</li>
+<li>通过→待总部审核（PRD 完成标准）。</li>
+</ul>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 审核弹窗 - 区域初审。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>区域负责人（只限本区域）对 <code>PENDING_REGION</code> 单做区域初审，录 <code>claim_target</code>（XW/SELF）、XW 时录 <code>project_code</code>，可含 SN 预判倾向。三种结果分别流转：通过→<code>PENDING_HQ</code>；驳回→<code>REJECTED</code>（退回服务商，可编辑重提回 <code>PENDING_REGION</code>）；拒绝→<code>DECLINED</code>（终态不可再动）。每种结果同一事务更新主单 + 写一条审核记录，走乐观锁。不触发下游（等业务审核）。</li>
+</ul>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：更新 <code>status</code>、<code>claim_target</code>、<code>project_code</code>、审计列。</li>
+<li><code>claim_audit_record</code>（审核记录）：写一条区域初审记录（SN 预判倾向本期写入其 <code>remark</code>）。</li>
+<li><code>claim_fee_part</code>（备件明细）：只读，取 <code>battery_sn</code> 做预判。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>区域初审</strong>（前置状态 <code>PENDING_REGION</code>，只限本区域）：</li>
+<ul>
+<li>要核查/要录的：</li>
 <ol>
 <li>核查工单真实性、资料完整性（人工，不入库字段，通过与否体现在结果里）。</li>
 <li>录 <code>claim_target</code>（<code>XW</code>=欣旺达件 / <code>SELF</code>=自采件，即主责件归属，A-6）。</li>
 <li><code>claim_target=XW</code> 时 <code>project_code</code>（项目编码）必填；<code>=SELF</code> 时 project_code 置 NULL。</li>
 <li><strong>电池包 SN 自动预判责任</strong>（A-26，可覆盖、非终判）：对含 <code>battery_sn</code> 的备件，系统按 SN 预判一个责任倾向给质量部参考。预判规则来源为 QMS，本期 <strong>Mock/待挂载</strong>；预判值无专用登记字段，本期写入本次 <code>claim_audit_record.remark</code>，不新增专列；QMS 正式契约到位后再补预判字段与口径（D-索赔-B4 已确认）。此预判不写 <code>claim_order.liability_result</code>（终判专用）。</li>
-<li><strong>汽车电子自由填报工时把关</strong>（A-14）：一级分类=汽车电子的单，工时为自由填报，区域负责人在此判合理性，不合理可<strong>驳回</strong>。</li>
+<li><strong>汽车电子自由填报工时把关</strong>（A-14）：一级分类=汽车电子的单，工时为自由填报，区域负责人在此判合理性，不合理可<strong>驳回</strong>（一级分类取 <code>claim_order.repair_type</code>，已按裁决 D-索赔-B9 落库，工单库 Mock/待挂载带出）。</li>
 </ol>
-<p><strong>三种结果分别写什么</strong>（同一事务，乐观锁）：</p>
+<li>结果一 · <strong>通过</strong>，则更新（同一事务，乐观锁）：</li>
 <ul>
-<li><strong>通过</strong>：</li>
-<ul>
-<li><code>claim_order</code>：<code>status</code>='PENDING_HQ'；<code>claim_target</code>=录入值；<code>project_code</code>=录入值(XW) 或 NULL(SELF)；审计列刷新。</li>
-<li><code>claim_audit_record</code> 插一行：<code>biz_type</code>='CLAIM'、<code>biz_id</code>=主单 id、<code>audit_stage</code>='区域初审'、<code>auditor</code>=当前用户、<code>audit_time</code>=NOW()、<code>audit_result</code>='通过'、<code>remark</code>=核查意见（含本期 Mock 的 SN 预判倾向，D-索赔-B4）、<code>approved_amount</code>=NULL、<code>attachment_ids</code>=如有。</li>
+<li><code>claim_order</code>：<code>status</code>='PENDING_HQ'；<code>claim_target</code>=录入值；<code>project_code</code>=录入值(XW) 或 NULL(SELF)；审计列刷新</li>
+<li><code>claim_audit_record</code>（插一行）：<code>biz_type</code>='CLAIM'、<code>biz_id</code>=主单 id、<code>audit_stage</code>='区域初审'、<code>auditor</code>=当前用户、<code>audit_time</code>=NOW()、<code>audit_result</code>='通过'、<code>remark</code>=核查意见（含本期 Mock 的 SN 预判倾向，D-索赔-B4）、<code>approved_amount</code>=NULL、<code>attachment_ids</code>=如有</li>
 </ul>
-<li><strong>驳回</strong>（退回服务商，A-13）：</li>
+<li>结果二 · <strong>驳回</strong>（退回服务商，A-13），则更新：</li>
 <ul>
-<li><code>claim_order</code>：<code>status</code>='REJECTED'；<code>claim_target/project_code</code> 若已录可保留也可留空（不影响，重提会从头再录）；审计列刷新。</li>
-<li><code>claim_audit_record</code>：同上但 <code>audit_result</code>='驳回'、<code>remark</code>=驳回原因（必填）。</li>
+<li><code>claim_order</code>：<code>status</code>='REJECTED'；<code>claim_target/project_code</code> 若已录可保留也可留空（不影响，重提会从头再录）；审计列刷新</li>
+<li><code>claim_audit_record</code>：同上但 <code>audit_result</code>='驳回'、<code>remark</code>=驳回原因（必填）</li>
 </ul>
-<li><strong>拒绝</strong>（终止，A-15 已关闭=已拒绝）：</li>
+<li>结果三 · <strong>拒绝</strong>（终止，A-15 已关闭=已拒绝），则更新：</li>
 <ul>
-<li><code>claim_order</code>：<code>status</code>='DECLINED'；审计列刷新。</li>
-<li><code>claim_audit_record</code>：<code>audit_result</code>='拒绝'、<code>remark</code>=拒绝原因（必填）。</li>
+<li><code>claim_order</code>：<code>status</code>='DECLINED'；审计列刷新</li>
+<li><code>claim_audit_record</code>：<code>audit_result</code>='拒绝'、<code>remark</code>=拒绝原因（必填）</li>
 </ul>
 </ul>
-<p><strong>状态变成</strong>：<code>PENDING_HQ</code> / <code>REJECTED</code> / <code>DECLINED</code>。</p>
-<p><strong>触发下游</strong>：无（等业务审核）。已驳回可编辑重提（回 <code>PENDING_REGION</code>）；已拒绝终态不可再动。</p>
-<p><strong>回滚</strong>：主单状态 + 审核记录同一事务，乐观锁保并发。</p>
+</ul>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>QMS 判责预判：对接系统为 QMS 判责系统；触发时机为区域初审对含 <code>battery_sn</code> 备件做 SN 预判。本期 <strong>Mock/待挂载</strong>（A-20），预判值暂写 <code>claim_audit_record.remark</code>；正式契约到位后补预判字段与口径（D-索赔-B4）。失败处理：Mock 无预判值时留空，不阻断初审。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>主单状态 + 审核记录同一事务，乐观锁保并发；前置状态白名单 <code>PENDING_REGION</code>。</li>
+<li>已驳回可编辑重提（回 <code>PENDING_REGION</code>）；已拒绝终态不可再动。</li>
+</ul>
 <hr>
-<h2>七、业务审核（对应 F-CLAIM-07）</h2>
-<p><strong>谁能点 + 前置</strong>：闪欣索赔专员（全国）；前置状态 <code>PENDING_HQ</code>。</p>
-<p><strong>核心：通过后按主责件归属唯一分流</strong>（A-6/A-12/A-36）。分流看 <code>claim_order.claim_target</code>（区域初审已录）。</p>
-<p><strong>三种结果</strong>（同一事务，乐观锁）：</p>
+<h2>F-CLAIM-07 业务审核</h2>
+<h3>功能说明：</h3>
 <ul>
-<li><strong>通过 · claim_target=XW（欣旺达件）</strong>：</li>
+<li>闪欣索赔专员复核；通过后按<strong>主责件归属唯一决定流向</strong>（A-6）分支：欣旺达件→逐单自动生成向欣旺达索赔单（A-36）+进待结算；外采件→进【待责任判定】（A-12）。</li>
+<li>通过→待责任判定/待结算（PRD 完成标准）。</li>
+</ul>
+<h3>开发类型：</h3>
 <ul>
-<li><code>claim_order</code>：<code>status</code>='PENDING_SETTLE'（进待结算）；审计列刷新。</li>
-<li><code>claim_audit_record</code> 插：<code>audit_stage</code>='业务审核'、<code>audit_result</code>='通过'、<code>auditor/audit_time/remark</code>。</li>
-<li><strong>触发下游</strong>：逐单自动生成一张向欣旺达索赔单（A-36，<code>xw_claim_order</code> + <code>xw_claim_detail</code> 草稿，金额=本单对应金额不乘系数 A-37）。该生成动作与主单状态更新放在<strong>同一事务</strong>保证「审核通过即有下游单」；<code>xw_claim_order</code> 的字段填充规则属向欣旺达链 LLD，本文只登记触发与关联键 <code>provider_claim_id=claim_order.id / provider_claim_no=claim_no</code>。<code>claim_order</code> 侧无回写字段（无 xw 关联列）。</li>
+<li>新增节点。</li>
 </ul>
-<li><strong>通过 · claim_target=SELF（自采/外采件）</strong>：</li>
+<h3>节点目录：</h3>
 <ul>
-<li><code>claim_order</code>：<code>status</code>='PENDING_LIABILITY'（进待责任判定，A-12）；审计列刷新。</li>
-<li><code>claim_audit_record</code> 插：<code>audit_stage</code>='业务审核'、<code>audit_result</code>='通过'。</li>
-<li><strong>触发下游</strong>：无自动生成，等质量部判责。</li>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 审核弹窗 - 业务审核。</li>
 </ul>
-<li><strong>驳回 / 拒绝</strong>：同区域初审的驳回/拒绝语义——<code>status</code>='REJECTED'（可重提，回 PENDING_REGION 从头）或 <code>status</code>='DECLINED'（终态）；<code>claim_audit_record</code> 记 <code>audit_stage</code>='业务审核'、<code>audit_result</code>='驳回'/'拒绝'、<code>remark</code>=原因（必填）。</li>
+<h3>业务流转说明：</h3>
+<ul>
+<li>闪欣索赔专员（全国）对 <code>PENDING_HQ</code> 单做业务审核，通过后按 <code>claim_order.claim_target</code>（区域初审已录）唯一分流：XW→<code>PENDING_SETTLE</code> 并在<strong>同一事务</strong>逐单自动生成一张向欣旺达索赔单草稿；SELF→<code>PENDING_LIABILITY</code>（等质量部判责），无自动生成。驳回→<code>REJECTED</code>（可重提，回 <code>PENDING_REGION</code> 从头）；拒绝→<code>DECLINED</code>（终态）。每种结果同一事务更新主单 + 写审核记录，走乐观锁。</li>
 </ul>
-<p><strong>状态变成</strong>：<code>PENDING_SETTLE</code>（XW）/ <code>PENDING_LIABILITY</code>（SELF）/ <code>REJECTED</code> / <code>DECLINED</code>。</p>
-<p><strong>回滚</strong>：主单 + 审核记录 +（XW 时）向欣旺达单生成，全在一个事务；向欣旺达单生成失败则整个审核回滚，主单不置通过（避免「通过了但没生成下游单」）。</p>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：更新 <code>status</code>、审计列。</li>
+<li><code>claim_audit_record</code>（审核记录）：写一条业务审核记录。</li>
+<li><code>xw_claim_order</code> / <code>xw_claim_detail</code>（向欣旺达索赔单，属相邻链）：XW 通过时触发生成草稿——本文只登记触发与关联键，不写其内部字段。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>业务审核</strong>（前置状态 <code>PENDING_HQ</code>，闪欣索赔专员全国）：核心：通过后按主责件归属唯一分流（A-6/A-12/A-36），看 <code>claim_order.claim_target</code>。</li>
+<ul>
+<li>结果一 · <strong>通过 · claim_target=XW（欣旺达件）</strong>，则更新（同一事务，乐观锁）：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='PENDING_SETTLE'（进待结算）；审计列刷新</li>
+<li><code>claim_audit_record</code>（插）：<code>audit_stage</code>='业务审核'、<code>audit_result</code>='通过'、<code>auditor/audit_time/remark</code></li>
+<li><strong>触发下游</strong>：逐单自动生成一张向欣旺达索赔单（A-36，<code>xw_claim_order</code> + <code>xw_claim_detail</code> 草稿，金额=本单对应金额不乘系数 A-37）。该生成动作与主单状态更新放在<strong>同一事务</strong>保证「审核通过即有下游单」；<code>xw_claim_order</code> 的字段填充规则属向欣旺达链 LLD，本文只登记触发与关联键 <code>provider_claim_id=claim_order.id / provider_claim_no=claim_no</code>。<code>claim_order</code> 侧无回写字段（无 xw 关联列）</li>
+</ul>
+<li>结果二 · <strong>通过 · claim_target=SELF（自采/外采件）</strong>，则更新：</li>
+<ul>
+<li><code>claim_order</code>：<code>status</code>='PENDING_LIABILITY'（进待责任判定，A-12）；审计列刷新</li>
+<li><code>claim_audit_record</code>（插）：<code>audit_stage</code>='业务审核'、<code>audit_result</code>='通过'</li>
+<li><strong>触发下游</strong>：无自动生成，等质量部判责</li>
+</ul>
+<li>结果三 · <strong>驳回 / 拒绝</strong>，则更新：同区域初审的驳回/拒绝语义——<code>status</code>='REJECTED'（可重提，回 PENDING_REGION 从头）或 <code>status</code>='DECLINED'（终态）；<code>claim_audit_record</code> 记 <code>audit_stage</code>='业务审核'、<code>audit_result</code>='驳回'/'拒绝'、<code>remark</code>=原因（必填）</li>
+</ul>
+</ul>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无（向欣旺达单号 SXCO 属相邻链，不在本链生成）。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>无外部系统对接（向欣旺达为本系统内建角色 A-22）；下游向欣旺达单生成属相邻链模块内调用，见「触发下游」。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>主单 + 审核记录 +（XW 时）向欣旺达单生成全在一个事务；向欣旺达单生成失败则整个审核回滚，主单不置通过（避免「通过了但没生成下游单」）。</li>
+<li>前置状态白名单 <code>PENDING_HQ</code>；核心动作叠加按 <code>claim_order.id</code> 分布式锁串行化，避免同单并发双审（PRD S12/S15）。</li>
+<li>向欣旺达单生成防重复生成：以「一张服务商单仅可纳入一张闪欣单」约束兜底（下游 <code>xw_claim_detail.uk_provider_claim</code>）。</li>
+</ul>
 <hr>
-<h2>八、判责录入（对应 F-CLAIM-08）</h2>
-<p><strong>谁能点 + 前置</strong>：质量部责任判定专员（只限【待责任判定】的自采件单）；前置状态 <code>PENDING_LIABILITY</code>。</p>
-<p><strong>要录的</strong>：责任判定结果 <code>liability_result</code>（三选一：<code>SUPPLIER</code> 供应商 / <code>PROVIDER</code> 服务商 / <code>INTERNAL</code> 内部，A-27）、责任说明 <code>liability_desc</code>（必填，≤200）、承担比例 <code>liability_ratio</code>（%，<code>DECIMAL(5,2)</code>；校验 <code>0 &lt; ratio ≤ 100</code>，不允许 0；<code>PROVIDER</code> 责任必填，其余按需，D-索赔-B7 已确认）。可传判责附件（<code>attachment</code>，<code>biz_type=LIABILITY</code>）。</p>
-<p><strong>公共写入</strong>（三种结果都写，同一事务，乐观锁）：</p>
+<h2>F-CLAIM-08 责任判定</h2>
+<h3>功能说明：</h3>
 <ul>
-<li><code>claim_order</code>：<code>liability_result</code>=录入值、<code>liability_desc</code>=录入值、<code>liability_ratio</code>=录入值、<code>liability_by</code>=当前用户、<code>liability_time</code>=NOW()、<code>status</code>='PENDING_SETTLE'；审计列刷新。</li>
-<li><strong>判责操作留痕</strong>（F-CLAIM-08 判责是一个独立用户动作，须与新建/提交/审核等动作一致进审核时间线，F-CLAIM-05「全流程留痕/操作日志」）：<code>claim_audit_record</code> 插一条：<code>biz_type</code>='CLAIM'、<code>biz_id</code>=主单 id、<code>audit_stage</code>=<strong>责任判定</strong>（⚠ schema <code>claim_audit_record.audit_stage</code> 枚举现无「责任判定」阶段码，属 schema 缺口——<strong>本期先登记该留痕动作，阶段码取值待 schema 补齐后锁定，不擅自塞枚举值</strong>，见 G2 待确认）、<code>audit_result</code>=判责结果 <code>SUPPLIER/PROVIDER/INTERNAL</code>（该三值已在 <code>audit_result</code> 列注释登记）、<code>auditor</code>=判定人、<code>audit_time</code>=NOW()、<code>remark</code>=责任说明（<code>liability_desc</code>）、<code>attachment_ids</code>=判责附件 id（如有）。</li>
-<li>判责附件若有 → <code>attachment</code> 逐条插（<code>biz_type=LIABILITY, biz_id=claim_order.id</code>）。</li>
+<li>质量部对外采件判定；结果三项：供应商责任/服务商责任/内部责任（A-27），录责任说明+承担比例；服务商责任→自动生成索赔抵扣单；供应商责任→触发供应商索赔流程；内部责任→记录比例/费用内部转嫁。</li>
+<li>判责完成→待结算（PRD 完成标准，S6.1）。</li>
 </ul>
-<p><strong>按结果分别再做</strong>：</p>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 判责录入弹窗 - 责任判定。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>质量部责任判定专员（只限【待责任判定】的自采件单）对 <code>PENDING_LIABILITY</code> 单录判责结果。系统同一事务写公共判责字段 + 判责操作留痕 +（如有）判责附件，主单统一进 <code>PENDING_SETTLE</code>；按结果再做：PROVIDER 生成索赔抵扣单并置 <code>provider_deduct_started=1</code>；SUPPLIER 仅置 <code>supplier_claim_started=1</code>（供应商索赔子流程 V2 范围，本期不落单）；INTERNAL 仅记录比例/说明（内部转嫁交 OA，本期待挂载）。走乐观锁。</li>
+</ul>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：写判责字段（liability_result/desc/ratio/by/time）、status、启动标志、审计列。</li>
+<li><code>claim_audit_record</code>（审核记录）：写一条判责留痕。</li>
+<li><code>attachment</code>（附件）：判责附件如有则按 <code>biz_type=LIABILITY</code> 逐条写入。</li>
+<li><code>claim_deduct_order</code>（索赔抵扣单）：PROVIDER 结果时插一行。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>判责录入</strong>（前置状态 <code>PENDING_LIABILITY</code>，只限质量部对自采件单）：</li>
+<ul>
+<li>要录的：责任判定结果 <code>liability_result</code>（三选一：<code>SUPPLIER</code> 供应商 / <code>PROVIDER</code> 服务商 / <code>INTERNAL</code> 内部，A-27）、责任说明 <code>liability_desc</code>（必填，≤200）、承担比例 <code>liability_ratio</code>（%，<code>DECIMAL(5,2)</code>；校验 <code>0 &lt; ratio ≤ 100</code>，不允许 0；<code>PROVIDER</code> 责任必填，其余按需，D-索赔-B7 已确认）。可传判责附件（<code>attachment</code>，<code>biz_type=LIABILITY</code>）。</li>
+<li>提交则更新以下数据（三种结果都写的<strong>公共写入</strong>，同一事务，乐观锁）：</li>
+<ul>
+<li><code>claim_order</code>：<code>liability_result</code>=录入值、<code>liability_desc</code>=录入值、<code>liability_ratio</code>=录入值、<code>liability_by</code>=当前用户、<code>liability_time</code>=NOW()、<code>status</code>='PENDING_SETTLE'；审计列刷新</li>
+<li><strong>判责操作留痕</strong>（F-CLAIM-08 判责是一个独立用户动作，须与新建/提交/审核等动作一致进审核时间线，F-CLAIM-05「全流程留痕/操作日志」）：<code>claim_audit_record</code> 插一条：<code>biz_type</code>='CLAIM'、<code>biz_id</code>=主单 id、<code>audit_stage</code>=<strong>'LIABILITY'（责任判定阶段码，裁决 D-索赔-B10 已决增该码并落进 schema/DDL）</strong>、<code>audit_result</code>=判责结果 <code>SUPPLIER/PROVIDER/INTERNAL</code>（该三值已在 <code>audit_result</code> 列注释登记）、<code>auditor</code>=判定人、<code>audit_time</code>=NOW()、<code>remark</code>=责任说明（<code>liability_desc</code>）、<code>attachment_ids</code>=判责附件 id（如有）</li>
+<li>判责附件若有 → <code>attachment</code> 逐条插（<code>biz_type=LIABILITY, biz_id=claim_order.id</code>）</li>
+</ul>
+<li><strong>按结果分别再做</strong>：</li>
 <ul>
 <li><strong>PROVIDER（服务商责任）→ 自动生成索赔抵扣单</strong>：</li>
 <ul>
-<li><code>claim_order</code>：<code>provider_deduct_started</code>=1。</li>
-<li><code>claim_deduct_order</code> 插一行：<code>id</code>=雪花；<code>deduct_no</code>=生成 DKD 号；<code>claim_id</code>=主单 id；<code>claim_no</code>=主单号；<code>provider_id</code>=主单 provider_id；<code>work_order_no</code>=主单 work_order_no；<code>liability_result</code>='PROVIDER'；<code>liability_ratio</code>=录入比例；<code>claim_liable_amount = claim_order.apply_total_amount</code>（抵扣针对服务商全额应付，D-索赔-D1 已确认）；<code>deduct_amount</code>=<code>claim_liable_amount × liability_ratio / 100</code>（A-30）；<code>settle_period_belong</code>=该索赔单 <code>claim_audit_record</code> 中「业务审核通过」的 <code>DATE(audit_time)</code>（A-30，按闪欣审批通过时间归入同周期，不得写 NULL）；<code>status</code>='UNSETTLED'。</li>
-<li>抵扣单被结算链汇总时冲减服务商应付（本链只负责生成，不管结算）。</li>
+<li><code>claim_order</code>：<code>provider_deduct_started</code>=1</li>
+<li><code>claim_deduct_order</code> 插一行：<code>id</code>=雪花；<code>deduct_no</code>=生成 DKD 号；<code>claim_id</code>=主单 id；<code>claim_no</code>=主单号；<code>provider_id</code>=主单 provider_id；<code>work_order_no</code>=主单 work_order_no；<code>liability_result</code>='PROVIDER'；<code>liability_ratio</code>=录入比例；<code>claim_liable_amount = claim_order.apply_total_amount</code>（抵扣针对服务商全额应付，D-索赔-D1 已确认）；<code>deduct_amount</code>=<code>claim_liable_amount × liability_ratio / 100</code>（A-30）；<code>settle_period_belong</code>=该索赔单 <code>claim_audit_record</code> 中「业务审核通过」的 <code>DATE(audit_time)</code>（A-30，按闪欣审批通过时间归入同周期，不得写 NULL）；<code>status</code>='UNSETTLED'</li>
+<li>抵扣单被结算链汇总时冲减服务商应付（本链只负责生成，不管结算）</li>
 </ul>
 <li><strong>SUPPLIER（供应商责任）→ 触发供应商索赔流程</strong>：</li>
 <ul>
-<li><code>claim_order</code>：<code>supplier_claim_started</code>=1。</li>
-<li>供应商索赔子流程为 V2 范围（PRD S5「9月项」）；本期只置 <code>supplier_claim_started=1</code>、标记<strong>待挂载</strong>，不生成实际单据或占位单（D-索赔-B5 已确认）。备件费走供应商索赔（S8.3），本期不落单。</li>
+<li><code>claim_order</code>：<code>supplier_claim_started</code>=1</li>
+<li>供应商索赔子流程为 V2 范围（PRD S5「9月项」）；本期只置 <code>supplier_claim_started=1</code>、标记<strong>待挂载</strong>，不生成实际单据或占位单（D-索赔-B5 已确认）。备件费走供应商索赔（S8.3），本期不落单</li>
 </ul>
 <li><strong>INTERNAL（内部责任）→ 记录比例，内部转嫁</strong>：</li>
 <ul>
-<li>仅记录 <code>liability_result/liability_ratio/liability_desc</code>（公共写入已含）；费用内部转嫁交 OA，本期<strong>待挂载</strong>，不生成转嫁单（<strong>B-6</strong>，A-19）。</li>
+<li>仅记录 <code>liability_result/liability_ratio/liability_desc</code>（公共写入已含）；费用内部转嫁交 OA，本期<strong>待挂载</strong>，不生成转嫁单（<strong>B-6</strong>，A-19）</li>
 </ul>
 </ul>
-<p><strong>状态变成</strong>：三种结果统一 <code>PENDING_SETTLE</code>（判责完成即进待结算，S6.1）。</p>
-<p><strong>触发下游</strong>：PROVIDER 生成抵扣单（本事务内）；SUPPLIER/INTERNAL 仅置标志/记录，实际下游待挂载。</p>
-<p><strong>回滚</strong>：主单判责字段 + 抵扣单 + 附件同一事务；抵扣单生成失败则判责整体回滚，主单不置待结算（避免「判了服务商责任却没抵扣单」）。</p>
-<hr>
-<h2>九、查看（对应 F-CLAIM-05）</h2>
-<p><strong>谁能点 + 前置</strong>：全部相关角色（按数据范围）；任意状态可查看。</p>
-<p><strong>读什么</strong>（只读，不写库）：主单 <code>claim_order</code> + 三张费用明细 + <code>claim_audit_record</code>（审核记录与 <code>audit_stage='OPERATION'</code> 的操作事件，按 <code>audit_time,id</code> 升序）+ <code>attachment</code>（按 biz_type 分组：维修凭证/旧件/回运单/判责）+ 责任判定字段 + 抵扣单（如有）。操作日志不再用“最后修改人/时间”代替历史；新建、编辑、提交、重提、作废均一次动作一条事件。无状态变更。</p>
-<hr>
-<h2>十、九态迁移总表（谁触发 + 条件 + 写哪些字段 + 拦截）</h2>
-<div class="tablewrap"><table><thead><tr><th>起态</th><th>事件（谁）</th><th>终态</th><th>迁移条件</th><th>迁移时写的关键字段</th></tr></thead><tbody><tr><td>—（新建）</td><td>新建（服务商专员）</td><td><code>DRAFT</code></td><td>工单已完工+技术审核已过+保内+条件唯一+工时费&gt;0</td><td>建 claim_order(status=DRAFT)+三明细+系数快照</td></tr><tr><td><code>DRAFT</code></td><td>提交（服务商专员）</td><td><code>PENDING_REGION</code></td><td>需回运件已发起回运+维修凭证附件在+硬校验</td><td>claim_order.status=PENDING_REGION</td></tr><tr><td><code>DRAFT</code></td><td>编辑（服务商专员）</td><td><code>DRAFT</code></td><td>仅改其它费用</td><td>claim_fee_other + 重算 other_fee_total/apply_total_amount</td></tr><tr><td><code>DRAFT</code></td><td>作废（服务商专员）</td><td><code>VOIDED</code></td><td>仅草稿</td><td>status=VOIDED；主单/明细/附件保留供全状态查看</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审通过（区域负责人）</td><td><code>PENDING_HQ</code></td><td>核查通过+录 claim_target（XW 必录 project_code）</td><td>status=PENDING_HQ、claim_target、project_code、audit_record(区域初审/通过)</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审驳回</td><td><code>REJECTED</code></td><td>资料不实/汽车电子工时不合理等</td><td>status=REJECTED、audit_record(区域初审/驳回+原因)</td></tr><tr><td><code>PENDING_REGION</code></td><td>区域初审拒绝</td><td><code>DECLINED</code></td><td>判定不予受理</td><td>status=DECLINED、audit_record(区域初审/拒绝+原因)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核通过·XW（索赔专员）</td><td><code>PENDING_SETTLE</code></td><td>claim_target=XW</td><td>status=PENDING_SETTLE、audit_record(业务审核/通过)、<strong>生成向欣旺达单</strong></td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核通过·SELF（索赔专员）</td><td><code>PENDING_LIABILITY</code></td><td>claim_target=SELF</td><td>status=PENDING_LIABILITY、audit_record(业务审核/通过)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核驳回</td><td><code>REJECTED</code></td><td>复核不通过</td><td>status=REJECTED、audit_record(业务审核/驳回+原因)</td></tr><tr><td><code>PENDING_HQ</code></td><td>业务审核拒绝</td><td><code>DECLINED</code></td><td>终止</td><td>status=DECLINED、audit_record(业务审核/拒绝+原因)</td></tr><tr><td><code>PENDING_LIABILITY</code></td><td>判责录入（质量部）</td><td><code>PENDING_SETTLE</code></td><td>三结果之一+说明</td><td>liability_result/desc/ratio/by/time、status=PENDING_SETTLE、audit_record(责任判定/判责结果，阶段码待 schema 补 G2)；PROVIDER 建抵扣单+provider_deduct_started=1；SUPPLIER 置 supplier_claim_started=1；INTERNAL 仅记录</td></tr><tr><td><code>REJECTED</code></td><td>编辑（服务商专员）</td><td><code>REJECTED</code></td><td>仅改其它费用</td><td>claim_fee_other + 重算金额（状态不变）</td></tr><tr><td><code>REJECTED</code></td><td>重新提交（服务商专员）</td><td><code>PENDING_REGION</code></td><td>同提交校验（从头，A-13）</td><td>status=PENDING_REGION</td></tr><tr><td><code>PENDING_SETTLE</code></td><td>结算完成（结算链，非本链动作）</td><td><code>SETTLED</code></td><td>由结算链驱动</td><td>status=SETTLED（字段属结算链）</td></tr></tbody></table></div>
-<p><strong>非法迁移拦截</strong>（统一策略）：每个写状态的操作，先用乐观锁 SQL 限定「前置状态白名单」——<code>UPDATE ... WHERE id=? AND status IN (&lt;该操作允许的前置态&gt;) AND version=? AND deleted_at IS NULL</code>。命中 0 行有两种原因：并发导致 version 变了、或状态已不在白名单（如对已结算单点作废、对草稿单点判责、对已拒绝/已作废终态做任何流转）。一律回滚并返回业务码「当前状态不允许该操作，请刷新」（HTTP 200，<code>Result.success=false</code>，S12 乐观锁+二次校验）。终态 <code>DECLINED / VOIDED / SETTLED</code> 不作为任何流转事件的前置态。<code>SETTLED</code> 由结算链负责，本链不主动写。</p>
-<hr>
-<h2>十一、事务与并发小结</h2>
+</ul>
+</ul>
+</ul>
+<h3>编码规则：</h3>
 <ul>
-<li><strong>多表同事务的操作</strong>：新建（工单互斥下主单+3 明细+附件+操作事件）、编辑（明细+主单汇总+操作事件）、提交/重提（主单+操作事件）、作废（只改主单状态+操作事件，主单/明细/附件均不软删）、各审核（主单+审核记录）、业务审核 XW（主单+审核记录+向欣旺达单）、判责（主单+判责留痕审核记录+附件；PROVIDER 再加抵扣单）。任一步失败整体回滚。</li>
-<li><strong>非审核操作事件</strong>：新建/编辑/提交/重提/作废分别写 <code>audit_result=CREATE/EDIT/SUBMIT/RESUBMIT/VOID</code>，统一 <code>audit_stage='OPERATION'</code>；审核节点仍使用原审核阶段和 PASS/REJECT/DECLINE/PARTIAL。</li>
-<li><strong>乐观锁</strong>：<code>claim_order</code> 每次状态/金额更新走 <code>version</code> 比对，未命中即冲突回滚；核心动作（提交/审核/判责）叠加分布式锁按 <code>claim_order.id</code> 串行化，避免同单并发双审（S12、S15）。</li>
-<li><strong>幂等</strong>：向欣旺达单生成以「一张服务商单仅可纳入一张闪欣单」约束兜底（下游 <code>xw_claim_detail.uk_provider_claim</code>）；抵扣单以 <code>deduct_no</code> 唯一 + 判责仅 <code>PENDING_LIABILITY→PENDING_SETTLE</code> 单向迁移，天然防重复生成。</li>
-<li><strong>金额一致性</strong>：任何改明细的操作，必须在同事务内把 <code>claim_order</code> 的四个汇总字段重算回写，禁止只改明细不改主单。</li>
+<li><code>deduct_no</code> = <code>DKD-yyyyMMdd-4位流水</code>（PROVIDER 生成抵扣单时，从 <code>doc_no_sequence</code> 同事务行锁取号，<code>deduct_no</code> 唯一兜底；D-编码-D1/D2）。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>QMS 判责系统：对接系统 QMS；触发时机为质量部判责录入（本期人工录入，A-20 Mock/待挂载）。契约未提供，V2 走 EXT-01 真实对接。失败处理：本期人工录入，无自动回传。</li>
+<li>供应商索赔流程：SUPPLIER 结果触发，本期<strong>待挂载</strong>仅置 <code>supplier_claim_started=1</code>，不生成单据（D-索赔-B5）。</li>
+<li>OA 内部转嫁：INTERNAL 结果触发，本期<strong>待挂载</strong>仅记录比例/说明，不生成转嫁单（B-6/A-19，EXT-04）。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>主单判责字段 + 抵扣单 + 附件同一事务；抵扣单生成失败则判责整体回滚，主单不置待结算（避免「判了服务商责任却没抵扣单」）。</li>
+<li>前置状态白名单 <code>PENDING_LIABILITY</code>，且只 <code>PENDING_LIABILITY→PENDING_SETTLE</code> 单向迁移，天然防重复生成抵扣单；抵扣单以 <code>deduct_no</code> 唯一兜底。</li>
+<li>核心动作叠加按 <code>claim_order.id</code> 分布式锁串行化。</li>
 </ul>
 <hr>
-<h2>十二、留白与取数边界（本链）</h2>
+<h2>F-CLAIM-09 搜索/导出</h2>
+<h3>功能说明：</h3>
 <ul>
-<li>工单库全部取数字段（工单状态/保内标识/业务类型/维修项目工时/备件明细/主责件/系数/VIN·SN·条码）本期 <strong>Mock/待挂载</strong>，物理表列未登记，禁止自造；真库到位走变更登记回填。</li>
-<li>回运单实体/在途状态与 OA 内部转嫁契约仍<strong>待挂载</strong>；本期分别以回运附件和仅记录比例/说明作为 Mock/临时边界。QMS 预判值本期写审核备注，供应商责任本期仅置启动标志，均已在决策表确认。</li>
-<li>本链 D4 已决口径与仍挂起的待文档/待契约项集中登记在配套溯源表 C 表及 <code>docs/decisions/待确认决策表.xlsx</code>。</li>
+<li>多维筛选（编号/工单/类型/服务商/区域/时间/状态）；按筛选导出（PRD F-CLAIM-09）。</li>
+<li>本功能点本期无独立详设定稿，<strong>解决方案沿用通用列表查询/导出规格（待 E-通用-B2 定稿）</strong>；本节写清从 PRD/原型能拿到的查询条件/结果列/权限范围，不编造未定细节，标待确认指针。</li>
+</ul>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 查询/导出。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>各相关角色在列表页（P01）填写多维筛选条件查询本人数据范围内的索赔单，命中结果分页展示、本页合计申请总金额；点导出按当前筛选条件导出明细（大数据量异步导出+进度，PRD S12）。只读、不写库。<strong>导出字段清单与异步/同步策略、分片阈值等通用规格待 E-通用-B2 定稿</strong>。</li>
+</ul>
+<h3>涉及数据表（均只读）：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：列表主表，按数据范围 + 筛选条件过滤。</li>
+<li>关联取 <code>provider</code>（服务商名/区域）、<code>claim_type_mapping</code>（索赔类型显示）等维度，具体关联路径随通用列表规格定稿（E-通用-B2）。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>查询条件</strong>（来自原型 P01 与 PRD F-CLAIM-09）：</li>
+<ul>
+<li>索赔单编号：文本输入框，默认空，来源 <code>claim_order.claim_no</code></li>
+<li>工单编号：文本输入框，默认空，来源 <code>claim_order.work_order_no</code></li>
+<li>索赔类型：下拉（全部类型），默认全部，来源 <code>claim_order.claim_type</code></li>
+<li>索赔单状态：下拉（全部状态），默认全部，来源 <code>claim_order.status</code>（九态）</li>
+<li>服务商：下拉（全部服务商），默认全部，来源 <code>claim_order.provider_id/provider_name</code></li>
+<li>所属区域：下拉（全部区域），默认全部，来源 <code>claim_order.region</code></li>
+<li>创建时间：日期区间（开始~结束），默认空，来源 <code>claim_order.created_at</code></li>
+</ul>
+<li><strong>查询结果</strong>：</li>
+<ul>
+<li><strong>查询数据范围：按当前角色数据范围过滤（服务商本店 provider_id / 区域本区 region / 索赔专员全国 / 质量部本人待责任判定件）+ <code>deleted_at IS NULL</code> + 上述筛选条件</strong></li>
+<li>索赔单编号：取 <code>claim_order.claim_no</code></li>
+<li>工单编号：取 <code>claim_order.work_order_no</code></li>
+<li>服务商：取 <code>claim_order.provider_name</code></li>
+<li>所属区域：取 <code>claim_order.region</code></li>
+<li>索赔类型：取 <code>claim_order.claim_type</code></li>
+<li>申请总金额：取 <code>claim_order.apply_total_amount</code></li>
+<li>状态：取 <code>claim_order.status</code></li>
+<li>创建人：取 <code>claim_order.create_by</code></li>
+<li>创建时间：取 <code>claim_order.created_at</code></li>
+<li>操作列：按状态+角色渲染（草稿→编辑/提交/作废；待区域初审/待总部审核→查看/审核；其它→查看/编辑），本页合计申请总金额</li>
+</ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>查询 / 重置</strong>：按条件查询 / 清空条件</li>
+<li><strong>导出</strong>：</li>
+<ul>
+<li>数据范围限制：按当前查询条件 + 角色数据范围，只导本人可见数据</li>
+<li>导出字段：与查询结果列一致（编号/工单/服务商/区域/类型/申请总金额/状态/创建人/创建时间）</li>
+<li><strong>导出字段完整清单、异步导出+进度、分片阈值等通用规格待 E-通用-B2 定稿</strong>（PRD S12「大数据异步导出+进度」）</li>
+</ul>
+</ul>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无（导出方向；汽车电子旧件条码 Excel 批量属备件录入侧能力，触发条件必填校验见 F-CLAIM-02 A-39）。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>只读，无并发写；导出大数据量走异步任务（通用规格待 E-通用-B2）。</li>
+</ul>
+<hr>
+<h2>F-CLAIM-10 批量审核</h2>
+<h3>功能说明：</h3>
+<ul>
+<li>区域/索赔专员勾选批量审核（部分成功部分失败）（PRD F-CLAIM-10）；返回成功/失败明细（PRD 完成标准）。</li>
+<li>本功能点本期无独立详设定稿，<strong>解决方案沿用通用批量审核规格（待 E-通用-B1 定稿）</strong>；本节写清从 PRD/原型能拿到的权限范围/单条处理口径，不编造未定细节，标待确认指针。</li>
+</ul>
+<h3>开发类型：</h3>
+<ul>
+<li>新增节点。</li>
+</ul>
+<h3>节点目录：</h3>
+<ul>
+<li>服务商索赔管理 - 服务商索赔单列表（P01）- 批量审核。</li>
+</ul>
+<h3>业务流转说明：</h3>
+<ul>
+<li>区域负责人（对 <code>PENDING_REGION</code> 本区域单）或闪欣索赔专员（对 <code>PENDING_HQ</code> 全国单）在列表页勾选多条，触发批量审核。系统逐条按单条审核规则处理（区域初审=F-CLAIM-06 通过口径 / 业务审核=F-CLAIM-07 通过口径，含分流与下游生成），<strong>每条独立事务，部分成功部分失败</strong>，返回成功/失败明细（PRD S12「批量操作部分成功部分失败返回明细」）。<strong>批量并发度、单条失败是否阻断、结果汇总结构等通用规格待 E-通用-B1 定稿</strong>。</li>
+</ul>
+<h3>涉及数据表：</h3>
+<ul>
+<li><code>claim_order</code>（索赔主单）：逐条更新 <code>status</code> + 审计列。</li>
+<li><code>claim_audit_record</code>（审核记录）：逐条写审核记录。</li>
+<li><code>xw_claim_order</code> / <code>xw_claim_detail</code>（向欣旺达单，相邻链）：批量业务审核中 XW 单逐单触发生成（同 F-CLAIM-07）。</li>
+</ul>
+<h3>解决方案：</h3>
+<ul>
+<li><strong>操作按钮</strong>：</li>
+<ul>
+<li><strong>批量审核</strong>（列表页勾选多条）：</li>
+<ul>
+<li>权限范围：区域负责人只批本区域 <code>PENDING_REGION</code> 单；闪欣索赔专员批全国 <code>PENDING_HQ</code> 单（数据范围过滤在 SQL）</li>
+<li>单条处理口径：沿用对应单条审核规则——区域初审按 F-CLAIM-06 通过/驳回/拒绝口径（录 claim_target/project_code）、业务审核按 F-CLAIM-07 通过口径（XW/SELF 分流、XW 逐单生成向欣旺达单）</li>
+<li>结果：<strong>部分成功部分失败</strong>，逐条独立事务，返回成功/失败明细（成功条数、失败条数及原因）</li>
+<li><strong>批量勾选上限、并发度、失败重试、结果汇总信封结构等通用规格待 E-通用-B1 定稿</strong></li>
+</ul>
+</ul>
+<li>说明：批量审核录入项（如 claim_target/project_code/驳回原因）在通用批量规格中如何承载待 E-通用-B1 明确，本期不编造弹窗字段细节。</li>
+</ul>
+<h3>编码规则：</h3>
+<ul>
+<li>无（沿用各单据既有编码）。</li>
+</ul>
+<h3>外部接口：</h3>
+<ul>
+<li>无（XW 单生成属相邻链模块内调用，同 F-CLAIM-07）。</li>
+</ul>
+<h3>导入：</h3>
+<ul>
+<li>无。</li>
+</ul>
+<h3>防重复与并发：</h3>
+<ul>
+<li>每条单独走乐观锁 + 前置状态白名单（<code>PENDING_REGION</code>/<code>PENDING_HQ</code>），单条并发冲突只失败该条、不影响其它条。</li>
+<li>核心动作叠加按 <code>claim_order.id</code> 分布式锁串行化，避免同单被单审与批量并发双审。</li>
+<li><strong>批量整体并发度/幂等键等通用规格待 E-通用-B1 定稿</strong>。</li>
+</ul>
+<hr>
+<h2>留白与取数边界（本链）</h2>
+<ul>
+<li>工单库全部取数字段（工单状态/保内标识/业务类型/维修项目工时/备件明细/主责件/系数/VIN·SN·条码/维修方案技术审核结果/备件销售价）本期 <strong>Mock/待挂载</strong>，物理表列未登记，禁止自造；真库到位走变更登记回填（A-21）。</li>
+<li>维修一级/二级分类等分类信息已按<strong>裁决 D-索赔-B9</strong> 落为本链真列 <code>claim_order.repair_type/sub_repair_type/serial_no/vin/province_city</code>（与 xw_claim_order 同名列对齐，值仍由工单库 Mock 带出）；F-CLAIM-02 A-39 条件必填场景触发与 F-CLAIM-06 A-14 汽车电子把关据此做<strong>硬校验</strong>。该 5 列为建表变更，schema/DDL 已登记并标「★ 列变更待研发组长审定后由人执行」。</li>
+<li><code>claim_audit_record.audit_stage</code> 已按<strong>裁决 D-索赔-B10</strong> 增「责任判定」阶段码 <code>LIABILITY</code>，F-CLAIM-08 判责留痕用此值；schema/DDL 注释已同步。</li>
+<li>备件销售价已按<strong>裁决 D-索赔-B11</strong> 落为 <code>claim_fee_part.sale_price</code> 真列（工单 Mock 带出），<code>mgmt_fee = sale_price × coefficient_snapshot</code> 事后可复核；该列变更 schema/DDL 已登记并标「★ 列变更待研发组长审定后由人执行」。</li>
+<li>回运单实体/在途状态与 OA 内部转嫁契约仍<strong>待挂载</strong>；本期分别以回运附件（B-3）和仅记录比例/说明（B-6）作为 Mock/临时边界。备件「是否需回运」暂按 <code>part_attr</code> 文本判定（B-2）。</li>
+<li>QMS 预判值本期写审核备注（D-索赔-B4）；供应商责任本期仅置启动标志（D-索赔-B5）；均已在决策表确认。</li>
+<li>F-CLAIM-09 通用列表查询/导出规格（导出字段全集/异步策略）待 <strong>E-通用-B2</strong> 定稿；F-CLAIM-10 通用批量审核规格（并发度/失败处置/结果信封）待 <strong>E-通用-B1</strong> 定稿。</li>
+<li>单据序列表 <code>doc_no_sequence</code> DDL 仍待研发组长审定（D-编码-B1）。</li>
+<li>本链 D4 已决口径与仍挂起的待文档/待契约项集中登记在配套溯源表 C 表及 <code>docs/decisions/待确认决策表.xlsx</code>；待确认与产品决策落 <code>.sdd/decisions-DE.json</code>（stage=D）派生进决策表，本文正文非 PRD 直接事实处以 <code>（裁决 D-x）</code>/<code>（待确认 X-x/B-x/G-x）</code> 标注对应编号。</li>
 </ul></div>
-<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.1 · 本页由产物渲染生成</p></main><script>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.2 · 本页由产物渲染生成</p></main><script>
 (function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();
 (function(){document.querySelectorAll('a[data-back]').forEach(function(a){a.addEventListener('click',function(e){try{if(history.length>1&&document.referrer&&new URL(document.referrer).origin===location.origin){e.preventDefault();history.back();}}catch(err){}});});})();
 (function(){if('scrollRestoration' in history)history.scrollRestoration='manual';var key='sdd-scroll:'+location.pathname;if(!location.hash){try{var y=sessionStorage.getItem(key);if(y!==null){var r=document.documentElement,p=r.style.scrollBehavior;r.style.scrollBehavior='auto';window.scrollTo(0,parseInt(y,10)||0);r.style.scrollBehavior=p;}}catch(e){}}var t=null;window.addEventListener('scroll',function(){if(t)return;t=setTimeout(function(){t=null;try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}},150);},{passive:true});window.addEventListener('beforeunload',function(){try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}});})();

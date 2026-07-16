@@ -133,69 +133,45 @@ pre code{counter-reset:l;display:block;font-family:var(--mono);font-size:12px;li
 <a class="up" href="../index.html" data-back>← 返回</a>
 <nav class="crumb"><a href="../../SDD-V8-使用手册.html">使用手册</a><span class="sep">›</span><a href="../index.html">产物站总览</a><span class="sep">›</span><span class="cur">开发计划 Plan.md</span></nav>
 <div class="sp"><span class="lbl">本站</span><a class="tl" href="../index.html">总览</a><a class="tl" href="../测试用例.html">测试用例</a><a class="tl" href="../代码-前端.html">前端代码</a><a class="tl" href="../代码-后端.html">后端代码</a><a class="tl" href="../界面展示.html">界面展示</a><button class="themebtn" id="tb" type="button">◐ 深浅色</button></div>
-</div></div><main class="wrap"><h1>开发计划 Plan.md</h1><div class="dl"><div class="ic"></div><div class="tx"><b>真实原始文件 · Plan.md</b><span>开发计划原件（Markdown）</span></div><a class="go" href="../原始文件/Plan.md" download>下载原件 ↓</a></div><div class="p"><h1>开发计划</h1>
+</div></div><main class="wrap"><h1>开发计划 Plan.md</h1><div class="dl"><div class="ic"></div><div class="tx"><b>真实原始文件 · Plan.md</b><span>开发计划原件（Markdown）</span></div><a class="go" href="../原始文件/Plan.md" download>下载原件 ↓</a></div><div class="p"><h1>开发计划 · 服务商索赔单（聚焦单模块）</h1>
 <blockquote><p>设计阶段与开发阶段的衔接文件。所有开发进度以本文件为准。</p>
-<p>项目：服务商索赔管理模块（单模块，V1/MVP）。上游：<code>docs/PRD.md</code>、<code>docs/prototypes/</code>、<code>docs/detail-design/</code>、<code>docs/api-contracts/</code>、<code>docs/conventions.md</code>、<code>docs/db-schema/</code>。</p></blockquote>
+<p><strong>范围</strong>：本项目经减法聚焦到<strong>服务商索赔单</strong>一条链（F-CLAIM-01~10）；向欣旺达/结算/付款/编码/配置本轮不设计（其他模块仍在 PRD，但无 LLD/契约）。</p>
+<p>上游：<code>docs/PRD.md</code>（F-CLAIM）、<code>docs/prototypes/pages/01,02</code>、<code>docs/detail-design/详细设计-服务商索赔单.md</code>、<code>docs/api-contracts/接口文档-服务商索赔单.md</code>、<code>docs/conventions.md</code>、<code>docs/db-schema/</code>。</p></blockquote>
 <h2>一、功能清单总览</h2>
-<div class="tablewrap"><table><thead><tr><th>序号</th><th>功能名称</th><th>一句话描述</th><th>对应页面</th><th>优先级</th><th>状态</th></tr></thead><tbody><tr><td>F-CLAIM-01</td><td>新建索赔</td><td>关联已完工保内工单，带出费用明细，暂存草稿</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-02</td><td>提交索赔</td><td>维修凭证附件必填、回运校验，进区域初审</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-03</td><td>编辑</td><td>仅草稿/驳回可编辑，仅其它费用明细可改</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-04</td><td>作废</td><td>仅草稿可作废</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-05</td><td>查看</td><td>全状态可查，含审核记录/附件/日志/判责</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-06</td><td>区域初审</td><td>录索赔对象+SN 预判，通过→待总部审核</td><td>P02/审核弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-07</td><td>业务审核</td><td>主责件归属决定流向（欣旺达件逐单生成向欣单/外采件进判责）</td><td>P02/审核弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-08</td><td>责任判定</td><td>外采件三项判责，服务商责任自动生成抵扣单</td><td>P02/判责弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-09</td><td>搜索/导出</td><td>多维筛选、按筛选导出</td><td>P01</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-10</td><td>批量审核</td><td>勾选批量审核，部分成功部分失败</td><td>P01</td><td>MVP</td><td>待开发</td></tr><tr><td>F-XW-01</td><td>向欣单生成</td><td>业务审核通过（欣旺达件）逐单自动生成，补附件提交</td><td>P04</td><td>MVP</td><td>待开发</td></tr><tr><td>F-XW-02</td><td>提交/审批</td><td>欣旺达审批（通过/驳回/拒绝/部分通过），内建角色</td><td>P04/审批弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-XW-03</td><td>查看/导出</td><td>全量明细、关联服务商单、审批记录、批量导出</td><td>P03</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-01</td><td>自动生成结算单</td><td>定时/手动按服务商维度汇总，应付=0 零元核销</td><td>P05</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-02</td><td>结算确认/对账</td><td>可增删索赔单据→确认结算→对账</td><td>P06</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-03</td><td>正数结算-开票</td><td>校验开票权限白名单，服务商上传发票</td><td>P06/发票上传弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-04</td><td>发票核验/申请付款</td><td>闪欣发票确认→人工申请付款生成付款单</td><td>P06</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-05</td><td>负数结算-强制结算</td><td>负数关闭开票权限，发起强制结算扣质保金</td><td>P06</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-06</td><td>闪欣结算</td><td>统一一张单不拆分，内部分账交财务共享/OA（Mock）</td><td>P08</td><td>MVP</td><td>待开发</td></tr><tr><td>F-SET-07</td><td>查询/导出</td><td>多维筛选、明细导出</td><td>P05/P07</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-01</td><td>付款申请生成</td><td>结算单人工点申请付款，系统带出信息生成草稿</td><td>P11</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-02</td><td>提交/分级审批</td><td>按金额匹配三档审批链（内建审批流）</td><td>P10</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-03</td><td>审批/驳回</td><td>逐节点审批，驳回退回待提交</td><td>P10/审批弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-04</td><td>付款/作废</td><td>审批通过录凭证付款，草稿可作废</td><td>P10</td><td>MVP</td><td>待开发</td></tr><tr><td>F-PAY-05</td><td>查询/导出/批量审核</td><td>多维筛选、导出、批量审核</td><td>P09</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CFG-01</td><td>结算基础配置</td><td>周期/开票权限白名单/审批流/索赔系数/付款金额档维护</td><td>P12</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CODE-01</td><td>单据编码（跨单据）</td><td>6 类单据编号生成（序列表+行锁），非独立页面</td><td>—</td><td>MVP</td><td>待开发</td></tr></tbody></table></div>
-<blockquote><p>V2+（不在本期开发范围）：QMS 判责真实对接（EXT-01）、财务共享付款对接（EXT-03）、OA 三级组织同步与自动分账（EXT-04）、里程地图自动计算与限次、美元/汇率、供应商索赔子流程完整化（PRD「9月」项）、欣旺达售后系统间实时对接（替代内建角色）。</p></blockquote>
+<div class="tablewrap"><table><thead><tr><th>序号</th><th>功能名称</th><th>一句话描述</th><th>对应页面</th><th>优先级</th><th>状态</th></tr></thead><tbody><tr><td>F-CLAIM-01</td><td>新建索赔</td><td>关联已完工+保内+<strong>技术审核已过</strong>工单，带出费用/分类列，暂存草稿</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-02</td><td>提交索赔</td><td>维修凭证必填、A-39 条件必填硬校验、回运校验，进区域初审</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-03</td><td>编辑</td><td>仅草稿/驳回可编辑，仅其它费用明细可改</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-04</td><td>作废</td><td>仅草稿可作废</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-05</td><td>查看</td><td>全状态可查，含审核记录/附件/日志/判责</td><td>P02</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-06</td><td>区域初审</td><td>录索赔对象+SN 预判，通过→待总部审核</td><td>P02/审核弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-07</td><td>业务审核</td><td>主责件归属决定流向（欣旺达件触发下游生成/外采件进判责）</td><td>P02/审核弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-08</td><td>责任判定</td><td>外采件三项判责，服务商责任自动生成抵扣单，判责留痕 LIABILITY</td><td>P02/判责弹窗</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-09</td><td>搜索/导出</td><td>多维筛选、按筛选导出（通用列表导出规格待 E-通用-B2）</td><td>P01</td><td>MVP</td><td>待开发</td></tr><tr><td>F-CLAIM-10</td><td>批量审核</td><td>勾选批量审核（通用批量规格待 E-通用-B1）</td><td>P01</td><td>MVP</td><td>待开发</td></tr></tbody></table></div>
+<blockquote><p>F-CLAIM-07「欣旺达件触发生成向欣旺达单」为<strong>下游触发点</strong>，向欣旺达单本身本轮不在范围（其模块已删）。</p></blockquote>
 <h2>二、数据契约摘要</h2>
-<blockquote><p>完整数据契约见 <code>docs/PRD.md S10 数据契约</code> 与 <code>docs/db-schema/表结构文档.md</code>（20 表，四段式，雪花 id + 审计列）；统一响应格式与接口契约见 <code>docs/conventions.md</code> + <code>docs/api-contracts/接口文档-&lt;模块&gt;.md</code>（唯一权威源，不在本文件重复列出）。</p>
-<p>编号规则见 <code>docs/conventions.md S7</code>。乐观锁 <code>version</code> 由后端维护、不入接口体（conventions S2/S5）。</p>
-<p><strong>建表由人执行</strong>：<code>docs/db-schema/ddl/supplier-claim-mgmt.sql</code> 为交付物；新增序列表 <code>doc_no_sequence</code> 的建表 SQL（<code>docs/db-schema/ddl/doc_no_sequence.sql</code>）<strong>待研发组长审定</strong>（单据编码 B-1），审定并由人执行后方可开发依赖它的编码逻辑。子智能体全程零 DDL。</p></blockquote>
+<blockquote><p>完整数据契约见 <code>docs/PRD.md S10</code> 与 <code>docs/db-schema/表结构文档.md</code>（索赔单 9 表：claim_order / claim_fee_labor/part/other / claim_audit_record / claim_deduct_order / claim_coefficient / claim_type_mapping / attachment，四段式，雪花 id + 审计列）；统一响应/接口见 <code>docs/conventions.md</code> + <code>docs/api-contracts/接口文档-服务商索赔单.md</code>。编号规则见 conventions S7（SPCO/DKD 用 doc_no_sequence）。乐观锁 version 后端维护、不入接口体。</p>
+<p><strong>建表由人执行</strong>：<code>ddl/supplier-claim-mgmt.sql</code>（含 B9/B10/B11 加列，★列变更待审定）、<code>ddl/doc_no_sequence.sql</code>（待审定）——均标待研发组长审定后由人执行，子智能体零 DDL。</p></blockquote>
 <h2>二点五、外部服务与测试权限清单</h2>
-<blockquote><p><strong>开发硬门禁</strong>：本清单是 PRD「A5-3 外部依赖」落定版，与 <code>docs/external-interfaces/待料清单.md</code>（EXT-01~06）一致。本期无需任何真实外部 Key/Token（全部走 Mock/内建/待挂载），故无真实密钥落入文档。状态列均为已决策略，无「待确认」。</p></blockquote>
-<div class="tablewrap"><table><thead><tr><th>服务</th><th>用途</th><th>配置项字段</th><th>MVP 必需</th><th>Tester 完整联调权限</th><th>缺失时策略</th><th>状态</th></tr></thead><tbody><tr><td>QMS 判责系统（EXT-01）</td><td>索赔单推送/责任判定回传</td><td>无（本期人工录入判责/SN 预判，落 <code>claim_audit_record.remark</code>）</td><td>否</td><td>无需（Mock）</td><td>人工/Mock 适配层，真接口到位再替换实现</td><td>Mock（已决）</td></tr><tr><td>欣旺达售后系统（EXT-02）</td><td>向欣单审批/对账</td><td>无（本系统内建欣旺达角色，A-22）</td><td>否</td><td>无需（内建角色）</td><td>内建角色，无跨系统接口</td><td>内建（已决）</td></tr><tr><td>财务共享系统（EXT-03）</td><td>闪欣结算付款推送/回传</td><td>无（本期人工回填付款结果，A-18）</td><td>否</td><td>无需（Mock）</td><td>人工回填，真接口到位再替换</td><td>Mock（已决）</td></tr><tr><td>OA 系统（EXT-04）</td><td>内部费用转嫁/分账</td><td>无（本期仅本系统记录转嫁单/分账意图）</td><td>否</td><td>无需</td><td>仅本系统记录，不外呼</td><td>待挂载（已决）</td></tr><tr><td>闪欣财务系统（EXT-05）</td><td>闪欣侧付款审批</td><td>无（本系统内建可配置审批流，S6.8/S7.9）</td><td>否</td><td>无需（内建）</td><td>内建审批流</td><td>内建（已决）</td></tr><tr><td>维修工单管理模块（EXT-06）</td><td>带出工单状态/保内标识/维修项目/工时/备件/主责件/系数</td><td>无（本期 Mock 数据集/固定夹具）</td><td>是（取数依赖）</td><td>Mock 夹具</td><td>Mock 取数适配层，字段契约明确后替换</td><td>Mock/待挂载（已决）</td></tr></tbody></table></div>
-<blockquote><p>附件存储：本地磁盘，DB 存相对路径，抽象存储层（<code>ATTACHMENT_ROOT_PATH</code> 配置项，V2 可迁 OSS/S3）。真实路径配置进 <code>.env</code>，不入 <code>docs/**</code>。</p></blockquote>
+<blockquote><p>本清单是 PRD A5-3 落定版。本期无需真实外部 Key（全 Mock/待挂载）。状态无「待确认」。</p></blockquote>
+<div class="tablewrap"><table><thead><tr><th>服务</th><th>用途</th><th>配置项</th><th>MVP 必需</th><th>缺失策略</th><th>状态</th></tr></thead><tbody><tr><td>QMS 判责系统（EXT-01）</td><td>SN 预判 / 责任判定回传</td><td>无（人工/Mock，落 claim_audit_record.remark）</td><td>否</td><td>人工/Mock 适配层</td><td>Mock（已决）</td></tr><tr><td>维修工单管理模块（EXT-06）</td><td>带出工单状态/保内/技术审核/维修项目/工时/备件/主责件/分类列(repair_type等)/系数</td><td>无（Mock 数据集/固定夹具）</td><td>是（取数依赖）</td><td>Mock 取数适配层</td><td>Mock/待挂载（已决）</td></tr></tbody></table></div>
+<blockquote><p>附件：本地磁盘，DB 存相对路径（<code>ATTACHMENT_ROOT_PATH</code>）。</p></blockquote>
 <h2>三、前端开发清单</h2>
 <h3>前端技术选型</h3>
-<div class="tablewrap"><table><thead><tr><th>层级</th><th>选择</th><th>说明</th></tr></thead><tbody><tr><td>框架</td><td>React</td><td>桌面 Web 后台</td></tr><tr><td>语言</td><td>TypeScript</td><td>组件/service/DTO 全类型化</td></tr><tr><td>构建工具</td><td>Vite</td><td>本地开发、代理、构建</td></tr><tr><td>路由</td><td>react-router</td><td>页面路由 + 角色鉴权守卫</td></tr><tr><td>状态管理</td><td>Zustand</td><td>登录态/全局 UI/跨页面状态</td></tr><tr><td>请求库</td><td>Axios</td><td>统一实例、拦截器、<code>Result&lt;T&gt;</code> 解包、错误处理</td></tr><tr><td>组件库</td><td>Ant Design</td><td>桌面 Web 后台</td></tr><tr><td>工程化</td><td>ESLint + Prettier + type-check + build</td><td>自动验收覆盖</td></tr><tr><td>可选增强</td><td>TanStack Query</td><td>列表分页/缓存/筛选刷新</td></tr></tbody></table></div>
-<div class="tablewrap"><table><thead><tr><th>序号</th><th>页面名称</th><th>涉及功能</th><th>Mock 数据来源</th><th>状态</th></tr></thead><tbody><tr><td>P01</td><td>服务商索赔单列表</td><td>F-CLAIM-05/09/10</td><td>接口文档-服务商索赔单 S2.9/2.8</td><td>待开发</td></tr><tr><td>P02</td><td>服务商索赔单 新建/编辑/详情</td><td>F-CLAIM-01~08</td><td>接口文档-服务商索赔单 各接口</td><td>待开发</td></tr><tr><td>P03</td><td>向欣旺达索赔单列表</td><td>F-XW-03</td><td>接口文档-向欣旺达索赔单 分页/详情</td><td>待开发</td></tr><tr><td>P04</td><td>闪欣索赔单 详情/编辑</td><td>F-XW-01/02</td><td>接口文档-向欣旺达索赔单 各接口</td><td>待开发</td></tr><tr><td>P05</td><td>服务商结算单列表</td><td>F-SET-01/07</td><td>接口文档-结算 列表</td><td>待开发</td></tr><tr><td>P06</td><td>服务商结算单详情</td><td>F-SET-02/03/04/05</td><td>接口文档-结算 详情/对账/开票/申请付款</td><td>待开发</td></tr><tr><td>P07</td><td>闪欣结算单列表</td><td>F-SET-07</td><td>接口文档-结算 列表</td><td>待开发</td></tr><tr><td>P08</td><td>闪欣结算单详情</td><td>F-SET-06</td><td>接口文档-结算 闪欣结算</td><td>待开发</td></tr><tr><td>P09</td><td>付款申请单列表</td><td>F-PAY-05</td><td>接口文档-付款申请 S2.9</td><td>待开发</td></tr><tr><td>P10</td><td>付款申请单 详情/编辑</td><td>F-PAY-02/03/04</td><td>接口文档-付款申请 S2.2~2.8</td><td>待开发</td></tr><tr><td>P11</td><td>付款申请单 新建</td><td>F-PAY-01</td><td>接口文档-付款申请 S2.1</td><td>待开发</td></tr><tr><td>P12</td><td>结算基础配置</td><td>F-CFG-01</td><td>结算配置接口（周期/白名单/审批流/系数/金额档）</td><td>待开发</td></tr><tr><td>弹窗</td><td>审核/审批/导出/判责录入/发票上传</td><td>各审核类操作</td><td>对应模块接口</td><td>待开发</td></tr></tbody></table></div>
-<blockquote><p>原型 HTML 全套 12 页在 <code>docs/prototypes/pages/</code>，前端 Mock 页面须与原型一致、Mock 数据格式与 api-contracts 完全一致。</p></blockquote>
-<h3>前端自动验收标准</h3>
+<p>React + TypeScript + Vite + Ant Design + react-router + Zustand + Axios（<code>Result&lt;T&gt;</code> 解包）；ESLint/Prettier/type-check/build 自动验收。</p>
+<div class="tablewrap"><table><thead><tr><th>序号</th><th>页面</th><th>涉及功能</th><th>Mock 数据来源</th><th>状态</th></tr></thead><tbody><tr><td>P01</td><td>服务商索赔单列表</td><td>F-CLAIM-05/09/10</td><td>接口文档-服务商索赔单 分页/导出</td><td>待开发</td></tr><tr><td>P02</td><td>服务商索赔单 新建/编辑/详情</td><td>F-CLAIM-01~08</td><td>接口文档-服务商索赔单 各接口</td><td>待开发</td></tr><tr><td>弹窗</td><td>审核/判责录入</td><td>F-CLAIM-06/07/08</td><td>对应接口</td><td>待开发</td></tr></tbody></table></div>
+<h3>前端自动验收</h3>
 <ul>
-<li>[ ] 所有页面 UI 与原型一致</li>
-<li>[ ] 所有页面使用 Mock 数据可正常交互</li>
-<li>[ ] Mock 数据格式与 api-contracts 完全一致（<code>Result&lt;T&gt;</code>/<code>PageResult&lt;T&gt;</code> 信封）</li>
-<li>[ ] Agent/Tester 自动验收通过</li>
+<li>[ ] 页面 UI 与原型 01/02 一致；Mock 数据格式与 api-contracts 一致（<code>Result&lt;T&gt;</code>/<code>PageResult&lt;T&gt;</code>）；Agent/Tester 自动验收通过。</li>
 </ul>
 <h2>四、后端开发清单</h2>
-<div class="tablewrap"><table><thead><tr><th>序号</th><th>功能名称</th><th>依赖</th><th>对应接口</th><th>状态</th></tr></thead><tbody><tr><td>B00</td><td>基础设施（多模块骨架 + Result/异常 + 鉴权拦截器 + DB 连接）</td><td>无</td><td>GET /actuator/health</td><td>待开发</td></tr><tr><td>B01</td><td>单据编码组件（doc_no_sequence 取号，序列表+行锁）</td><td>B00 + doc_no_sequence 表已建</td><td>conventions S7（无独立 REST）</td><td>待开发</td></tr><tr><td>B02</td><td>结算基础配置（周期/白名单/审批流/系数/金额档）</td><td>B00</td><td>配置类接口（P12）</td><td>待开发</td></tr><tr><td>B03</td><td>服务商索赔单链</td><td>B00/B01</td><td>接口文档-服务商索赔单（9 接口）</td><td>待开发</td></tr><tr><td>B04</td><td>向欣旺达索赔单链</td><td>B03（业务审核触发生成）</td><td>接口文档-向欣旺达索赔单（7 接口+内部生成）</td><td>待开发</td></tr><tr><td>B05</td><td>结算链（服务商+闪欣结算、质保金账户）</td><td>B01/B02/B03/B04</td><td>接口文档-结算（20 接口，含定时作业 OP1）</td><td>待开发</td></tr><tr><td>B06</td><td>付款申请链（内建分级审批流）</td><td>B02/B05</td><td>接口文档-付款申请（9 接口）</td><td>待开发</td></tr></tbody></table></div>
-<h3>后端任务验收规则</h3>
+<div class="tablewrap"><table><thead><tr><th>序号</th><th>功能</th><th>依赖</th><th>对应接口</th><th>状态</th></tr></thead><tbody><tr><td>B00</td><td>基础设施（多模块骨架 + Result/异常 + 鉴权拦截器 + DB 连接）</td><td>无</td><td>GET /actuator/health</td><td>待开发</td></tr><tr><td>B01</td><td>单据编码组件（doc_no_sequence 取号 SPCO/DKD，序列表+行锁）</td><td>B00 + doc_no_sequence 表已建</td><td>conventions S7（无独立 REST）</td><td>待开发</td></tr><tr><td>B02</td><td>服务商索赔单链（F-CLAIM-01~10）</td><td>B00/B01</td><td>接口文档-服务商索赔单（9 接口）</td><td>待开发</td></tr></tbody></table></div>
+<h3>后端验收规则</h3>
 <ul>
-<li><strong>基础设施按企业多模块拓扑搭建</strong>（parent + common + starter + 域 sdk/service，脚手架见 <code>dev-standards/java/研发工程模块与SDK-Service拆分指南.md S7</code>，权威 <code>dev-standards/backend-java.md</code>）：禁止自建 pom / 响应包装 / 异常体系。</li>
-<li><strong>建表/改表由人执行、子智能体零 DDL</strong>：建表 SQL 是设计侧交付物（<code>docs/db-schema/ddl/</code>）；<code>doc_no_sequence</code> DDL 待研发组长审定并由人执行后，B01 编码组件方可开发。后端任务前置假设"目标表已由人建好"。</li>
-<li>基础设施任务由 Agent 自动连续执行，不触发用户门禁；验收：<code>$MVN -q verify</code> 通过（ArchUnit/Spotless/JaCoCo 门禁）、<code>/actuator/health</code> 返回 UP。</li>
-<li>业务任务必须在任务内完成真实联调验收（后端真实 API + 前端 <code>VITE_USE_MOCK=false</code> 切真实、页面核心操作可用、不展示 <code>[Mock]</code> 数据、Tester 能证明命中真实后端）。</li>
-<li>涉及外部服务（QMS/财务共享/OA/工单）的后端任务：本期一律走 Mock/内建适配层，标记 Mock 验收，不得宣称真实外部联调通过。Mock 必须可被同一适配接口的真实实现替换，不把外部地址/鉴权/正式枚举写死在业务层。</li>
+<li>基础设施按企业多模块拓扑（parent+common+starter+域 sdk/service，见 dev-standards）；禁自建 pom/响应包装/异常体系。</li>
+<li><strong>建表由人执行、子智能体零 DDL</strong>：claim_order 的 B9 加列、claim_fee_part 的 sale_price、audit_stage 的 LIABILITY 码、doc_no_sequence 建表——均待研发组长审定并由人执行后开发。</li>
+<li>业务任务须真实联调验收（后端真实 API + 前端 <code>VITE_USE_MOCK=false</code>、页面核心操作可用、不展示 <code>[Mock]</code>）。</li>
+<li>QMS/工单本期走 Mock 适配层，标 Mock 验收，不得宣称真实外部联调。</li>
 </ul>
-<h2>五、功能详情（开发时逐个展开）</h2>
-<blockquote><p>以下详情在开发阶段由 Developer 和 Tester 逐个展开和验收，权威规格见对应 LLD（<code>docs/detail-design/</code>）与接口契约（<code>docs/api-contracts/</code>）。</p></blockquote>
-<hr>
+<h2>五、功能详情</h2>
+<blockquote><p>开发时逐个展开，权威规格见 <code>docs/detail-design/详细设计-服务商索赔单.md</code> 与 <code>docs/api-contracts/接口文档-服务商索赔单.md</code>。</p></blockquote>
 <h2>六、开发顺序建议</h2>
-<blockquote><p>默认推荐节奏，实际开发以 Planner 产出的 <code>.sdd/tasks.md</code> 为准。</p></blockquote>
-<p><strong>阶段1：前端 MVP（Mock，用户先验收 UI/UX）</strong></p>
-<ol>
-<li>P01~P12 全部页面用 Mock 数据完成（Mock 格式对齐 api-contracts）</li>
-<li>验收（用户门禁）：布局/配色/交互与原型一致</li>
-</ol>
-<p><strong>阶段2：后端基础设施（自动连续执行，不触发用户门禁）</strong></p>
-<ol>
-<li>按拆分指南 S7 初始化多模块骨架 + 统一响应/异常（Result/BizException + i18n）+ DB 连接（不建表）+ 鉴权拦截器；B01 单据编码组件（依赖 doc_no_sequence 已建）</li>
-<li>验收（Agent 自动）：<code>$MVN -q verify</code> 通过、<code>/actuator/health</code> UP</li>
-</ol>
-<p><strong>阶段3：逐功能闭环开发（每个功能完成后触发用户门禁）</strong></p>
-<ol>
-<li>业务依赖顺序：结算基础配置 → 服务商索赔单 → 向欣旺达索赔单 → 结算链 → 付款申请链</li>
-<li>每个功能 = 后端真实 API + 前端 Mock 切真实 + 联调验收</li>
-<li>验收（用户门禁）：用户从前端页面操作验证功能可用</li>
-</ol>
-<p><strong>阶段4：E2E 回归测试</strong></p>
-<ol>
-<li>完整流程走通（新建索赔 → 初审 → 业务审核 →（向欣/判责）→ 结算 → 付款）</li>
-<li>验收（用户门禁）：全流程通过，无阻塞性 Bug</li>
-</ol></div>
-<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.1 · 本页由产物渲染生成</p></main><script>
+<p><strong>阶段1 前端 MVP（Mock）</strong>：P01/P02 用 Mock 完成 → 用户验收 UI/UX。</p>
+<p><strong>阶段2 后端基础设施（自动连续）</strong>：多模块骨架 + Result/异常 + DB 连接（不建表）+ 鉴权；B01 编码组件（依赖 doc_no_sequence 已建）→ <code>$MVN -q verify</code> + /actuator/health UP。</p>
+<p><strong>阶段3 逐功能闭环</strong>：F-CLAIM-01 新建 → 02 提交 → 06 区域初审 → 07 业务审核 → 08 判责 →（03 编辑/04 作废/05 查看/09 搜索/10 批量）；每功能=后端真实 API + 前端切真实 + 联调验收。</p>
+<p><strong>阶段4 E2E 回归</strong>：新建→初审→业务审核→判责 全流程走通。</p></div>
+<p class="doc-note">SDD V8 · 服务商索赔管理模块 · 冻结 v1.2 · 本页由产物渲染生成</p></main><script>
 (function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();
 (function(){document.querySelectorAll('a[data-back]').forEach(function(a){a.addEventListener('click',function(e){try{if(history.length>1&&document.referrer&&new URL(document.referrer).origin===location.origin){e.preventDefault();history.back();}}catch(err){}});});})();
 (function(){if('scrollRestoration' in history)history.scrollRestoration='manual';var key='sdd-scroll:'+location.pathname;if(!location.hash){try{var y=sessionStorage.getItem(key);if(y!==null){var r=document.documentElement,p=r.style.scrollBehavior;r.style.scrollBehavior='auto';window.scrollTo(0,parseInt(y,10)||0);r.style.scrollBehavior=p;}}catch(e){}}var t=null;window.addEventListener('scroll',function(){if(t)return;t=setTimeout(function(){t=null;try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}},150);},{passive:true});window.addEventListener('beforeunload',function(){try{sessionStorage.setItem(key,String(window.scrollY));}catch(e){}});})();

@@ -4,7 +4,7 @@
 > 冻结版本：v1.0｜冻结 commit：88ed0f850780e2f012229395c4fa6d109c2d04b7
 > 来源：docs/PRD.md、docs/Plan.md、docs/api-contracts/接口文档-服务商索赔单.md（S2.8/S2.9）、docs/detail-design/详细设计-服务商索赔单.md（第九节）、docs/db-schema/表结构文档.md + ddl/supplier-claim-mgmt.sql、docs/test-cases/测试用例.xlsx（TC018/TC019）、docs/conventions.md、docs/feature-signoff.md
 >
-> **本轮范围声明（最小场景验证）**：本轮 Orchestrator 明确只对 **F-CLAIM-05 查看**（服务商索赔单详情 + 分页列表）生成实现任务。其余 26 个功能点本轮不开发，登记在本文件末尾「本轮不开发（pass）」一节，保留可溯性，不排任何实现任务。
+> **本轮范围声明（最小场景验证）**：本轮 Orchestrator 明确只对 **F-CLAIM-05 查看**（服务商索赔单详情 + 分页列表）生成实现任务。其余功能点本轮不开发，登记在本文件末尾「本轮不开发（pass）」一节，保留可溯性，不排任何实现任务。
 
 ## 外部服务
 
@@ -243,7 +243,7 @@
 
 ## 本轮不开发（pass）
 
-> 以下 26 个功能点已在 `docs/feature-signoff.md` 冻结确认（v1.0），但本轮 Orchestrator 明确只做 F-CLAIM-05 最小场景验证，其余功能点本轮 **不排任何实现任务**，登记状态 `pass / 超范围`，保留可溯性，待后续轮次按 Plan.md 开发顺序建议逐个排入。
+> 以下 9 个 F-CLAIM 功能点（减法后仅存索赔单模块）本轮不开发，但本轮 Orchestrator 明确只做 F-CLAIM-05 最小场景验证，其余功能点本轮 **不排任何实现任务**，登记状态 `pass / 超范围`，保留可溯性，待后续轮次按 Plan.md 开发顺序建议逐个排入。
 
 | 功能编码 | 功能名称 | 权威设计来源 | 状态 |
 |---|---|---|---|
@@ -256,20 +256,3 @@
 | F-CLAIM-08 | 责任判定 | detail-design 第八节 / api-contracts S2.7 | pass / 超范围 |
 | F-CLAIM-09 | 搜索/导出 | api-contracts（列表筛选/导出） | pass / 超范围 |
 | F-CLAIM-10 | 批量审核 | api-contracts（批量审核） | pass / 超范围 |
-| F-XW-01 | 向欣单生成 | 详细设计-向欣旺达索赔单.md | pass / 超范围 |
-| F-XW-02 | 提交/审批 | 详细设计-向欣旺达索赔单.md | pass / 超范围 |
-| F-XW-03 | 查看/导出 | 详细设计-向欣旺达索赔单.md | pass / 超范围 |
-| F-SET-01 | 自动生成结算单 | 详细设计-结算.md | pass / 超范围 |
-| F-SET-02 | 结算确认/对账 | 详细设计-结算.md | pass / 超范围 |
-| F-SET-03 | 正数结算-开票 | 详细设计-结算.md | pass / 超范围 |
-| F-SET-04 | 发票核验/申请付款 | 详细设计-结算.md | pass / 超范围 |
-| F-SET-05 | 负数结算-强制结算 | 详细设计-结算.md | pass / 超范围 |
-| F-SET-06 | 闪欣结算 | 详细设计-结算.md | pass / 超范围 |
-| F-SET-07 | 查询/导出 | 详细设计-结算.md | pass / 超范围 |
-| F-PAY-01 | 付款申请生成 | 详细设计-付款申请.md | pass / 超范围 |
-| F-PAY-02 | 提交/分级审批 | 详细设计-付款申请.md | pass / 超范围 |
-| F-PAY-03 | 审批/驳回 | 详细设计-付款申请.md | pass / 超范围 |
-| F-PAY-04 | 付款/作废 | 详细设计-付款申请.md | pass / 超范围 |
-| F-PAY-05 | 查询/导出/批量审核 | 详细设计-付款申请.md | pass / 超范围 |
-| F-CFG-01 | 结算基础配置 | 结算配置接口（P12） | pass / 超范围 |
-| F-CODE-01 | 单据编码（跨单据） | 详细设计-单据编码.md | pass / 超范围 |
