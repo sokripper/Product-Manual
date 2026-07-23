@@ -177,6 +177,12 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 .guide-shot img{display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:11px; background:var(--surface)}
 .guide-shot figcaption{margin-top:7px; color:var(--muted); font-size:12.5px; text-align:center}
 .prompt-parts td:first-child{font-weight:650; white-space:nowrap}
+.purchase-card{display:grid; grid-template-columns:minmax(0,1fr) 270px; gap:24px; align-items:center; border:1px solid var(--line); border-radius:14px; background:var(--surface); padding:22px; margin:18px 0}
+.purchase-card h3{margin-top:0}
+.purchase-card ul{padding-left:20px; color:var(--muted); font-size:13.5px}
+.purchase-card li{margin:7px 0}
+.purchase-card img{display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:11px}
+.purchase-card .contact{font-family:var(--mono); font-size:11.5px; color:var(--muted); text-align:center; margin-top:8px}
 
 /* ---------- gate list ---------- */
 .gates{counter-reset:g; list-style:none; padding:0; margin:16px 0; display:grid; gap:8px}
@@ -198,6 +204,8 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
   .hero h1{font-size:30px}
   .pipe .lane{grid-template-columns:88px 1fr}
   .howgrid{grid-template-columns:1fr}
+  .purchase-card{grid-template-columns:1fr}
+  .purchase-card img{max-width:300px; margin:0 auto}
 }
 </style>
 </head>
@@ -233,6 +241,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
     <a href="#gates">门禁与硬规则</a>
     <a href="#howto">常见操作手册</a>
     <a href="#exp">三级经验 · 技术栈</a>
+    <a href="#purchase">Codex 购买渠道</a>
   </nav>
   <button class="themebtn" id="themebtn" type="button">◐ 切换深浅色</button>
 </aside>
@@ -828,6 +837,29 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
   <div class="note"><b>闭环：</b>进入开发时 Orchestrator 先读系统经验，挑出相关教训随任务传给 Planner（回读环）；Tester FAIL 时若发现跨项目通用问题，回传系统经验（写回环）。经验可上升，但必须带证据 + 人确认。</div>
   <h3>技术栈支持边界</h3>
   <div class="note warn"><b>研发侧自动开发循环只支持默认栈：</b>后端 JDK 17 / Spring Boot 3 / MyBatis-Plus / Maven（MySQL 8 或 PostgreSQL）；前端 React + TypeScript + Vite（桌面 Ant Design，H5/PWA Ant Design Mobile）。其他栈（Python/Go/Vue/原生移动端/纯 CLI）可<b>导入纳管</b>但<b>不进自动开发循环</b>。原生 App / React Native / Flutter / uni-app / 小程序不在默认支持范围。</div>
+</section>
+
+<!-- ===== PURCHASE ===== -->
+<section id="purchase">
+  <h2><span class="idx">采购</span>Codex 购买渠道</h2>
+  <p class="sub">供内部产品与研发人员采购或扩充 Codex 额度时参考。</p>
+  <div class="purchase-card">
+    <div>
+      <h3>产品/高频用户建议优先选择 5× 额度</h3>
+      <p>OpenAI 当前 Pro 套餐提供相对 Plus 的 5× 或 20× Codex 使用上限。产品经理、研发组长等需要持续跑完整 SDD 流程的用户，建议先申请 <b>Pro 5× 档</b>；只有实际使用仍不足时再评估 20×。</p>
+      <ul>
+        <li><b>优先官方订阅：</b><a href="https://chatgpt.com/explore/pro?utm_internal_source=openai_developers_codex" target="_blank" rel="noopener">ChatGPT Pro 官方购买页</a>。</li>
+        <li><b>内部采购咨询：</b>可扫描右侧二维码联系 AI chat（浙江杭州）；该联系人为第三方渠道，<b>非 OpenAI 官方</b>。</li>
+        <li><b>账号归属：</b>一人一号，尽量绑定购买人或公司可控邮箱；交付后立即修改密码并开启 MFA，禁止多人共享账号。</li>
+        <li><b>采购确认：</b>下单前确认 5×/20× 档位、账号找回方式、续费、售后、退款和票据，并按公司内部采购与安全流程审批。</li>
+      </ul>
+      <div class="note warn"><b>额度说明：</b>5× 是相对 Plus 的使用上限档位，不代表固定任务数或固定 Token。实际价格、可用模型和限额以购买时的 <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">OpenAI Codex Pricing</a> 页面为准。</div>
+    </div>
+    <div>
+      <img src="assets/codex/purchase-channel-ai-chat.jpg" alt="内部 Codex 采购咨询联系人 AI chat 的微信二维码">
+      <div class="contact">扫码添加 · AI chat · 浙江杭州</div>
+    </div>
+  </div>
 </section>
 
 <footer class="footer">
