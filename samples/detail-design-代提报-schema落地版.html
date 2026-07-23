@@ -125,7 +125,7 @@ tbody tr:nth-child(even){background:var(--zebra)}
 <li><strong>反向发现 PRD 的错</strong>：OP vs EO（M1）、ASSIGN_TYPE=12 不在枚举（M2）、SUMMIT_TIME 拼写（M3）——这些是<strong>光看 PRD 永远发现不了、只有对上真实 schema 才暴露</strong>的坑。这正是详细设计阶段该拦下的。</li>
 </ol>
 <p><strong>唯一还需要的</strong>：代提报那套"资源匹配 + 五表级联"的服务层原始代码（不在这 10 个实体里，在 service 类），拿到后连"匹配顺序、边界条件"也能 100% 复刻；没有它，我现在已能把字段级写到位，匹配算法引用既有逻辑并标注。</p>
-<p class="doc-note">本页由 SDD V8 使用手册渲染 · 源文件 docs/samples/detail-design-代提报-schema落地版.md · 内容为真实生成产物样例</p>
+<p class="doc-note">本页由 SDD_V8_4 使用手册渲染 · 源文件 docs/samples/detail-design-代提报-schema落地版.md · 内容为真实生成产物样例</p>
 </main>
 <script>
 (function(){var b=document.getElementById('tb');if(b)b.addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');if(!c)c=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';r.setAttribute('data-theme',c==='dark'?'light':'dark');});})();

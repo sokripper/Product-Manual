@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SDD V8 使用手册</title>
+<title>SDD_V8_4 使用手册</title>
 <style>
 :root{
   --bg:#f5f7fa; --surface:#ffffff; --surface-2:#fbfcfe; --ink:#12161c; --muted:#5b6673; --faint:#8a95a3;
@@ -165,6 +165,18 @@ td code{white-space:nowrap}
 /* ---------- code example ---------- */
 pre{background:var(--code-bg); border:1px solid var(--line); border-radius:11px; padding:15px 17px; overflow-x:auto; margin:14px 0}
 pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-height:1.62}
+.promptbox{position:relative; margin:14px 0 20px}
+.promptbox pre{margin:0; padding:42px 17px 16px; white-space:pre-wrap}
+.copybtn{position:absolute; z-index:1; top:8px; right:8px; border:1px solid var(--line); border-radius:6px; padding:5px 9px; background:var(--surface); color:var(--muted); font:11px var(--mono); cursor:pointer}
+.copybtn:hover{color:var(--accent); border-color:var(--accent)}
+.howgrid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0}
+.howcard{border:1px solid var(--line); border-radius:11px; background:var(--surface); padding:14px 16px}
+.howcard b{display:block; font-size:13.5px; margin-bottom:4px}
+.howcard p{font-size:12.5px; color:var(--muted); margin:0}
+.guide-shot{margin:15px 0 24px}
+.guide-shot img{display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:11px; background:var(--surface)}
+.guide-shot figcaption{margin-top:7px; color:var(--muted); font-size:12.5px; text-align:center}
+.prompt-parts td:first-child{font-weight:650; white-space:nowrap}
 
 /* ---------- gate list ---------- */
 .gates{counter-reset:g; list-style:none; padding:0; margin:16px 0; display:grid; gap:8px}
@@ -185,6 +197,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
   .main{padding:0 22px 100px}
   .hero h1{font-size:30px}
   .pipe .lane{grid-template-columns:88px 1fr}
+  .howgrid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -195,7 +208,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <aside class="sidebar">
   <div class="brand">
     <div class="logo"></div>
-    <div><b>SDD V8</b><span>USER MANUAL</span></div>
+    <div><b>SDD_V8_4</b><span>USER MANUAL</span></div>
   </div>
   <nav class="nav" id="nav">
     <a href="supplier-claim-mgmt/index.html" style="color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);font-weight:600">⌘ 真实案例产物站 →</a>
@@ -228,9 +241,9 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <main class="main">
 
 <header class="hero" id="top">
-  <div class="eyebrow">Spec-Driven Development · V8</div>
+  <div class="eyebrow">Spec-Driven Development · SDD_V8_4</div>
   <h1>把需求做实、逐条冻结，<br>再让 AI 只读实现。</h1>
-  <p class="lede">SDD V8 是一套<b>项目管理型、多平台 AI 研发流水线</b>。它把工作切成两侧接力——产品侧负责设计并冻结，研发侧拿冻结合同只读实现，独立审计员全程抓幻觉。<b>人拍板，Agent 执行，门禁把关。</b></p>
+  <p class="lede">SDD_V8_4 是一套<b>项目管理型、多平台 AI 研发流水线</b>。默认从用户上传的半成品 PRD 开始审计、补齐和设计延展；低频场景也保留从零生成 PRD 初稿的入口。产品侧负责设计并冻结，研发侧拿冻结合同只读实现。<b>人拍板，Agent 执行，门禁把关。</b></p>
   <div class="pillrow">
     <span class="pill">三端入口 · <b>Codex / Claude Code / Cursor</b></span>
     <span class="pill">默认栈 · <b>Spring Boot 3 + React/TS</b></span>
@@ -243,7 +256,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <section id="intro">
   <h2><span class="idx">01</span>定位与核心概念</h2>
   <p class="sub">先搞懂这几个词，后面全流程就顺了。</p>
-  <div class="note"><b>V5 是"项目内的开发规范包"，V8 是"管理多个项目的 AI 研发流水线"。</b> 它先管理项目仓库 <code>Projects_Repo/</code>，再按你的意图进入六大分支之一，然后在单个项目里跑完整的产品设计→多 Agent 开发→测试→修复流水线。</p>
+  <div class="note"><b>V5 是“项目内的开发规范包”，SDD_V8_4 是“管理多个项目的 AI 研发流水线”。</b> 它先管理项目仓库 <code>Projects_Repo/</code>，再按你的意图进入六大分支之一，然后跑完整的 PRD 审计与延展→产品设计→多 Agent 开发→测试→修复流水线。</div>
   <div class="tablewrap"><table>
     <thead><tr><th>概念</th><th>含义</th></tr></thead>
     <tbody>
@@ -263,11 +276,12 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <!-- ===== START ===== -->
 <section id="start">
   <h2><span class="idx">02</span>快速上手 · 你只需要说人话</h2>
-  <p class="sub">SDD V8 几乎不用手动命令。你用自然语言表达意图，Router 自动分发到六大分支。</p>
+  <p class="sub">SDD_V8_4 几乎不用手动命令。你用自然语言表达意图，Router 自动分发到六大分支。</p>
   <div class="tablewrap"><table>
     <thead><tr><th>你想做的事</th><th>你可以这么说</th><th>进入的分支</th></tr></thead>
     <tbody>
-      <tr><td>从零做个新应用</td><td>"新建项目 / 做一个 XX 系统 / 从零开始"</td><td>① 新建项目</td></tr>
+      <tr><td><b>基于半成品 PRD 启动（默认）</b></td><td>“我上传了 PRD，请基于它启动 SDD”</td><td>① 新建项目 · PRD 审计与延展</td></tr>
+      <tr><td>只有想法、没有 PRD（低频）</td><td>“我还没有 PRD，请从零帮我梳理”</td><td>① 新建项目 · PRD 初稿生成</td></tr>
       <tr><td>改已有项目的设计</td><td>"改需求 / 加个功能的设计 / 调整接口契约"</td><td>② 设计修整</td></tr>
       <tr><td>把老代码纳入管理</td><td>"把这个已有项目接入 SDD / 导入代码库"</td><td>③ 导入项目</td></tr>
       <tr><td>不要某个项目了</td><td>"删除项目 / 这个项目不要了"</td><td>④ 删除项目</td></tr>
@@ -286,8 +300,8 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
     <div class="lane">
       <div class="who"><b>产品经理</b><span>Product</span></div>
       <div class="steps">
-        <span class="node"><span class="k">R</span>需求澄清·竞品调研</span><span class="arrow">→</span>
-        <span class="node"><span class="k">A</span>PRD初稿·数据契约</span>
+        <span class="node"><span class="k">R</span>读取PRD·需求澄清</span><span class="arrow">→</span>
+        <span class="node"><span class="k">A</span>PRD审计补全·数据契约</span>
         <span class="node audit"><span class="k">A0.5</span>需求盲扫审计</span><span class="arrow">→</span>
         <span class="node"><span class="k">B1</span>Design Spec</span><span class="arrow">→</span>
         <span class="node"><span class="k">B2</span>原型·用户验收</span><span class="arrow">→</span>
@@ -326,7 +340,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <!-- ===== ROLES ===== -->
 <section id="roles">
   <h2><span class="idx">04</span>角色区分 · 人 + Agent</h2>
-  <p class="sub">SDD V8 不是一个角色端到端跑完。它把工作切成"人负责拍板、Agent 负责执行"。</p>
+  <p class="sub">SDD_V8_4 不是一个角色端到端跑完。它把工作切成"人负责拍板、Agent 负责执行"。</p>
   <h3>人侧角色</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>角色</th><th>负责什么</th><th>在哪拍板</th></tr></thead>
@@ -359,7 +373,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 
   <div class="casebar">
     <div class="ic"></div>
-    <div class="tx"><b>贯穿案例 · 服务商索赔管理模块</b><p>一个走完 A0~G 全流程、设计冻结 v1.2（索赔单聚焦）的真实 V8 项目（本期只保留服务商索赔单 · 10 功能点、78 测试用例）。研发侧已跑通最小场景 F-CLAIM-05（列表+详情）的前后端闭环。下文每个节点的「真实产物」都来自它。</p></div>
+    <div class="tx"><b>贯穿案例 · 服务商索赔管理模块</b><p>一个走完 A0~G 全流程、设计冻结 v1.2（索赔单聚焦）的真实 SDD_V8_4 项目（本期只保留服务商索赔单 · 10 功能点、78 测试用例）。研发侧已跑通最小场景 F-CLAIM-05（列表+详情）的前后端闭环。下文每个节点的「真实产物」都来自它。</p></div>
     <a class="go" href="supplier-claim-mgmt/index.html">打开案例产物站 →</a>
   </div>
   <p class="sub" style="margin-top:14px">另注：阶段 D 还额外保留了几份跨项目的<b>标杆/压测样例</b>（经销商新能源订单、整车市场活动管理），用于对照"一份合格 LLD 的颗粒度"。</p>
@@ -368,7 +382,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
   <div class="stage" id="stage-r">
     <div class="head"><span class="code">R</span><h4>需求澄清 + 竞品调研</h4><span class="role">主会话 · 产品经理拍板</span></div>
     <div class="body">
-      <p>把用户的大段想法整理成清晰的业务目标、范围、场景、验收口径；调研竞品；沉淀视觉证据。</p>
+      <p>默认先读取用户上传的半成品 PRD，识别已明确的业务目标、范围、场景和验收口径，再集中澄清缺口、矛盾与假设；调研竞品并沉淀视觉证据。只有用户明确没有 PRD 时，才从口述想法开始梳理。</p>
       <div class="kv"><span class="t">产出</span><span>需求澄清结论（一般合并进 PRD，不单独建文件）；大功能落 <code>docs/澄清文档/&lt;feature&gt;/01-alignment.md</code></span></div>
       <a class="realart sample" href="samples/整车市场活动管理-产品补充需求清单.html"><span class="lead">样例产物</span>跨项目样例 · 整车市场活动管理-产品补充需求清单<span class="arw">→</span></a>
     </div>
@@ -376,11 +390,11 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 
   <!-- A -->
   <div class="stage" id="stage-a">
-    <div class="head"><span class="code">A</span><h4>PRD 初稿 + 数据契约 + 外部依赖</h4><span class="role">主会话 · 产品经理拍板</span></div>
+    <div class="head"><span class="code">A</span><h4>PRD 审计与补全 + 数据契约 + 外部依赖</h4><span class="role">主会话 · 产品经理拍板</span></div>
     <div class="body">
-      <p>产出 PRD 初稿（A1→A5），核心是<b>数据契约确认清单</b>和<b>接口响应格式契约</b>；A5-3 登记所有外部依赖（LLM/支付/短信/对象存储等供应商、密钥来源、配置字段）。</p>
+      <p>默认保留半成品 PRD 的原意和可追溯结构，先做 A0.5 盲审，再补齐 A1→A5 缺失内容；核心是<b>数据契约确认清单</b>和<b>接口响应格式契约</b>。只有用户明确没有 PRD 时，才从零生成初稿并接回同一流程。</p>
       <div class="kv"><span class="t">产出</span><span><code>docs/PRD.md</code>（含完整数据契约章节）</span></div>
-      <div class="audit-tag">A0.5 独立审计 · 用户提供既有 PRD 时触发，BLIND 盲扫抓假确认点与真矛盾</div>
+      <div class="audit-tag">A0.5 独立审计 · 半成品 PRD 默认触发，BLIND 盲扫抓假确认点与真矛盾</div>
       <a class="realart" href="supplier-claim-mgmt/设计文档/PRD.html"><span class="lead">真实产物</span>服务商索赔管理 · PRD（含数据契约确认清单 + 外部依赖登记）<span class="arw">→</span></a>
       <div class="deliv">
         <div class="lbl">PRD 数据契约片段示例</div>
@@ -598,7 +612,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
   <div class="tablewrap"><table>
     <thead><tr><th>阶段</th><th>产出物</th><th>路径</th><th>谁产</th><th>谁审</th></tr></thead>
     <tbody>
-      <tr><td>A</td><td>PRD</td><td><code>docs/PRD.md</code></td><td>产品/主会话</td><td>A0.5</td></tr>
+      <tr><td>A</td><td>PRD 审计与补全（低频：初稿生成）</td><td><code>docs/PRD.md</code></td><td>产品/主会话</td><td>A0.5</td></tr>
       <tr><td>B2</td><td>原型</td><td><code>docs/prototypes/</code></td><td>主会话</td><td>用户验收</td></tr>
       <tr><td>D</td><td>详细设计 LLD</td><td><code>docs/detail-design/</code></td><td>主会话</td><td><b>D3.5</b></td></tr>
       <tr><td>D</td><td>表结构+建表SQL</td><td><code>docs/db-schema/</code></td><td>组长审定</td><td>D3.5</td></tr>
@@ -645,10 +659,138 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <!-- ===== HOWTO ===== -->
 <section id="howto">
   <h2><span class="idx">09</span>常见操作手册</h2>
+  <p class="sub">下面以 Codex 桌面端为例，给出从打开 Harness、输入需求、回复门禁到审查并推送代码的完整操作方式。Claude Code / Cursor 仍可使用前面的自然语言入口。</p>
+
+  <h3>首次使用：在 Codex 中挂载 SDD_V8_4</h3>
+  <p>SDD_V8_4 是一套本地 Harness。第一次使用时，要先把解压后的 SDD_V8_4 文件夹作为现有项目挂载到 Codex。完成一次后，后续直接在左侧 Projects 中进入该项目并新建任务即可。</p>
+  <ol class="gates">
+    <li>点击左上角模式菜单，确认当前选择的是 <b>Codex</b>，不是 ChatGPT。</li>
+    <li>点击左侧 <b>New chat</b> 新建任务。</li>
+    <li>点击输入框上方的 <b>Choose project</b>。</li>
+    <li>选择 <b>New project → Use an existing folder</b>，不要选择 Start from scratch。</li>
+    <li>在文件选择器中选中解压后的 <b>SDD_V8_4</b> 文件夹，然后点击 <b>Open</b>。</li>
+  </ol>
+
+  <figure class="guide-shot">
+    <img src="assets/codex/01-select-codex-mode.png" alt="步骤一：在左上角模式菜单中选择 Codex">
+    <figcaption>步骤一 · 选择 Codex 模式</figcaption>
+  </figure>
+  <figure class="guide-shot">
+    <img src="assets/codex/02-new-chat-choose-project.png" alt="步骤二和三：点击 New chat，再点击 Choose project">
+    <figcaption>步骤二、三 · 新建任务并点击 Choose project</figcaption>
+  </figure>
+  <figure class="guide-shot">
+    <img src="assets/codex/03-use-existing-folder.png" alt="步骤四：从 New project 菜单选择 Use an existing folder">
+    <figcaption>步骤四 · 选择 Use an existing folder</figcaption>
+  </figure>
+  <figure class="guide-shot">
+    <img src="assets/codex/04-select-sdd-folder.png" alt="步骤五：选择解压后的 SDD_V8_4 文件夹并打开">
+    <figcaption>步骤五 · 选择 SDD_V8_4 文件夹并点击 Open</figcaption>
+  </figure>
+  <div class="note warn"><b>不要挂载业务项目子目录。</b>应挂载包含 <code>harness-core/</code>、<code>.codex/</code> 和 <code>Projects_Repo/</code> 的 SDD_V8_4 根目录。挂载后，业务项目仍由 SDD 在 <code>Projects_Repo/</code> 中统一管理。</div>
+
+  <h3>用 Codex 跑 SDD：先记住这 5 件事</h3>
+  <div class="howgrid">
+    <div class="howcard"><b>1 · 打开 Harness 根目录</b><p>Codex 的工作目录必须是 SDD_V8_4 根目录，不要只打开某个业务项目子目录。</p></div>
+    <div class="howcard"><b>2 · 一个任务一个明确角色</b><p>产品经理、研发组长、研发执行建议分别开新任务；至少要用新的用户消息明确交接身份。</p></div>
+    <div class="howcard"><b>3 · 默认先上传半成品 PRD</b><p>让 Codex 从材料中识别项目名称、目标、范围和功能点；用户只补材料里没有的信息。</p></div>
+    <div class="howcard"><b>4 · 门禁回复写清结论</b><p>分开写确认项、修改项和待确认项。角色交接时只说“继续 / 可以”不算接棒。</p></div>
+    <div class="howcard"><b>5 · 提交前先审查</b><p>先让 Codex 报告 diff、测试结果和风险；你确认后再 commit / push。</p></div>
+  </div>
+
+  <div class="note"><b>提示词统一骨架：</b>Codex 官方建议复杂任务交代目标、上下文、约束和完成标准。下面的模板已把这些内容预置好，用户通常只需上传 PRD，再补一句特别要求；不要求逐项填写四要素。</div>
+  <div class="tablewrap"><table class="prompt-parts">
+    <thead><tr><th>要素</th><th>在 SDD 里写什么</th></tr></thead>
+    <tbody>
+      <tr><td>目标 Goal</td><td>模板预置为 PRD 审计与延展、续做、开发、变更、Bugfix 或导入</td></tr>
+      <tr><td>上下文 Context</td><td>优先由 Codex 从上传的 PRD、截图、日志和仓库状态中识别</td></tr>
+      <tr><td>约束 Constraints</td><td>角色边界、冻结保护、不可猜测项、技术栈或时间范围</td></tr>
+      <tr><td>完成标准 Done when</td><td>模板预置当前门禁和停止条件，用户只需确认或纠正</td></tr>
+    </tbody>
+  </table></div>
+  <h3>第一次进入：先做环境与路由自检</h3>
+  <p>新开 Codex 任务后先发送下面这段。它只确认环境，不应直接生成业务代码。</p>
+  <div class="promptbox"><pre><code>请先确认当前工作目录是 SDD_V8_4 Harness 根目录，并读取仓库中的 Codex/SDD 入口规则与 harness-core/router.md。
+
+请只报告：
+1. 是否识别到 Harness 根目录；
+2. 当前活动项目及其阶段（没有则明确说没有）；
+3. 我接下来可以进入的 SDD 分支；
+4. 当前存在的阻塞或缺失材料。
+
+本轮不要创建项目、不要修改文件、不要开始开发。</code></pre></div>
+  <h3>标准流程提示词：从半成品 PRD 到交付</h3>
+
+  <h4>1）默认入口：上传半成品 PRD 并启动</h4>
+  <div class="promptbox"><pre><code>请基于我上传的 PRD 启动 SDD_V8_4。
+
+可选补充：[没有可删掉这一行]
+
+请先从 PRD 中识别项目名称、目标用户、业务目标、范围和功能点，不要让我重复填写材料里已经有的内容。保留原文意图，先做需求审计与缺口分析；事实、假设、矛盾和待确认项分开列出，无法确认的内容集中问我。不要从零重写整份 PRD，未经我确认当前门禁不要进入下一阶段，也不要开始写业务代码。</code></pre></div>
+
+  <h4>2）低频入口：只有想法、还没有 PRD</h4>
+  <p>原来的 PRD 生成流程仍保留，但只在用户明确没有任何 PRD 时使用：</p>
+  <div class="promptbox"><pre><code>我目前没有 PRD，只有下面这个想法，请按 SDD_V8_4 从阶段 R 开始梳理：
+
+[用一两句话描述想法]
+
+请先通过提问确认目标、用户和范围，再生成 PRD 初稿。事实、假设和待确认项必须分开；未经我确认当前门禁，不要进入下一阶段，也不要开始写业务代码。</code></pre></div>
+
+  <h4>3）补充其它附件或强调重点</h4>
+  <div class="promptbox"><pre><code>这些附件也是当前 PRD 的补充材料，请一起读取。重点关注：[没有可删掉]。
+
+请提取可以直接确认的事实；推断内容单独标记为“假设”；冲突、缺失或看不清的内容进入待确认清单。先给我材料解读摘要和待确认项，不要直接跨过当前门禁。</code></pre></div>
+  <h4>4）回复阶段门禁</h4>
+  <div class="promptbox"><pre><code>阶段 [R/A/B1/B2/C/D/E/F/G] 的门禁结论如下：
+
+确认通过：
+- [已确认项]
+
+需要修改：
+- [修改项 + 正确结论]
+
+仍待确认：
+- [暂时不能拍板的项]
+
+请只更新本阶段受影响的产物，给出修改摘要和新的门禁检查结果。仍待确认项未清零前不要进入下一阶段。</code></pre></div>
+  <h4>5）换任务继续产品设计</h4>
+  <div class="promptbox"><pre><code>继续 [项目名 / project_id] 的设计。我现在以产品经理身份接手。
+
+请先读取项目状态、已有产物和最近一次门禁记录，告诉我：当前阶段、已完成项、待确认项、下一步动作。不要重做已确认阶段；恢复上下文后停下来等我确认再继续。</code></pre></div>
+
+  <h4>6）产品交接后，由研发组长显式接棒</h4>
+  <p>产品经理完成交接后，<b>建议新开一个 Codex 任务</b>，再发送：</p>
+  <div class="promptbox"><pre><code>以研发组长身份接手 [项目名 / project_id]，从产品交接点继续设计。
+
+请先核验已有 PRD、原型、条件触发的详细设计和当前状态，只从 SDD 允许的下一阶段继续。按顺序完成 E 接口契约、E2 独立审计、F 开发计划、G 测试用例、G-audit 和 feature-signoff 冻结；每道用户门禁都要停下来等我确认，不要在本轮进入研发实现。</code></pre></div>
+
+  <h4>7）设计冻结后开始开发</h4>
+  <p>冻结完成后，<b>建议再开一个 Codex 新任务</b>：</p>
+  <div class="promptbox"><pre><code>开始开发 [项目名 / project_id]。我现在以研发执行方身份接手。
+
+请先校验 feature-signoff 冻结合同和全部开发门禁。设计文档只读，发现缺陷必须停止并报告，不能在研发侧私自修改。
+
+门禁通过后，先由 Planner 读取 Plan、测试用例和项目经验，生成或恢复 .sdd/tasks.md，并把任务顺序、验收标准和风险给我确认。未经我确认任务清单，不要开始写功能代码。后续按 Developer → Tester 的独立循环逐任务推进。</code></pre></div>
+
+  <h4>8）换任务继续开发</h4>
+  <div class="promptbox"><pre><code>继续开发 [项目名 / project_id]。请读取 .sdd/tasks.md、最近测试报告、未提交改动和项目经验恢复上下文。
+
+先报告已完成任务、当前未完成任务、上次失败证据和下一步；从第一个未完成任务继续，不重跑产品设计，不修改冻结文档。每个任务必须经过独立测试并留下可复现证据。</code></pre></div>
+
+  <h4>9）交付前检查、commit 和 push</h4>
+  <div class="promptbox"><pre><code>请做本轮交付检查：
+1. 检查 git diff，确认没有误改冻结文档或无关文件；
+2. 运行与改动范围匹配的测试、构建、lint 和类型检查；
+3. 汇总变更文件、用户可见结果、验证证据和剩余风险；
+4. 先把检查结果和建议的 commit message 给我，不要立即提交或推送。
+
+等我明确确认后，再 commit 并 push 到当前远端分支；push 后返回 commit hash 和远端结果。</code></pre></div>
+  <h3>高频场景速查</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>场景</th><th>怎么做</th></tr></thead>
     <tbody>
-      <tr><td><b>我要新建一个项目</b></td><td>说"新建项目 / 做一个 XX 系统"。进入 <code>sdd-product-design</code>，确认 project_id/name，建目录骨架和 Git，从阶段 R 一路走到冻结。</td></tr>
+      <tr><td><b>我有半成品 PRD，要启动项目（默认）</b></td><td>上传 PRD 后说“请基于这份 PRD 启动 SDD_V8_4”。进入 <code>sdd-product-design</code>，从材料中识别项目身份和已有需求，先审计缺口再按 R→A→…推进。</td></tr>
+      <tr><td><b>我只有想法、还没有 PRD（低频）</b></td><td>说“我还没有 PRD，请从零帮我梳理”。仍进入 <code>sdd-product-design</code>，先提问并生成 PRD 初稿，再接回同一套审计、门禁与冻结流程。</td></tr>
       <tr><td><b>设计做到一半换人接</b></td><td>新会话说"继续 &lt;项目名&gt; 的设计"。走接续入口，跳过空项目检查，由 <code>status.json</code> 自动落到当前阶段。</td></tr>
       <tr><td><b>设计已冻结要写代码</b></td><td>说"开始开发"。进入 <code>sdd-dev-execution</code>，校验冻结合同和开发门禁，通过后 Planner 拆任务→你确认→Developer/Tester 循环。</td></tr>
       <tr><td><b>接手开发到一半的项目</b></td><td>新会话说"继续开发 / 接手"。读 <code>.sdd/tasks.md</code> + 测试报告 + 项目经验恢复上下文，从第一个未完成任务继续，不重跑设计。</td></tr>
@@ -657,6 +799,18 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
       <tr><td><b>导入老代码库</b></td><td>先把代码放到 <code>Projects_Repo/&lt;id&gt;/</code>，再说"导入项目"。只补缺失的 <code>.sdd/</code> 脚手架，反向梳理 PRD/契约/Plan，不覆盖业务文件。</td></tr>
     </tbody>
   </table></div>
+
+  <h3>Bugfix 推荐提示词</h3>
+  <div class="promptbox"><pre><code>/sdd-bugfix [项目名 / project_id]
+
+问题现象：[发生了什么]
+复现步骤：[1、2、3]
+预期结果：[应该怎样]
+实际结果：[现在怎样]
+影响范围：[用户/功能/数据]
+证据：[日志、报错、截图、请求响应]
+
+请先稳定复现并定位根因，再给出最小修复方案。只改代码和必要测试，不修改冻结设计文档；如果根因属于设计缺陷，停止并建议走变更登记。完成标准：复现用例转为通过、相关回归通过、给出验证证据和风险说明。</code></pre></div>
 </section>
 
 <!-- ===== EXP ===== -->
@@ -679,7 +833,7 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
 <footer class="footer">
   <div class="big">一句话总结</div>
   <p>产品侧把设计做实、逐条冻结；研发侧拿冻结合同只读实现；独立审计员全程抓幻觉；三级经验持续进化。<b>人拍板，Agent 执行，门禁把关。</b></p>
-  <p style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:14px">SDD V8 使用手册 · 唯一真相源 harness-core/ · 本页产出物示例链接指向 docs/samples/ 内真实生成产物</p>
+  <p style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:14px">SDD_V8_4 使用手册 · 唯一真相源 harness-core/ · 本页产出物示例链接指向 docs/samples/ 内真实生成产物</p>
 </footer>
 
 </main>
@@ -732,6 +886,24 @@ pre code{background:none; padding:0; color:var(--ink); font-size:12.5px; line-he
     t=setTimeout(function(){ t=null; try{sessionStorage.setItem(key, String(window.scrollY));}catch(e){} }, 150);
   }, {passive:true});
   window.addEventListener('beforeunload', function(){ try{sessionStorage.setItem(key, String(window.scrollY));}catch(e){} });
+})();
+// 常见操作手册：复制提示词
+(function(){
+  var boxes=[].slice.call(document.querySelectorAll('.promptbox'));
+  boxes.forEach(function(box){
+    var code=box.querySelector('code');
+    if(!code) return;
+    var btn=document.createElement('button');
+    btn.type='button'; btn.className='copybtn'; btn.textContent='复制提示词';
+    btn.addEventListener('click',function(){
+      var value=code.textContent;
+      function done(){btn.textContent='已复制'; setTimeout(function(){btn.textContent='复制提示词';},1600);}
+      if(navigator.clipboard && window.isSecureContext){navigator.clipboard.writeText(value).then(done); return;}
+      var ta=document.createElement('textarea'); ta.value=value; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); done();}catch(e){} document.body.removeChild(ta);
+    });
+    box.appendChild(btn);
+  });
 })();
 </script>
 </body>
